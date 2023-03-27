@@ -1,7 +1,7 @@
 [
     {
         "no": 1,
-        "name": "LETUCCE",
+        "name": "letucce",
         "seedlingAge": 21,
         "harvestAge": 50,
         "harvestTime": 1,
@@ -10,7 +10,7 @@
     },
     {
         "no": 2,
-        "name": "ROMAINE",
+        "name": "romaine",
         "seedlingAge": 21,
         "harvestAge": 45,
         "harvestTime": 1,
@@ -19,7 +19,7 @@
     },
     {
         "no": 3,
-        "name": "TOMAT CERI",
+        "name": "tomat ceri",
         "seedlingAge": 21,
         "harvestAge": 70,
         "harvestTime": 40,
@@ -28,7 +28,7 @@
     },
     {
         "no": 4,
-        "name": "TOMAT BEEF",
+        "name": "tomat beef",
         "seedlingAge": 21,
         "harvestAge": 90,
         "harvestTime": 40,
@@ -37,7 +37,7 @@
     },
     {
         "no": 5,
-        "name": "PAPRIKA ",
+        "name": "paprika ",
         "seedlingAge": 30,
         "harvestAge": 75,
         "harvestTime": 65,
@@ -46,7 +46,7 @@
     },
     {
         "no": 6,
-        "name": "KYURI",
+        "name": "kyuri",
         "seedlingAge": 14,
         "harvestAge": 45,
         "harvestTime": 25,
@@ -55,15 +55,25 @@
     },
     {
         "no": 7,
-        "name": "BROKOLI"
+        "name": "brokoli",
+        "seedlingAge": 21,
+        "harvestAge": 65,
+        "harvestTime": 25,
+        "cropAge": 90,
+        "cropProdWeight": 0.25
     },
     {
         "no": 8,
-        "name": "KEMBANG KOL"
+        "name": "kembang kol",
+        "seedlingAge": 21,
+        "harvestAge": 65,
+        "harvestTime": 25,
+        "cropAge": 90,
+        "cropProdWeight": 0.3
     },
     {
         "no": 9,
-        "name": "PAKCHOY",
+        "name": "pakchoy",
         "harvestAge": 45,
         "harvestTime": 1,
         "cropAge": 45,
@@ -71,7 +81,7 @@
     },
     {
         "no": 10,
-        "name": "POLENG",
+        "name": "poleng",
         "harvestAge": 40,
         "harvestTime": 1,
         "cropAge": 40,
@@ -79,7 +89,7 @@
     },
     {
         "no": 11,
-        "name": "NAIBAY",
+        "name": "naibay",
         "harvestAge": 45,
         "harvestTime": 1,
         "cropAge": 45,
@@ -87,97 +97,97 @@
     },
     {
         "no": 12,
-        "name": "DAUN SINGKONG",
+        "name": "daun singkong",
         "harvestAge": 180,
         "cropAge": 360
     },
     {
         "no": 13,
-        "name": "SEREH",
+        "name": "sereh",
         "harvestAge": 150,
         "harvestTime": 1,
         "cropAge": 150
     },
     {
         "no": 14,
-        "name": "ROSMERY",
+        "name": "rosmery",
         "harvestAge": 180
     },
     {
         "no": 15,
-        "name": "DAUN MINT",
+        "name": "daun mint",
         "harvestAge": 120
     },
     {
         "no": 16,
-        "name": "SELADA AIR"
+        "name": "selada air"
     },
     {
         "no": 17,
-        "name": "DAUN KETUMBAR",
+        "name": "daun ketumbar",
         "harvestAge": 60,
         "cropAge": 60,
         "cropProdWeight": 0.02
     },
     {
         "no": 18,
-        "name": "DAUN PUCUK LABU SIAM",
+        "name": "daun pucuk labu siam",
         "harvestAge": 120
     },
     {
         "no": 19,
-        "name": "DAUN BAWANG",
+        "name": "daun bawang",
         "harvestAge": 90,
         "cropAge": 90
     },
     {
         "no": 20,
-        "name": "ROCKET ",
+        "name": "rocket ",
         "harvestAge": 45,
         "cropAge": 45,
         "cropProdWeight": 0.024
     },
     {
         "no": 21,
-        "name": "SELEDRI STIK",
+        "name": "seledri stik",
         "harvestAge": 120,
         "cropAge": 120,
         "cropProdWeight": 0.25
     },
     {
         "no": 22,
-        "name": "SELEDRI SAYUR",
+        "name": "seledri sayur",
         "harvestAge": 90,
         "cropAge": 90
     },
     {
         "no": 23,
-        "name": "KALE HIJAU",
+        "name": "kale hijau",
         "harvestAge": 120,
         "cropAge": 120,
         "cropProdWeight": 0.12
     },
     {
         "no": 24,
-        "name": "BAYAM HIJAU",
+        "name": "bayam hijau",
         "harvestAge": 40,
         "cropAge": 40,
         "cropProdWeight": 0.005
     },
     {
         "no": 25,
-        "name": "KAILAN",
+        "name": "kailan",
         "harvestAge": 40,
         "cropAge": 40
     },
     {
         "no": 26,
-        "name": "JERUK LEMON",
+        "name": "jeruk lemon",
         "harvestAge": 360
     },
     {
         "no": 27,
-        "name": "STRAWBERY",
+        "name": "strawbery",
         "seedlingAge": 240,
         "harvestAge": 130,
         "cropAge": 720,
@@ -185,7 +195,7 @@
     },
     {
         "no": 26,
-        "name": "SELADA ROMAINE",
+        "name": "selada romaine",
         "harvestAge": 35,
         "harvestTime": 1,
         "cropAge": 35,
@@ -193,7 +203,7 @@
     },
     {
         "no": 27,
-        "name": "SELADA KERITING",
+        "name": "selada keriting",
         "harvestAge": 35,
         "harvestTime": 1,
         "cropAge": 35,
@@ -201,7 +211,7 @@
     },
     {
         "no": 28,
-        "name": "LOLOROSA",
+        "name": "lolorosa",
         "harvestAge": 35,
         "harvestTime": 1,
         "cropAge": 35,
@@ -209,7 +219,7 @@
     },
     {
         "no": 29,
-        "name": "SIOMAK",
+        "name": "siomak",
         "harvestAge": 35,
         "harvestTime": 1,
         "cropAge": 35,
@@ -217,7 +227,7 @@
     },
     {
         "no": 30,
-        "name": "BATERHEAD",
+        "name": "baterhead",
         "harvestAge": 45,
         "harvestTime": 1,
         "cropAge": 45,
@@ -225,7 +235,7 @@
     },
     {
         "no": 31,
-        "name": "LETUCCE",
+        "name": "letucce",
         "harvestAge": 45,
         "harvestTime": 1,
         "cropAge": 45,

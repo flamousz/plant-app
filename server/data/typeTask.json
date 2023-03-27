@@ -1,0 +1,35 @@
+[
+    {
+        "name": "persiapan pupuk"
+    },
+    {
+        "name": "pengolahan lahan/media tanam"
+    },
+    {
+        "name": "semai"
+    },
+    {
+        "name": "mencuci"
+    },
+    {
+        "name": "pemindahan media"
+    },
+    {
+        "name": "menguras"
+    },
+    {
+        "name": "pengecekan"
+    },
+    {
+        "name": "sanitasi hidroponik"
+    },
+    {
+        "name": "tanam"
+    },
+    {
+        "name": "perawatan"
+    },
+    {
+        "name": "panen"
+    }
+]

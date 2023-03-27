@@ -1,0 +1,107 @@
+[
+    {
+        "name": "mempersiapkan pupuk (fermentasi)"
+    },
+    {
+        "name": "handtraktor"
+    },
+    {
+        "name": "membuat garitan"
+    },
+    {
+        "name": "membuat lubang tanam"
+    },
+    {
+        "name": "pengaplikasian pupuk"
+    },
+    {
+        "name": "membuat larikan"
+    },
+    {
+        "name": "memasang mulsa"
+    },
+    {
+        "name": "membuat jalan"
+    },
+    {
+        "name": "memotong rockwool"
+    },
+    {
+        "name": "menyemai benih"
+    },
+    {
+        "name": "menyiram"
+    },
+    {
+        "name": "mencuci net pot"
+    },
+    {
+        "name": "mencuci styrofoam"
+    },
+    {
+        "name": "dari baki ke rockwool"
+    },
+    {
+        "name": "memasukan ke net pot"
+    },
+    {
+        "name": "dari net pot ke paralon"
+    },
+    {
+        "name": "dari bekong ke lahan"
+    },
+    {
+        "name": "menguras tandon"
+    },
+    {
+        "name": "menguras bak stainless"
+    },
+    {
+        "name": "mengecek suhu"
+    },
+    {
+        "name": "mengecek ppm"
+    },
+    {
+        "name": "mengecek kondisi tanaman"
+    },
+    {
+        "name": "membersihkan instalasi paralon"
+    },
+    {
+        "name": "menyapu lantai"
+    },
+    {
+        "name": "caplak"
+    },
+    {
+        "name": "tugal"
+    },
+    {
+        "name": "tabur"
+    },
+    {
+        "name": "siram"
+    },
+    {
+        "name": "penyiangan"
+    },
+    {
+        "name": "pestisida"
+    },
+    {
+        "name": "pemberian pupuk susulan"
+    },
+    {
+        "name": "pemberian nutrisi / cor"
+    },
+    {
+        "name": "perompesan daun kering"
+    },
+    {
+        "name": "pemangkasan"
+    },
+    {
+        "name": "pemberian ab mix"
+    }
+]
