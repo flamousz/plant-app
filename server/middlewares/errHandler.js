@@ -22,7 +22,7 @@ async function errHandler(err, req, res, next) {
             break;
     }
 
-    res.status(status).res.json({message})
+    res.status(status).json({message})
 }
 
 module.exports = errHandler
