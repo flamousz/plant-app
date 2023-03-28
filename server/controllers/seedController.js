@@ -1,9 +1,9 @@
-const { Material } = require("../models/index");
+const {Seed} = require('../models/index')
 
-class MaterialController {
-	static async getMaterial(req, res, next) {
+class SeedController{
+    static async getSeed(req, res, next) {
 		try {
-			const data = await Material.findAll({
+			const data = await Seed.findAll({
 				attributes: {
 					exclude: ["createdAt", "updatedAt"],
 				},
@@ -20,14 +20,13 @@ class MaterialController {
 		}
 	}
 
-	static async postMaterial(req, res, next) {
+    static async postSeed(req, res, next) {
 		try {
-			let { name, dose, uom } = req.body;
+			let { name, brand } = req.body;
 
-			let data = await Material.create({
+			let data = await Seed.create({
 				name,
-				dose,
-				uom,
+				brand
 			});
 
 			res.status(201).json(`${data.name} has been added`);
@@ -36,21 +35,20 @@ class MaterialController {
 		}
 	}
 
-	static async putMaterial(req, res, next) {
+    static async putSeed(req, res, next) {
 		try {
 			let { id } = req.params;
-			let { name, dose, uom } = req.body;
-			let findData = await Material.findByPk(id);
+			let { name, brand } = req.body;
+			let findData = await Seed.findByPk(id);
 			if (!findData) {
 				throw {
 					name: "NotFound",
 				};
 			}
-			await Material.update(
+			await Seed.update(
 				{
 					name,
-					dose,
-					uom,
+					brand
 				},
 				{
 					where: { id },
@@ -63,18 +61,18 @@ class MaterialController {
 		}
 	}
 
-    static async deleteMaterial(req, res, next) {
+    static async deleteSeed(req, res, next) {
 		try {
 			const { id } = req.params;
 
-			let findData = await Material.findByPk(id);
+			let findData = await Seed.findByPk(id);
 			if (!findData) {
 				throw {
 					name: "NotFound",
 				};
 			}
 
-			await Material.destroy({
+			await Seed.destroy({
 				where: { id },
 			});
 
@@ -85,4 +83,5 @@ class MaterialController {
 	}
 }
 
-module.exports = MaterialController;
+
+module.exports = SeedController

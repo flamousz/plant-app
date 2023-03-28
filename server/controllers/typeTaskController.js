@@ -1,9 +1,9 @@
-const { Material } = require("../models/index");
+const {TypeTask}=require('../models/index')
 
-class MaterialController {
-	static async getMaterial(req, res, next) {
+class TypeTaskController{
+    static async getTypeTask(req, res, next) {
 		try {
-			const data = await Material.findAll({
+			const data = await TypeTask.findAll({
 				attributes: {
 					exclude: ["createdAt", "updatedAt"],
 				},
@@ -20,14 +20,12 @@ class MaterialController {
 		}
 	}
 
-	static async postMaterial(req, res, next) {
+    static async postTypeTask(req, res, next) {
 		try {
-			let { name, dose, uom } = req.body;
+			let { name } = req.body;
 
-			let data = await Material.create({
+			let data = await TypeTask.create({
 				name,
-				dose,
-				uom,
 			});
 
 			res.status(201).json(`${data.name} has been added`);
@@ -36,21 +34,19 @@ class MaterialController {
 		}
 	}
 
-	static async putMaterial(req, res, next) {
+    static async putTypeTask(req, res, next) {
 		try {
 			let { id } = req.params;
-			let { name, dose, uom } = req.body;
-			let findData = await Material.findByPk(id);
+			let { name } = req.body;
+			let findData = await TypeTask.findByPk(id);
 			if (!findData) {
 				throw {
 					name: "NotFound",
 				};
 			}
-			await Material.update(
+			await TypeTask.update(
 				{
 					name,
-					dose,
-					uom,
 				},
 				{
 					where: { id },
@@ -63,18 +59,18 @@ class MaterialController {
 		}
 	}
 
-    static async deleteMaterial(req, res, next) {
+    static async deleteTypeTask(req, res, next) {
 		try {
 			const { id } = req.params;
 
-			let findData = await Material.findByPk(id);
+			let findData = await TypeTask.findByPk(id);
 			if (!findData) {
 				throw {
 					name: "NotFound",
 				};
 			}
 
-			await Material.destroy({
+			await TypeTask.destroy({
 				where: { id },
 			});
 
@@ -83,6 +79,8 @@ class MaterialController {
 			next(err);
 		}
 	}
+
 }
 
-module.exports = MaterialController;
+
+module.exports=TypeTaskController

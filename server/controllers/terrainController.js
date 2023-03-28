@@ -1,9 +1,9 @@
-const { Material } = require("../models/index");
+const { Terrain } = require("../models/index");
 
-class MaterialController {
-	static async getMaterial(req, res, next) {
+class TerrainController {
+	static async getTerrain(req, res, next) {
 		try {
-			const data = await Material.findAll({
+			const data = await Terrain.findAll({
 				attributes: {
 					exclude: ["createdAt", "updatedAt"],
 				},
@@ -20,14 +20,12 @@ class MaterialController {
 		}
 	}
 
-	static async postMaterial(req, res, next) {
+	static async postTerrain(req, res, next) {
 		try {
-			let { name, dose, uom } = req.body;
+			let { name } = req.body;
 
-			let data = await Material.create({
+			let data = await Terrain.create({
 				name,
-				dose,
-				uom,
 			});
 
 			res.status(201).json(`${data.name} has been added`);
@@ -36,21 +34,19 @@ class MaterialController {
 		}
 	}
 
-	static async putMaterial(req, res, next) {
+	static async putTerrain(req, res, next) {
 		try {
 			let { id } = req.params;
-			let { name, dose, uom } = req.body;
-			let findData = await Material.findByPk(id);
+			let { name } = req.body;
+			let findData = await Terrain.findByPk(id);
 			if (!findData) {
 				throw {
 					name: "NotFound",
 				};
 			}
-			await Material.update(
+			await Terrain.update(
 				{
 					name,
-					dose,
-					uom,
 				},
 				{
 					where: { id },
@@ -63,18 +59,18 @@ class MaterialController {
 		}
 	}
 
-    static async deleteMaterial(req, res, next) {
+    static async deleteTerrain(req, res, next) {
 		try {
 			const { id } = req.params;
 
-			let findData = await Material.findByPk(id);
+			let findData = await Terrain.findByPk(id);
 			if (!findData) {
 				throw {
 					name: "NotFound",
 				};
 			}
 
-			await Material.destroy({
+			await Terrain.destroy({
 				where: { id },
 			});
 
@@ -85,4 +81,4 @@ class MaterialController {
 	}
 }
 
-module.exports = MaterialController;
+module.exports = TerrainController;

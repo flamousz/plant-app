@@ -1,9 +1,13 @@
-const { Material } = require("../models/index");
+const { CropArea, Crop } = require("../models/index");
 
-class MaterialController {
-	static async getMaterial(req, res, next) {
+class CropAreaController {
+	static async getCropArea(req, res, next) {
 		try {
-			const data = await Material.findAll({
+			const data = await CropArea.findAll({
+                include: {
+                    model: Crop,
+                    attributes: ['name']
+                },
 				attributes: {
 					exclude: ["createdAt", "updatedAt"],
 				},
@@ -20,14 +24,16 @@ class MaterialController {
 		}
 	}
 
-	static async postMaterial(req, res, next) {
+	static async postCropArea(req, res, next) {
 		try {
-			let { name, dose, uom } = req.body;
+			let { name, area, type, detailPlace, CropId } = req.body;
 
-			let data = await Material.create({
+			let data = await CropArea.create({
 				name,
-				dose,
-				uom,
+				area,
+				type,
+				detailPlace,
+				CropId,
 			});
 
 			res.status(201).json(`${data.name} has been added`);
@@ -36,21 +42,23 @@ class MaterialController {
 		}
 	}
 
-	static async putMaterial(req, res, next) {
+	static async putCropArea(req, res, next) {
 		try {
 			let { id } = req.params;
-			let { name, dose, uom } = req.body;
-			let findData = await Material.findByPk(id);
+			let { name, area, type, detailPlace, CropId } = req.body;
+			let findData = await CropArea.findByPk(id);
 			if (!findData) {
 				throw {
 					name: "NotFound",
 				};
 			}
-			await Material.update(
+			await CropArea.update(
 				{
 					name,
-					dose,
-					uom,
+					area,
+					type,
+					detailPlace,
+					CropId,
 				},
 				{
 					where: { id },
@@ -63,18 +71,18 @@ class MaterialController {
 		}
 	}
 
-    static async deleteMaterial(req, res, next) {
+    static async deleteCropArea(req, res, next) {
 		try {
 			const { id } = req.params;
 
-			let findData = await Material.findByPk(id);
+			let findData = await CropArea.findByPk(id);
 			if (!findData) {
 				throw {
 					name: "NotFound",
 				};
 			}
 
-			await Material.destroy({
+			await CropArea.destroy({
 				where: { id },
 			});
 
@@ -85,4 +93,4 @@ class MaterialController {
 	}
 }
 
-module.exports = MaterialController;
+module.exports = CropAreaController;

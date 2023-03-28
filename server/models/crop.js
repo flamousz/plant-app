@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      Crop.hasMany(models.CropArea)
     }
   }
   Crop.init({
