@@ -1,4 +1,5 @@
 const express = require('express')
+const { authentication } = require('../middlewares/authentication')
 const cropRouter = require('./crop')
 const cropAreaRouter = require('./cropArea')
 const employeeRouter = require('./employee')
@@ -6,13 +7,16 @@ const fertilizerRouter = require('./fertilizer')
 const materialRouter = require('./material')
 const pesticideRouter = require('./pesticide')
 const seedRouter = require('./seed')
+const subTaskRouter = require('./subTask')
 const taskRouter = require('./task')
 const terrainRouter = require('./terrain')
 const typeTaskRouter = require('./typeTask')
+const userRouter = require('./user')
 const router = express.Router()
 
 
-
+router.use('/users', userRouter)
+router.use(authentication)
 router.use('/crops', cropRouter)
 router.use('/pesticides', pesticideRouter)
 router.use('/fertilizers', fertilizerRouter)
@@ -23,6 +27,7 @@ router.use('/cropareas', cropAreaRouter)
 router.use('/tasks', taskRouter)
 router.use('/terrains', terrainRouter)
 router.use('/typetasks', typeTaskRouter)
+router.use('/subtasks', subTaskRouter)
 
 
 module.exports = router

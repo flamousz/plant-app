@@ -6,7 +6,8 @@
         "harvestAge": 50,
         "harvestTime": 1,
         "cropAge": 50,
-        "cropProdWeight": 0.3
+        "cropProdWeight": 0.3,
+        "type": "organic"
     },
     {
         "no": 2,
@@ -15,7 +16,8 @@
         "harvestAge": 45,
         "harvestTime": 1,
         "cropAge": 45,
-        "cropProdWeight": 0.2
+        "cropProdWeight": 0.2,
+        "type": "organic"
     },
     {
         "no": 3,
@@ -24,7 +26,8 @@
         "harvestAge": 70,
         "harvestTime": 40,
         "cropAge": 110,
-        "cropProdWeight": 1.3
+        "cropProdWeight": 1.3,
+        "type": "organic"
     },
     {
         "no": 4,
@@ -33,7 +36,8 @@
         "harvestAge": 90,
         "harvestTime": 40,
         "cropAge": 130,
-        "cropProdWeight": 1
+        "cropProdWeight": 1,
+        "type": "organic"
     },
     {
         "no": 5,
@@ -42,7 +46,8 @@
         "harvestAge": 75,
         "harvestTime": 65,
         "cropAge": 140,
-        "cropProdWeight": 1
+        "cropProdWeight": 1,
+        "type": "organic"
     },
     {
         "no": 6,
@@ -51,7 +56,8 @@
         "harvestAge": 45,
         "harvestTime": 25,
         "cropAge": 70,
-        "cropProdWeight": 1
+        "cropProdWeight": 1,
+        "type": "organic"
     },
     {
         "no": 7,
@@ -60,7 +66,8 @@
         "harvestAge": 65,
         "harvestTime": 25,
         "cropAge": 90,
-        "cropProdWeight": 0.25
+        "cropProdWeight": 0.25,
+        "type": "organic"
     },
     {
         "no": 8,
@@ -69,7 +76,8 @@
         "harvestAge": 65,
         "harvestTime": 25,
         "cropAge": 90,
-        "cropProdWeight": 0.3
+        "cropProdWeight": 0.3,
+        "type": "organic"
     },
     {
         "no": 9,
@@ -77,7 +85,8 @@
         "harvestAge": 45,
         "harvestTime": 1,
         "cropAge": 45,
-        "cropProdWeight": 1
+        "cropProdWeight": 1,
+        "type": "organic"
     },
     {
         "no": 10,
@@ -85,7 +94,8 @@
         "harvestAge": 40,
         "harvestTime": 1,
         "cropAge": 40,
-        "cropProdWeight": 0.05
+        "cropProdWeight": 0.05,
+        "type": "organic"
     },
     {
         "no": 11,
@@ -93,97 +103,113 @@
         "harvestAge": 45,
         "harvestTime": 1,
         "cropAge": 45,
-        "cropProdWeight": 0.4
+        "cropProdWeight": 0.4,
+        "type": "organic"
     },
     {
         "no": 12,
         "name": "daun singkong",
         "harvestAge": 180,
-        "cropAge": 360
+        "cropAge": 360,
+        "type": "organic"
     },
     {
         "no": 13,
         "name": "sereh",
         "harvestAge": 150,
         "harvestTime": 1,
-        "cropAge": 150
+        "cropAge": 150,
+        "type": "organic"
     },
     {
         "no": 14,
         "name": "rosmery",
-        "harvestAge": 180
+        "harvestAge": 180,
+        "type": "organic"
     },
     {
         "no": 15,
         "name": "daun mint",
-        "harvestAge": 120
+        "harvestAge": 120,
+        "type": "organic"
     },
     {
         "no": 16,
-        "name": "selada air"
+        "name": "selada air",
+        "type": "organic"
     },
     {
         "no": 17,
         "name": "daun ketumbar",
         "harvestAge": 60,
         "cropAge": 60,
-        "cropProdWeight": 0.02
+        "cropProdWeight": 0.02,
+        "type": "organic"
     },
     {
         "no": 18,
         "name": "daun pucuk labu siam",
-        "harvestAge": 120
+        "harvestAge": 120,
+        "type": "organic"
     },
     {
         "no": 19,
         "name": "daun bawang",
         "harvestAge": 90,
-        "cropAge": 90
+        "cropAge": 90,
+        "type": "organic"
     },
     {
         "no": 20,
         "name": "rocket ",
         "harvestAge": 45,
         "cropAge": 45,
-        "cropProdWeight": 0.024
+        "cropProdWeight": 0.024,
+        "type": "organic"
     },
     {
         "no": 21,
         "name": "seledri stik",
         "harvestAge": 120,
         "cropAge": 120,
-        "cropProdWeight": 0.25
+        "cropProdWeight": 0.25,
+        "type": "organic"
     },
     {
         "no": 22,
         "name": "seledri sayur",
         "harvestAge": 90,
-        "cropAge": 90
+        "cropAge": 90,
+        "type": "organic"
     },
     {
         "no": 23,
         "name": "kale hijau",
         "harvestAge": 120,
         "cropAge": 120,
-        "cropProdWeight": 0.12
+        "cropProdWeight": 0.12,
+        "type": "organic"
     },
     {
         "no": 24,
         "name": "bayam hijau",
         "harvestAge": 40,
         "cropAge": 40,
-        "cropProdWeight": 0.005
+        "cropProdWeight": 0.005,
+        "type": "organic"
     },
     {
         "no": 25,
         "name": "kailan",
         "harvestAge": 40,
-        "cropAge": 40
+        "cropAge": 40,
+        "type": "organic"
     },
     {
         "no": 26,
         "name": "jeruk lemon",
-        "harvestAge": 360
+        "harvestAge": 360,
+        "type": "organic"
     },
     {
         "no": 27,
@@ -191,7 +217,8 @@
         "seedlingAge": 240,
         "harvestAge": 130,
         "cropAge": 720,
-        "cropProdWeight": 0.014
+        "cropProdWeight": 0.014,
+        "type": "organic"
     },
     {
         "no": 26,
@@ -199,7 +226,8 @@
         "harvestAge": 35,
         "harvestTime": 1,
         "cropAge": 35,
-        "cropProdWeight": 0.15
+        "cropProdWeight": 0.15,
+        "type": "non-organic"
     },
     {
         "no": 27,
@@ -207,7 +235,8 @@
         "harvestAge": 35,
         "harvestTime": 1,
         "cropAge": 35,
-        "cropProdWeight": 0.15
+        "cropProdWeight": 0.15,
+        "type": "non-organic"
     },
     {
         "no": 28,
@@ -215,7 +244,8 @@
         "harvestAge": 35,
         "harvestTime": 1,
         "cropAge": 35,
-        "cropProdWeight": 0.15
+        "cropProdWeight": 0.15,
+        "type": "non-organic"
     },
     {
         "no": 29,
@@ -223,7 +253,8 @@
         "harvestAge": 35,
         "harvestTime": 1,
         "cropAge": 35,
-        "cropProdWeight": 0.1
+        "cropProdWeight": 0.1,
+        "type": "non-organic"
     },
     {
         "no": 30,
@@ -231,7 +262,8 @@
         "harvestAge": 45,
         "harvestTime": 1,
         "cropAge": 45,
-        "cropProdWeight": 0.5
+        "cropProdWeight": 0.5,
+        "type": "non-organic"
     },
     {
         "no": 31,
@@ -239,6 +271,7 @@
         "harvestAge": 45,
         "harvestTime": 1,
         "cropAge": 45,
-        "cropProdWeight": 0.5
+        "cropProdWeight": 0.5,
+        "type": "non-organic"
     }
 ]

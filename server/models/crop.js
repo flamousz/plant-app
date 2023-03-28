@@ -20,7 +20,8 @@ module.exports = (sequelize, DataTypes) => {
     harvestAge: DataTypes.INTEGER,
     harvestTime: DataTypes.INTEGER,
     cropAge: DataTypes.INTEGER,
-    cropProdWeight: DataTypes.INTEGER
+    cropProdWeight: DataTypes.INTEGER,
+    type: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'Crop',

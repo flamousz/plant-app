@@ -27,6 +27,10 @@ module.exports = {
       cropProdWeight: {
         type: Sequelize.NUMERIC
       },
+      type: {
+        type: Sequelize.STRING
+      }
+      ,
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
