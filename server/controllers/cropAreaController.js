@@ -1,25 +1,53 @@
+const { Op } = require("sequelize");
 const { CropArea, Crop } = require("../models/index");
 
 class CropAreaController {
 	static async getCropArea(req, res, next) {
 		try {
-			const data = await CropArea.findAll({
-                include: {
-                    model: Crop,
-                    attributes: ['name']
-                },
+			const { filter, search, page } = req.query;
+
+			let limit = 5;
+			let offset = 0;
+
+			const opt = {
+				include: {
+					model: Crop,
+					attributes: ["name"],
+				},
 				attributes: {
 					exclude: ["createdAt", "updatedAt"],
 				},
 				order: [["createdAt", "DESC"]],
-			});
-			if (!data) {
-				throw {
-					name: "NotFound",
+			};
+
+			if (filter !== "" && typeof filter !== "undefined") {
+				const query = filter.split(",").map((item) => ({
+					[Op.eq]: item,
+				}));
+				opt.where = {
+					type: { [Op.or]: query },
 				};
 			}
-			res.status(200).json(data);
+
+			if (search) {
+				opt.where = {
+					type: { [Op.iLike]: `%${search}%` },
+				};
+			}
+			if (page !== "" && typeof page !== "undefined") {
+				offset = page * limit - limit;
+				opt.offset = offset;
+			}
+			opt.limit = limit;
+
+			let data = await CropArea.findAndCountAll(opt);
+			if (!data) {
+				throw { name: "NotFound" };
+			} else {
+				res.status(200).json(data);
+			}
 		} catch (err) {
+			console.log(err);
 			next(err);
 		}
 	}
@@ -71,7 +99,7 @@ class CropAreaController {
 		}
 	}
 
-    static async deleteCropArea(req, res, next) {
+	static async deleteCropArea(req, res, next) {
 		try {
 			const { id } = req.params;
 

@@ -16,7 +16,7 @@ const router = express.Router()
 
 
 router.use('/users', userRouter)
-router.use(authentication)
+// router.use(authentication)
 router.use('/crops', cropRouter)
 router.use('/pesticides', pesticideRouter)
 router.use('/fertilizers', fertilizerRouter)
