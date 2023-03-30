@@ -1,12 +1,9 @@
-<script setup>
+<script>
+import { RouterView } from 'vue-router';
 </script>
 
 <template>
-  <div class="w-screen h-screen flex justify-center items-center bg-green-300 text-4xl">
-    mereka dg
-  </div>
-
-
+  <RouterView />
 </template>
 
 
