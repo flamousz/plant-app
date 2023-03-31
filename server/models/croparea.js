@@ -11,7 +11,11 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      CropArea.belongsTo(models.Crop)
+      CropArea.belongsTo(models.Crop, {
+        foreignKey: 'CropId',
+        onDelete: 'CASCADE', 
+        onUpdate: 'CASCADE' 
+      })
     }
   }
   CropArea.init({

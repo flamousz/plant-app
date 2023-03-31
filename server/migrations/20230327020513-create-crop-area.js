@@ -26,8 +26,10 @@ module.exports = {
         references: {
           model: 'Crops',
           key: 'id',
-          onDelete: 'cascade'
-        }
+          
+        },
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE'
       },
       createdAt: {
         allowNull: false,
