@@ -29,6 +29,7 @@ class CropController {
 				harvestTime,
 				cropAge,
 				cropProdWeight,
+				type
 			} = req.body;
 
 			let data = await Crop.create({
@@ -38,6 +39,7 @@ class CropController {
 				harvestTime,
 				cropAge,
 				cropProdWeight,
+				type
 			});
 
 			res.status(201).json(`${data.name} has been added`);
@@ -86,7 +88,7 @@ class CropController {
 	static async deleteCrop(req, res, next) {
 		try {
 			const { id } = req.params;
-
+			console.log(id,'<< ini id');
 			let findData = await Crop.findByPk(id);
 			if (!findData) {
 				throw {
@@ -100,6 +102,7 @@ class CropController {
 
 			res.status(200).json(`${findData.name} has been deleted`);
 		} catch (err) {
+			console.log(err);
 			next(err);
 		}
 	}

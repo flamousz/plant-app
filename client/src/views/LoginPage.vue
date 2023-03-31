@@ -1,6 +1,7 @@
 <script>
 import { mapActions } from "pinia";
 import { useUserStore } from "../stores/user";
+import GreenButton from '../components/Buttons/GreenButton.vue'
 
 export default {
 	name: "LoginPage",
@@ -9,12 +10,13 @@ export default {
 			loginData: {
 				email: "",
 				password: "",
-			},
+			}
 		};
 	},
 	methods: {
 		...mapActions(useUserStore, ["handleLogin"]),
 	},
+	components: {GreenButton}
 };
 </script>
 
@@ -68,12 +70,7 @@ export default {
 							/>
 						</div>
 						<div class="flex justify-end lg:mr-[20%]">
-							<button
-								type="submit"
-								className="bg-[#6bbd99] rounded flex hover:bg-green-700 justify-center items-center font-semibold text-[11px] text-slate-100 lg:h-[30px] w-[90px]"
-							>
-								Click to Sign in
-							</button>
+							<GreenButton :type="'submit'" :text="'Click to Sign in'" />
 						</div>
 					</div>
 				</form>
