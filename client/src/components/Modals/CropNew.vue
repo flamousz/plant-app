@@ -1,7 +1,7 @@
 <script>
-import { mapActions } from "pinia";
+import { mapActions, mapState } from "pinia";
 import GreenButton from "../Buttons/GreenButton.vue";
-import {useCropStore} from '../../stores/crop'
+import { useCropStore } from "../../stores/crop";
 
 export default {
 	name: "CropNew",
@@ -16,18 +16,44 @@ export default {
 				cropAge: "",
 				cropProdWeight: "",
 				type: "",
+				id: ''
 			},
 		};
 	},
-    methods: {
-        ...mapActions(useCropStore, ['postCrop'])
-        }
-    }
+	methods: {
+		...mapActions(useCropStore, ["postCrop", 'putCrop']),
+		handlePutorPost(){
+			if (this.editFlag === true) {
+				this.putCrop(this.cropData)
+			} else if (this.editFlag === false) {
+				this.postCrop(this.cropData)
+			}
+		}
+	},
+	computed:{
+		...mapState(useCropStore, ['editFlag', 'cropDetail'])
+	},
+	created(){
+		console.log(this.cropDetail, 'ini crop detail dari crop new page');
+		console.log(this.cropDetail.id, 'ini crop detail ID dari crop new page');
+		console.log(this.editFlag, 'ini edit flag dari crop new page');
+		if (this.editFlag == true) {
+			this.cropData.name = this.cropDetail.name
+			this.cropData.seedlingAge = this.cropDetail.seedlingAge
+			this.cropData.harvestAge = this.cropDetail.harvestAge
+			this.cropData.harvestTime = this.cropDetail.harvestTime
+			this.cropData.cropAge = this.cropDetail.cropAge
+			this.cropData.cropProdWeight = this.cropDetail.cropProdWeight
+			this.cropData.type = this.cropDetail.type
+			this.cropData.id = this.cropDetail.id
+		}
+	}
+};
 </script>
 
 <template>
 	<div class="w-[600px] bg-slate-500 h-[400px]">
-		<form @click.prevent="postCrop(cropData)">
+		<form @submit.prevent="handlePutorPost">
 			<div class="flex flex-col w-[100%] gap-2">
 				<div class="flex flex-row">
 					<label
@@ -41,7 +67,7 @@ export default {
 						name="name"
 						type="text"
 						id="name"
-                        v-model="cropData.name"
+						v-model="cropData.name"
 					/>
 				</div>
 				<div class="flex flex-row">
@@ -56,7 +82,7 @@ export default {
 						placeholder="Seedling Age ...."
 						name="seedlingAge"
 						type="number"
-                        v-model="cropData.seedlingAge"
+						v-model="cropData.seedlingAge"
 					/>
 				</div>
 				<div class="flex flex-row">
@@ -71,7 +97,7 @@ export default {
 						placeholder="Harvest Age ...."
 						name="harvestAge"
 						type="number"
-                        v-model="cropData.harvestAge"
+						v-model="cropData.harvestAge"
 					/>
 				</div>
 				<div class="flex flex-row">
@@ -86,7 +112,7 @@ export default {
 						placeholder="Harvest Time ...."
 						name="harvestTime"
 						type="number"
-                        v-model="cropData.harvestTime"
+						v-model="cropData.harvestTime"
 					/>
 				</div>
 				<div class="flex flex-row">
@@ -101,7 +127,7 @@ export default {
 						placeholder="Crop Age ...."
 						name="cropAge"
 						type="number"
-                        v-model="cropData.cropAge"
+						v-model="cropData.cropAge"
 					/>
 				</div>
 				<div class="flex flex-row">
@@ -116,7 +142,7 @@ export default {
 						placeholder="Crop Production Weight..."
 						name="cropProdWeight"
 						type="number"
-                        v-model="cropData.cropProdWeight"
+						v-model="cropData.cropProdWeight"
 					/>
 				</div>
 				<div class="flex flex-row">
@@ -131,7 +157,7 @@ export default {
 						placeholder="Type..."
 						name="type"
 						type="text"
-                        v-model="cropData.type"
+						v-model="cropData.type"
 					/>
 				</div>
 				<div class="flex">

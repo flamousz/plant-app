@@ -37,7 +37,7 @@ export default {
 				</div>
 			</div>
 			<div class="flex flex-col lg:w-full lg:h-full bg-[#c4e8c2] rounded-b-xl">
-				<form @click.prevent="handleLogin(loginData)">
+				<form @submit.prevent="handleLogin(loginData)">
 					<div class="flex flex-col w-[100%] gap-2 lg:mt-[15%] lg:ml-[9%]">
 						<div class="flex flex-row">
 							<label
