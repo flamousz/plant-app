@@ -2,11 +2,16 @@
 import { RouterLink } from "vue-router";
 import BlueButton from "../Buttons/BlueButton.vue";
 import RedButton from "../Buttons/RedButton.vue";
+import { mapActions } from "pinia";
+import { useCropStore } from "../../stores/crop";
 
 export default {
 	name: "TableRowCrop",
 	props: ["item", "index"],
-	components: { RedButton, BlueButton, RouterLink }
+	methods: {
+		...mapActions(useCropStore, ["getCropById"]),
+	},
+	components: { RedButton, BlueButton, RouterLink },
 };
 </script>
 
@@ -24,10 +29,9 @@ export default {
 		<td class="h-14">{{ item.type }}</td>
 		<td class="h-14 flex flex-row gap-1 justify-center items-center">
 			<RedButton :type="'button'" :text="'DELETE'" :id="item.id" />
-            <RouterLink to="/cropnew">
-
-                <BlueButton :type="'button'" :text="'EDIT'" />
-            </RouterLink>
+			<div @click="getCropById(item.id)">
+				<BlueButton :type="'button'" :text="'EDIT'" />
+			</div>
 		</td>
 	</tr>
 </template>
