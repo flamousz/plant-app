@@ -18,7 +18,12 @@ module.exports = (sequelize, DataTypes) => {
   }
   Uom.init({
     name: DataTypes.STRING,
-    code: DataTypes.STRING,
+    code: {
+      type: DataTypes.STRING,
+      unique: {
+        msg: "Code has been exists",
+      },
+    },
     description: DataTypes.STRING
   }, {
     sequelize,

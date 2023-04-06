@@ -46,7 +46,6 @@ export default {
 						<th class="w-10">Crop Age</th>
 						<th class="w-10">Crop Production Weight</th>
 						<th class="w-10">Type</th>
-						<th class="w-10">Action</th>
 					</tr>
 				</thead>
 				<tbody

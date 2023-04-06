@@ -7,6 +7,8 @@ const categoryRouter = require("./category");
 const uomRouter = require("./uom");
 const plantTypeRouter = require("./plantType");
 const itemRouter = require("./item");
+const plantDataRouter = require("./plantData");
+const plantSheetRouter = require("./plantSheet");
 const router = express.Router();
 
 router.use("/", userRouter);
@@ -17,6 +19,8 @@ router.use('/categories', categoryRouter)
 router.use('/uoms', uomRouter)
 router.use('/planttypes', plantTypeRouter)
 router.use('/items', itemRouter)
+router.use('/plantdata', plantDataRouter)
+router.use('/plantsheet', plantSheetRouter)
 
 
 

@@ -15,17 +15,52 @@ module.exports = (sequelize, DataTypes) => {
 			Item.belongsTo(models.Uom, {
 				foreignKey: "uomid",
 			});
+			Item.hasMany(models.PlantData, {
+				foreignKey: "itemid",
+			});
+			Item.hasMany(models.materialConjunction, {
+				foreignKey: "materialid",
+			});
+			Item.hasMany(models.PesticideConjunction, {
+				foreignKey: "pesticideid",
+			});
+			Item.hasMany(models.fertilizerConjunction, {
+				foreignKey: "fertilizerid",
+			});
+			Item.hasMany(models.SeedConjunction, {
+				foreignKey: "seedid",
+			});
+			Item.hasMany(models.PlantSheet, {
+				foreignKey: "plantid",
+				as: "plant",
+			});
+			Item.hasMany(models.PlantSheet, {
+				foreignKey: "materialid",
+				as: "material",
+			});
+			Item.hasMany(models.PlantSheet, {
+				foreignKey: "pesticideid",
+				as: "pesticide",
+			});
+			Item.hasMany(models.PlantSheet, {
+				foreignKey: "fertilizerid",
+				as: "fertilizer",
+			});
+			Item.hasMany(models.PlantSheet, {
+				foreignKey: "seedid",
+				as: "seed",
+			});
 		}
 	}
 	Item.init(
 		{
-			name: {
+			name: DataTypes.STRING,
+			code: {
 				type: DataTypes.STRING,
 				unique: {
 					msg: "Code has been exists",
 				},
 			},
-			code: DataTypes.STRING,
 			description: DataTypes.STRING,
 			categoryid: DataTypes.INTEGER,
 			uomid: DataTypes.INTEGER,

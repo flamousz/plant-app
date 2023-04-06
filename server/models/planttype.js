@@ -11,11 +11,22 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      PlantType.hasMany(models.PlantData, {
+        foreignKey: 'planttypeid'
+      })
+      PlantType.hasMany(models.PlantSheet, {
+        foreignKey: 'planttypeid'
+      })
     }
   }
   PlantType.init({
     name: DataTypes.STRING,
-    code: DataTypes.STRING,
+    code: {
+      type: DataTypes.STRING,
+      unique: {
+        msg: "Code has been exists",
+      },
+    },
     description: DataTypes.STRING
   }, {
     sequelize,

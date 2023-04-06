@@ -1,4 +1,11 @@
-[
+[   
+    {
+        "name": "Lettuce",
+        "code": "VEGETABLE001111",
+        "categoryid": 1,
+        "uomid": 4,
+        "standardqty": 1
+    },
     {
         "name": "Romaine",
         "code": "VEGETABLE000111",

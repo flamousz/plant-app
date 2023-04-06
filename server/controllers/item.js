@@ -2,6 +2,101 @@ const { Op } = require("sequelize");
 const { Item, Category, Uom } = require("../models/index");
 
 class ItemController {
+	static async getItemPesticides(req, res, next) {
+		try {
+			const data = await Item.findAll({
+				where: {categoryid : 3},
+				attributes: ["name", 'id'],
+				order: [["createdAt", "DESC"]],
+			});
+			if (!data) {
+				throw {
+					name: "NotFound",
+				};
+			}
+			res.status(200).json(data);
+		} catch (err) {
+			console.log(err);
+			next(err);
+		}
+	}
+
+	static async getItemSeeds(req, res, next) {
+		try {
+			const data = await Item.findAll({
+				where: {categoryid : 9},
+				attributes: ["name", 'id'],
+				order: [["createdAt", "DESC"]],
+			});
+			if (!data) {
+				throw {
+					name: "NotFound",
+				};
+			}
+			res.status(200).json(data);
+		} catch (err) {
+			console.log(err);
+			next(err);
+		}
+	}
+
+	static async getItemFertilizers(req, res, next) {
+		try {
+			const data = await Item.findAll({
+				where: {categoryid : 7},
+				attributes: ["name", 'id'],
+				order: [["createdAt", "DESC"]],
+			});
+			if (!data) {
+				throw {
+					name: "NotFound",
+				};
+			}
+			res.status(200).json(data);
+		} catch (err) {
+			console.log(err);
+			next(err);
+		}
+	}
+
+	static async getItemMaterial(req, res, next) {
+		try {
+			const data = await Item.findAll({
+				where: {categoryid : 8},
+				attributes: ["name", 'id'],
+				order: [["createdAt", "DESC"]],
+			});
+			if (!data) {
+				throw {
+					name: "NotFound",
+				};
+			}
+			res.status(200).json(data);
+		} catch (err) {
+			console.log(err);
+			next(err);
+		}
+	}
+
+	static async getItemPlant(req, res, next) {
+		try {
+			const data = await Item.findAll({
+				where: {categoryid : 1},
+				attributes: ["name", 'id'],
+				order: [["createdAt", "DESC"]],
+			});
+			if (!data) {
+				throw {
+					name: "NotFound",
+				};
+			}
+			res.status(200).json(data);
+		} catch (err) {
+			console.log(err);
+			next(err);
+		}
+	}
+
 	static async getItem(req, res, next) {
 		try {
 			const { filter, search, page } = req.query;

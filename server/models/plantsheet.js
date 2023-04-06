@@ -1,0 +1,69 @@
+"use strict";
+const { Model } = require("sequelize");
+module.exports = (sequelize, DataTypes) => {
+	class PlantSheet extends Model {
+		/**
+		 * Helper method for defining associations.
+		 * This method is not a part of Sequelize lifecycle.
+		 * The `models/index` file will call this method automatically.
+		 */
+		static associate(models) {
+			// define association here
+			PlantSheet.belongsTo(models.Item, {
+				foreignKey: "plantid",
+				as: "plant",
+			});
+			PlantSheet.belongsTo(models.Item, {
+				foreignKey: "materialid",
+				as: "material",
+			});
+			PlantSheet.belongsTo(models.Item, {
+				foreignKey: "pesticideid",
+				as: "pesticide",
+			});
+			PlantSheet.belongsTo(models.Item, {
+				foreignKey: "fertilizerid",
+				as: "fertilizer",
+			});
+			PlantSheet.belongsTo(models.Item, {
+				foreignKey: "seedid",
+				as: "seed",
+			});
+			PlantSheet.belongsTo(models.PlantType, {
+				foreignKey: 'planttypeid'
+			})
+			PlantSheet.hasMany(models.materialConjunction, {
+				foreignKey: 'plantsheetid'
+			})
+			PlantSheet.hasMany(models.PesticideConjunction, {
+				foreignKey: 'plantsheetid'
+			})
+			PlantSheet.hasMany(models.SeedConjunction, {
+				foreignKey: 'plantsheetid'
+			})
+			PlantSheet.hasMany(models.fertilizerConjunction, {
+				foreignKey: 'plantsheetid'
+			})
+		}
+	}
+	PlantSheet.init(
+		{
+			seedlingAge: DataTypes.INTEGER,
+			harvestAge: DataTypes.INTEGER,
+			harvestTime: DataTypes.INTEGER,
+			cropAge: DataTypes.INTEGER,
+			cropProdWeight: DataTypes.NUMERIC,
+			planttypeid: DataTypes.INTEGER,
+			plantid: DataTypes.INTEGER,
+			materialid: DataTypes.INTEGER,
+			pesticideid: DataTypes.INTEGER,
+			fertilizerid: DataTypes.INTEGER,
+			seedid: DataTypes.INTEGER,
+		},
+		{
+			sequelize,
+			modelName: "PlantSheet",
+		}
+	);
+	return PlantSheet;
+};

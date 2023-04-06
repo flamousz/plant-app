@@ -12,7 +12,7 @@ export const useUserStore = defineStore("user", {
 		async handleLogin(val) {
 			try {
 				const { data } = await axios({
-                    url: `${baseUrl}/users/login`,
+                    url: `${baseUrl}/login`,
                     method: "POST",
 					data: val,
 				});
