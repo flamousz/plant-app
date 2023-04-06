@@ -33,3 +33,6 @@ export default {
 		</div>
 	</td>
 </template>
+
+
+

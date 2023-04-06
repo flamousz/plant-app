@@ -65,12 +65,11 @@ export const useCropStore = defineStore("crop", {
 				this.editFlag = true;
 				console.log(`masuk dengan id ${id}`);
 				const { data } = await axios({
-					url: `${baseUrl}/crops/${id}`,
+					url: `${baseUrl}/plantsheet/${id}`,
 					method: "GET",
 				});
 				console.log(data, 'ini data dari store');
 				this.cropDetail = data;
-				this.router.push('/cropnew')
 				// console.log(this.cropDetail, "< crop detail");
 			} catch (err) {
 				console.log(err);

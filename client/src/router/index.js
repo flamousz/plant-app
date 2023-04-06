@@ -8,6 +8,7 @@ import PesticidePage from '../views/PesticidePage.vue'
 import FertilizerPage from'../views/FertilizerPage.vue'
 import LoginPage from '../views/LoginPage.vue'
 import CropNew from '../components/Modals/CropNew.vue'
+import DetailPlant from '../views/DetailPlant.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -21,6 +22,11 @@ const router = createRouter({
       path: '/crop',
       name: 'crop',
       component: CropPage
+    },
+    {
+      path: '/detailplant/:id',
+      name: 'detailplant',
+      component: DetailPlant
     },
     {
       path: '/cropnew',

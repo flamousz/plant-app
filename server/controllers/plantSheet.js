@@ -105,10 +105,38 @@ class PlantSheetController {
 			const data = await PlantSheet.findByPk(id, {
 				include: [
 					{ model: Item, as: "plant", attributes: ["name"] },
-					{ model: Item, as: "material", attributes: ["name"] },
-					{ model: Item, as: "pesticide", attributes: ["name"] },
-					{ model: Item, as: "fertilizer", attributes: ["name"] },
-					{ model: Item, as: "seed", attributes: ["name"] },
+					{
+						model: SeedConjunction,
+						attributes: ["id"],
+						include: {
+							model: Item,
+							attributes: ["name"],
+						},
+					},
+					{
+						model: fertilizerConjunction,
+						attributes: ["id"],
+						include: {
+							model: Item,
+							attributes: ["name"],
+						},
+					},
+					{
+						model: PesticideConjunction,
+						attributes: ["id"],
+						include: {
+							model: Item,
+							attributes: ["name"],
+						},
+					},
+					{
+						model: materialConjunction,
+						attributes: ["id"],
+						include: {
+							model: Item,
+							attributes: ["name"],
+						},
+					},
 					{
 						model: PlantType,
 						attributes: ["name"],
