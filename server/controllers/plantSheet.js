@@ -6,6 +6,8 @@ const {
 	PesticideConjunction,
 	fertilizerConjunction,
 	SeedConjunction,
+	Category,
+	Uom,
 } = require("../models/index");
 
 class PlantSheetController {
@@ -68,47 +70,62 @@ class PlantSheetController {
 		}
 	}
 
-	// static async getPlantSheet(req, res, next) {
-	// 	try {
-	// 		const data = await PlantSheet.findAll({
-	// 			include: [
-	// 				{ model: Item, as: "plant", attributes: ["name"] },
-	// 				{ model: Item, as: "material", attributes: ["name"] },
-	// 				{ model: Item, as: "pesticide", attributes: ["name"] },
-	// 				{ model: Item, as: "fertilizer", attributes: ["name"] },
-	// 				{ model: Item, as: "seed", attributes: ["name"] },
-	// 				{
-	// 					model: PlantType,
-	// 					attributes: ["name"],
-	// 				},
-	// 			],
-	// 			attributes: {
-	// 				exclude: ["createdAt", "updatedAt"],
-	// 			},
-	// 			order: [["createdAt", "DESC"]],
-	// 		});
-	// 		if (!data) {
-	// 			throw {
-	// 				name: "NotFound",
-	// 			};
-	// 		}
-	// 		res.status(200).json(data);
-	// 	} catch (err) {
-	// 		console.log(err);
-	// 		next(err);
-	// 	}
-	// }
-
 	static async getPlantSheetById(req, res, next) {
 		try {
 			const { id } = req.params;
 			const data = await PlantSheet.findByPk(id, {
 				include: [
-					{ model: Item, as: "plant", attributes: ["name"] },
-					{ model: Item, as: "material", attributes: ["name"] },
-					{ model: Item, as: "pesticide", attributes: ["name"] },
-					{ model: Item, as: "fertilizer", attributes: ["name"] },
-					{ model: Item, as: "seed", attributes: ["name"] },
+					{ model: Item, as: "plant", attributes: ["name", "code"] },
+					{
+						model: SeedConjunction,
+						attributes: ["id"],
+						include: {
+							model: Item,
+							attributes: ["name", "description", "standardqty"],
+						},
+					},
+					{
+						model: fertilizerConjunction,
+						attributes: ["id"],
+						include: {
+							model: Item,
+							attributes: ["name", "standardqty", "description"],
+							include: [
+								{
+									model: Uom,
+									attributes: ["name"],
+								},
+							],
+						},
+					},
+					{
+						model: PesticideConjunction,
+						attributes: ["id"],
+						include: {
+							model: Item,
+							attributes: ["name", "standardqty", "description"],
+							include: [
+								{
+									model: Uom,
+									attributes: ["name"],
+								},
+							],
+						},
+					},
+					{
+						model: materialConjunction,
+						attributes: ["id"],
+						include: {
+							model: Item,
+							attributes: ["name", "standardqty", "description"],
+							include: [
+								{
+									model: Uom,
+									attributes: ["name"],
+								},
+							],
+						},
+					},
 					{
 						model: PlantType,
 						attributes: ["name"],
