@@ -55,7 +55,7 @@ export default {
 </script>
 
 <template>
-	{{ materials }}
+	<!-- {{ materials }} -->
 	<div class="w-[600px] bg-slate-500 h-[500px]">
 		<form @submit.prevent="handlePutorPost">
 			<div class="flex flex-row">

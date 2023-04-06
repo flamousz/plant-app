@@ -104,10 +104,12 @@ export const useCropStore = defineStore("crop", {
 				}).showToast();
 			}
 		},
+		
 		async deleteCrop(id) {
 			try {
+				console.log(`tanamanan dengan id ${id} masuk ke crop store`);
 				const { data } = await axios({
-					url: `${baseUrl}/plantdata/${id}`,
+					url: `${baseUrl}/plantsheet/${id}`,
 					method: "DELETE",
 				});
 

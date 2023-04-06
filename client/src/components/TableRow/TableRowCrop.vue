@@ -1,5 +1,4 @@
 <script>
-import { RouterLink } from "vue-router";
 import BlueButton from "../Buttons/BlueButton.vue";
 import RedButton from "../Buttons/RedButton.vue";
 import { mapActions } from "pinia";
@@ -11,7 +10,7 @@ export default {
 	methods: {
 		...mapActions(useCropStore, ["getCropById"]),
 	},
-	components: { RedButton, BlueButton, RouterLink },
+	components: { RedButton, BlueButton },
 };
 </script>
 
