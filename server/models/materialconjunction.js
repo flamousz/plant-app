@@ -21,7 +21,8 @@ module.exports = (sequelize, DataTypes) => {
   }
   materialConjunction.init({
     plantsheetid: DataTypes.INTEGER,
-    materialid: DataTypes.INTEGER
+    materialid: DataTypes.INTEGER,
+    dose: DataTypes.FLOAT
   }, {
     sequelize,
     modelName: 'materialConjunction',

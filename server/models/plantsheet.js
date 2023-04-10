@@ -13,22 +13,6 @@ module.exports = (sequelize, DataTypes) => {
 				foreignKey: "plantid",
 				as: "plant",
 			});
-			PlantSheet.belongsTo(models.Item, {
-				foreignKey: "materialid",
-				as: "material",
-			});
-			PlantSheet.belongsTo(models.Item, {
-				foreignKey: "pesticideid",
-				as: "pesticide",
-			});
-			PlantSheet.belongsTo(models.Item, {
-				foreignKey: "fertilizerid",
-				as: "fertilizer",
-			});
-			PlantSheet.belongsTo(models.Item, {
-				foreignKey: "seedid",
-				as: "seed",
-			});
 			PlantSheet.belongsTo(models.PlantType, {
 				foreignKey: 'planttypeid'
 			})
@@ -55,10 +39,6 @@ module.exports = (sequelize, DataTypes) => {
 			cropProdWeight: DataTypes.NUMERIC,
 			planttypeid: DataTypes.INTEGER,
 			plantid: DataTypes.INTEGER,
-			materialid: DataTypes.INTEGER,
-			pesticideid: DataTypes.INTEGER,
-			fertilizerid: DataTypes.INTEGER,
-			seedid: DataTypes.INTEGER,
 		},
 		{
 			sequelize,

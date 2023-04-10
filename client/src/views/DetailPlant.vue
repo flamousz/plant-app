@@ -153,20 +153,67 @@ export default {
 						Seeds
 					</button>
 				</div>
-				<div class="p-2">
-					<div v-if="activeTab === 'fertilizers'">
+				<div class="pt-2">
+					<div v-if="activeTab === 'fertilizers'" class="bg-yellow-400 w-[90%] flex flex-col ">
 						<thead>
-							<tr>
-								<th>Name</th>
-								<th>Dose</th>
-								<th>UOM</th>
-								<th>Description</th>
+							<tr class="flex flex-row w-full bg-red-600 ">
+								<th class="w-[43%] bg-slate-400 border-black border">Name</th>
+								<th class="w-[10%] bg-green-600 border-y border-black">Dose</th>
+								<th class="w-[10%] bg-white border border-black">UOM</th>
+								<th class="w-[37%] border border-black">Description</th>
 							</tr>
 						</thead>
-						<tbody>
+						<tbody >
 							<TableRow4Colum 
 							v-for="(fertilizer, index) in cropDetail.fertilizerConjunctions" 
-							:key="fertilizer.id" :fertilizer="fertilizer" :index="index"
+							:key="fertilizer.id" :fertilizer="fertilizer" :index="index" 
+							/>
+						</tbody>
+					</div>
+					<div v-if="activeTab === 'pesticides'" class="bg-yellow-400 w-[90%] flex flex-col ">
+						<thead>
+							<tr class="flex flex-row w-full bg-red-600 ">
+								<th class="w-[22%] bg-slate-400 border-black border">Name</th>
+								<th class="w-[21%] bg-slate-400 border-black border">Category</th>
+								<th class="w-[10%] bg-green-600 border-y border-black">Dose</th>
+								<th class="w-[10%] bg-white border border-black">UOM</th>
+								<th class="w-[37%] border border-black">Description</th>
+							</tr>
+						</thead>
+						<tbody >
+							<TableRow4Colum 
+							v-for="(pesticide, index) in cropDetail.PesticideConjunctions" 
+							:key="pesticide.id" :pesticide="pesticide" :index="index" 
+							/>
+						</tbody>
+					</div>
+					<div v-if="activeTab === 'materials'" class="bg-yellow-400 w-[90%] flex flex-col ">
+						<thead>
+							<tr class="flex flex-row w-full bg-red-600 ">
+								<th class="w-[43%] bg-slate-400 border-black border">Name</th>
+								<th class="w-[10%] bg-green-600 border-y border-black">Dose</th>
+								<th class="w-[10%] bg-white border border-black">UOM</th>
+								<th class="w-[37%] border border-black">Description</th>
+							</tr>
+						</thead>
+						<tbody >
+							<TableRow4Colum 
+							v-for="(materials, index) in cropDetail.materialConjunctions" 
+							:key="materials.id" :material="materials" :index="index" 
+							/>
+						</tbody>
+					</div>
+					<div v-if="activeTab === 'seeds'" class="bg-yellow-400 w-[90%] flex flex-col ">
+						<thead>
+							<tr class="flex flex-row w-full bg-red-600 ">
+								<th class="w-[43%] bg-slate-400 border-black border">Name</th>
+								<th class="w-[57%] border border-black">Brand</th>
+							</tr>
+						</thead>
+						<tbody >
+							<TableRow4Colum 
+							v-for="(seed, index) in cropDetail.SeedConjunctions" 
+							:key="seed.id" :seed="seed" :index="index" 
 							/>
 						</tbody>
 					</div>

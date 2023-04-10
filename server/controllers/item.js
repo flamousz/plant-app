@@ -2,10 +2,67 @@ const { Op } = require("sequelize");
 const { Item, Category, Uom } = require("../models/index");
 
 class ItemController {
-	static async getItemPesticides(req, res, next) {
+	static async getItemPesticidesFungi(req, res, next) {
 		try {
 			const data = await Item.findAll({
 				where: {categoryid : 3},
+				attributes: ["name", 'id'],
+				order: [["createdAt", "DESC"]],
+			});
+			if (!data) {
+				throw {
+					name: "NotFound",
+				};
+			}
+			res.status(200).json(data);
+		} catch (err) {
+			console.log(err);
+			next(err);
+		}
+	}
+
+	static async getItemPesticidesInsecticide(req, res, next) {
+		try {
+			const data = await Item.findAll({
+				where: {categoryid : 4},
+				attributes: ["name", 'id'],
+				order: [["createdAt", "DESC"]],
+			});
+			if (!data) {
+				throw {
+					name: "NotFound",
+				};
+			}
+			res.status(200).json(data);
+		} catch (err) {
+			console.log(err);
+			next(err);
+		}
+	}
+
+	static async getItemPesticidesZpt(req, res, next) {
+		try {
+			const data = await Item.findAll({
+				where: {categoryid : 5},
+				attributes: ["name", 'id'],
+				order: [["createdAt", "DESC"]],
+			});
+			if (!data) {
+				throw {
+					name: "NotFound",
+				};
+			}
+			res.status(200).json(data);
+		} catch (err) {
+			console.log(err);
+			next(err);
+		}
+	}
+
+	static async getItemPesticidesPerekat(req, res, next) {
+		try {
+			const data = await Item.findAll({
+				where: {categoryid : 6},
 				attributes: ["name", 'id'],
 				order: [["createdAt", "DESC"]],
 			});

@@ -34,22 +34,7 @@ module.exports = (sequelize, DataTypes) => {
 				foreignKey: "plantid",
 				as: "plant",
 			});
-			Item.hasMany(models.PlantSheet, {
-				foreignKey: "materialid",
-				as: "material",
-			});
-			Item.hasMany(models.PlantSheet, {
-				foreignKey: "pesticideid",
-				as: "pesticide",
-			});
-			Item.hasMany(models.PlantSheet, {
-				foreignKey: "fertilizerid",
-				as: "fertilizer",
-			});
-			Item.hasMany(models.PlantSheet, {
-				foreignKey: "seedid",
-				as: "seed",
-			});
+			
 		}
 	}
 	Item.init(
