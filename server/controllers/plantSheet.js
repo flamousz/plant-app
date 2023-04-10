@@ -86,7 +86,7 @@ class PlantSheetController {
 					},
 					{
 						model: fertilizerConjunction,
-						attributes: ["id"],
+						attributes: ["id", 'dose'],
 						include: {
 							model: Item,
 							attributes: ["name", "standardqty", "description"],
@@ -100,7 +100,7 @@ class PlantSheetController {
 					},
 					{
 						model: PesticideConjunction,
-						attributes: ["id"],
+						attributes: ["id", 'dose'],
 						include: {
 							model: Item,
 							attributes: ["name", "standardqty", "description"],
@@ -109,12 +109,16 @@ class PlantSheetController {
 									model: Uom,
 									attributes: ["name"],
 								},
+								{
+									model: Category,
+									attributes: ['name']
+								}
 							],
 						},
 					},
 					{
 						model: materialConjunction,
-						attributes: ["id"],
+						attributes: ["id", 'dose'],
 						include: {
 							model: Item,
 							attributes: ["name", "standardqty", "description"],
@@ -152,7 +156,7 @@ class PlantSheetController {
 
 	static async postPlantSheet(req, res, next) {
 		try {
-			const {
+			let {
 				plantid,
 				seedlingAge,
 				harvestAge,
@@ -160,13 +164,21 @@ class PlantSheetController {
 				cropAge,
 				cropProdWeight,
 				planttypeid,
-				materialid,
-				pesticideid,
-				fertilizerid,
-				seedid,
+				materials,
+				pesticides,
+				fertilizers,
+				seeds,
 			} = req.body;
 
-			await PlantSheet.create({
+			// fertilizers.pop();
+			// fungiPesticide.pop();
+			// materials.pop();
+			// insecticidePesticide.pop();
+			// zptPesticide.pop();
+			// perekatPesticide.pop();
+			// seeds.pop()
+
+			const plantsheet = await PlantSheet.create({
 				plantid,
 				seedlingAge,
 				harvestAge,
@@ -174,61 +186,30 @@ class PlantSheetController {
 				cropAge,
 				cropProdWeight,
 				planttypeid,
-				materialid,
-				pesticideid,
-				fertilizerid,
-				seedid,
 			});
 
-			res.status(201).json(`successfully added new plant data`);
-		} catch (err) {
-			console.log(err);
-			next(err);
-		}
-	}
+			materials.forEach((el) => {
+				el.plantsheetid = plantsheet.id;
+			});
 
-	static async putPlantSheet(req, res, next) {
-		try {
-			const { id } = req.params;
-			const {
-				plantid,
-				seedlingAge,
-				harvestAge,
-				harvestTime,
-				cropAge,
-				cropProdWeight,
-				planttypeid,
-				materialid,
-				pesticideid,
-				fertilizerid,
-				seedid,
-			} = req.body;
-			let findData = await PlantSheet.findByPk(id);
-			if (!findData) {
-				throw {
-					name: "NotFound",
-				};
-			}
-			await PlantSheet.update(
-				{
-					plantid,
-					seedlingAge,
-					harvestAge,
-					harvestTime,
-					cropAge,
-					cropProdWeight,
-					planttypeid,
-					materialid,
-					pesticideid,
-					fertilizerid,
-					seedid,
-				},
-				{
-					where: { id },
-					returning: true,
-				}
-			);
-			res.status(200).json(`updated successfully`);
+			pesticides.forEach((el) => {
+				el.plantsheetid = plantsheet.id;
+			});
+
+			seeds.forEach((el) => {
+				el.plantsheetid = plantsheet.id
+			})
+			
+			fertilizers.forEach((el) => {
+				el.plantsheetid = plantsheet.id;
+			});
+
+			await materialConjunction.bulkCreate(materials);
+			await PesticideConjunction.bulkCreate(pesticides);
+			await SeedConjunction.bulkCreate(seeds)
+			await fertilizerConjunction.bulkCreate(fertilizers);
+
+			res.status(200).json("new plantsheet has been added");
 		} catch (err) {
 			console.log(err);
 			next(err);

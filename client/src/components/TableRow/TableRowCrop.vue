@@ -20,7 +20,7 @@ export default {
 		<td class="h-14">
 			{{ index + 1 }}
 		</td>
-		<td class="h-14">{{ item?.plant.name }}</td>
+		<td class="h-14">{{ item?.plant?.name }}</td>
 		<td class="h-14">{{ item?.seedlingAge }}</td>
 		<td class="h-14">{{ item?.harvestAge }}</td>
 		<td class="h-14">{{ item?.harvestTime }}</td>

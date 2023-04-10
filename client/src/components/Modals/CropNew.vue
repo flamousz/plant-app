@@ -3,6 +3,7 @@ import { mapActions, mapState } from "pinia";
 import GreenButton from "../Buttons/GreenButton.vue";
 import { useCropStore } from "../../stores/crop";
 import RedButton from "../Buttons/RedButton.vue";
+import { useItemStore } from "../../stores/item";
 
 export default {
 	name: "CropNew",
@@ -16,14 +17,48 @@ export default {
 				harvestTime: "",
 				cropAge: "",
 				cropProdWeight: "",
-				type: "",
+				planttypeid: "",
 				id: "",
-				materialid: "",
+				materials: [
+					{
+						materialid: 0,
+					},
+				],
+				fertilizers: [
+					{
+						fertilizerid: 0,
+					},
+				],
+				fungiPesticide: [
+					{
+						pesticideid: 0,
+					},
+				],
+				insecticidePesticide: [
+					{
+						pesticideid: 0,
+					},
+				],
+				zptPesticide: [
+					{
+						pesticideid: 0,
+					},
+				],
+				perekatPesticide: [
+					{
+						pesticideid: 0,
+					},
+				],
+				seeds: [
+					{
+						seedid: []
+					}
+				]
 			},
 		};
 	},
 	methods: {
-		...mapActions(useCropStore, ["postCrop", "putCrop", "fetchMaterial"]),
+		...mapActions(useCropStore, ["postCrop", "putCrop", "fetchCrop"]),
 		handlePutorPost() {
 			if (this.editFlag === true) {
 				this.putCrop(this.cropData);
@@ -31,15 +66,96 @@ export default {
 				this.postCrop(this.cropData);
 			}
 		},
+		...mapActions(useItemStore, [
+			"fetchPlant",
+			"fetchPlantType",
+			"fetchMaterial",
+			"fetchFertilizer",
+			"fetchFungiPesticide",
+			"fetchInsecticidePesticide",
+			"fetchZptPesticide",
+			"fetchPerekatPesticide",
+			'fetchSeed'
+		]),
+
+		materialInputHandler(e) {
+			// console.log("masuk ingredient handler");
+			// console.log(e, "<< ini e");
+			// console.log(i, "<< ini index");
+			this.cropData.materials.push({
+				materialid: e,
+			});
+			// this.cropData.materials.pop()
+			// console.log(this.cropData.materials, "<< ini materials");
+		},
+
+		fertilizersInputHandler(e) {
+			this.cropData.fertilizers.push({
+				fertilizerid: e,
+			});
+		},
+
+		fungiPesticideInputHandler(e) {
+			this.cropData.fungiPesticide.push({
+				pesticideid: e,
+			});
+		},
+
+		insecticidePesticideInputHandler(e) {
+			this.cropData.insecticidePesticide.push({
+				pesticideid: e,
+			});
+		},
+
+		zptPesticideInputHandler(e) {
+			this.cropData.zptPesticide.push({
+				pesticideid: e,
+			});
+		},
+
+		perekatPesticideInputHandler(e) {
+			this.cropData.perekatPesticide.push({
+				pesticideid: e,
+			});
+		},
+
+		seedInputHandler(e){
+			this.cropData.seeds.push({
+				seedid: e
+			})
+		}
 	},
+
 	computed: {
-		...mapState(useCropStore, ["editFlag", "cropDetail", "materials"]),
+		...mapState(useCropStore, ["editFlag", "cropDetail", "crop"]),
+		...mapState(useItemStore, [
+			"plants",
+			"plantTypes",
+			"materials",
+			"fertilizers",
+			"fungiPesticides",
+			"insecticidePesticides",
+			"zptPesticides",
+			"perekatPesticides",
+			'seeds'
+		]),
 	},
 	created() {
+		this.fetchSeed()
+		this.fetchPerekatPesticide();
+		this.fetchZptPesticide();
+		this.fetchInsecticidePesticide();
+		this.fetchFungiPesticide();
+		this.fetchFertilizer();
 		this.fetchMaterial();
-		console.log(this.cropDetail, "ini crop detail dari crop new page");
-		console.log(this.cropDetail.id, "ini crop detail ID dari crop new page");
-		console.log(this.editFlag, "ini edit flag dari crop new page");
+		this.fetchPlant();
+		this.fetchPlantType();
+		// console.log(this.editFlag, "<< ini editflag");
+
+		// console.log(this.plantTypes,'<< plant type');
+		// console.log(this.cropDetail, "ini crop detail dari crop new page");
+		// console.log(this.cropDetail.id, "ini crop detail ID dari crop new page");
+		// console.log(this.editFlag, "ini edit flag dari crop new page");
 		if (this.editFlag == true) {
 			this.cropData.name = this.cropDetail.name;
 			this.cropData.seedlingAge = this.cropDetail.seedlingAge;
@@ -47,7 +163,7 @@ export default {
 			this.cropData.harvestTime = this.cropDetail.harvestTime;
 			this.cropData.cropAge = this.cropDetail.cropAge;
 			this.cropData.cropProdWeight = this.cropDetail.cropProdWeight;
-			this.cropData.type = this.cropDetail.type;
+			this.cropData.planttypeid = this.cropDetail.type;
 			this.cropData.id = this.cropDetail.id;
 		}
 	},
@@ -55,25 +171,25 @@ export default {
 </script>
 
 <template>
-	<!-- {{ materials }} -->
-	<div class="w-[600px] bg-slate-500 h-[500px]">
+	<!-- {{ seeds }} -->
+	<div class="w-full bg-slate-300 p-2">
 		<form @submit.prevent="handlePutorPost">
-			<div class="flex flex-row">
-				<div>
-					<div class="flex flex-col w-[100%] gap-2">
-						<div class="flex flex-row">
+			<div class="flex flex-row gap-2">
+				<div class="w-[30%]">
+					<div class="flex flex-col gap-2">
+						<div class="flex flex-row justify-between">
 							<label
 								for="name"
 								class="flex justify-start items-center lg:w-[23%]"
-								>Material:</label
+								>Plant:</label
 							>
 							<select
-								v-model="cropData.materialid"
+								v-model="cropData.plantid"
 								class="h-auto w-auto bg-green-100 rounded-md"
 							>
 								<option value="" disabled>Enter Plant Name here</option>
 								<option
-									v-for="item in materials"
+									v-for="item in plants"
 									:key="item.id"
 									:value="item.id"
 								>
@@ -81,10 +197,10 @@ export default {
 								</option>
 							</select>
 						</div>
-						<div class="flex flex-row">
+						<div class="flex flex-row justify-between">
 							<label
 								for="seedlingAge"
-								class="lg:w-[23%] flex justify-start items-center"
+								class="lg:w-[30%] flex justify-start items-center"
 								>Seedling Age:
 							</label>
 							<input
@@ -96,7 +212,7 @@ export default {
 								v-model="cropData.seedlingAge"
 							/>
 						</div>
-						<div class="flex flex-row">
+						<div class="flex flex-row justify-between">
 							<label
 								for="harvestAge"
 								class="lg:w-[23%] flex justify-start items-center"
@@ -111,10 +227,10 @@ export default {
 								v-model="cropData.harvestAge"
 							/>
 						</div>
-						<div class="flex flex-row">
+						<div class="flex flex-row justify-between">
 							<label
 								for="harvestTime"
-								class="lg:w-[23%] flex justify-start items-center"
+								class="lg:w-[35%] flex justify-start items-center"
 								>Harvest Time:
 							</label>
 							<input
@@ -126,7 +242,7 @@ export default {
 								v-model="cropData.harvestTime"
 							/>
 						</div>
-						<div class="flex flex-row">
+						<div class="flex flex-row justify-between">
 							<label
 								for="cropAge"
 								class="lg:w-[23%] flex justify-start items-center"
@@ -141,10 +257,10 @@ export default {
 								v-model="cropData.cropAge"
 							/>
 						</div>
-						<div class="flex flex-row">
+						<div class="flex flex-row justify-between">
 							<label
 								for="cropProdWeight"
-								class="lg:w-[23%] flex justify-start items-center"
+								class="lg:w-[60%] flex justify-start items-center"
 								>Crop Production Weight:
 							</label>
 							<input
@@ -156,22 +272,27 @@ export default {
 								v-model="cropData.cropProdWeight"
 							/>
 						</div>
-						<div class="flex flex-row">
+						<div class="flex flex-row justify-between">
 							<label
-								for="type"
-								class="lg:w-[23%] flex justify-start items-center"
-								>Type:
-							</label>
-							<input
-								id="type"
-								class="placeholder:text-xs p-[6px] border border-gray-300 rounded-md bg-green-100"
-								placeholder="Type..."
-								name="type"
-								type="text"
-								v-model="cropData.type"
-							/>
+								for="name"
+								class="flex justify-start items-center lg:w-[23%]"
+								>Type:</label
+							>
+							<select
+								v-model="cropData.planttypeid"
+								class="h-auto w-auto bg-green-100 rounded-md"
+							>
+								<option value="" disabled>Enter type here</option>
+								<option
+									v-for="item in plantTypes"
+									:key="item.id"
+									:value="item.id"
+								>
+									{{ item.name }}
+								</option>
+							</select>
 						</div>
-						<div class="flex gap-3">
+						<div class="flex gap-3 justify-end pt-3">
 							<GreenButton :type="'submit'" :text="'Submit'" />
 							<RouterLink to="/crop">
 								<button
@@ -183,22 +304,217 @@ export default {
 						</div>
 					</div>
 				</div>
-				<div>
+				<div class="w-[10%]">
 					<div class="flex flex-col w-[100%] gap-2">
-						<div class="flex flex-row">
-							<label
-								for="name"
-								class="flex justify-start items-center lg:w-[23%]"
-								>Name:</label
+						<div class="flex flex-col gap-2">
+							<label for="name" class="lg:w-full text-center"
+								>Material:</label
 							>
-							<input
-								class="placeholder:text-xs p-[6px] border border-gray-300 rounded-md bg-green-100"
-								placeholder="Name ...."
-								name="name"
-								type="text"
-								id="name"
-								v-model="cropData.name"
-							/>
+							<div
+								class="flex flex-col"
+								v-for="el in cropData.materials"
+							>
+								<select
+									v-model="el.materialid"
+									@change="materialInputHandler(el.materialid)"
+									class="h-auto w-auto bg-green-100 rounded-md flex flex-col"
+								>
+									<option value="" disabled selected>
+										Enter Material here
+									</option>
+									<option
+										v-for="item in materials"
+										:key="item.id"
+										:value="item.id"
+									>
+										{{ item.name }}
+									</option>
+								</select>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="w-[10%]">
+					<div class="flex flex-col w-[100%] gap-2">
+						<div class="flex flex-col gap-2">
+							<label for="name" class="lg:w-full text-center"
+								>Fertilizer:</label
+							>
+							<div
+								class="flex flex-col"
+								v-for="el in cropData.fertilizers"
+							>
+								<select
+									v-model="el.fertilizerid"
+									@change="fertilizersInputHandler(el.fertilizerid)"
+									class="h-auto w-auto bg-green-100 rounded-md flex flex-col"
+								>
+									<option value="" disabled>
+										Enter Fertilizer here
+									</option>
+									<option
+										v-for="item in fertilizers"
+										:key="item.id"
+										:value="item.id"
+									>
+										{{ item.name }}
+									</option>
+								</select>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="w-[10%]">
+					<div class="flex flex-col w-[100%] gap-2">
+						<div class="flex flex-col gap-2">
+							<label for="name" class="lg:w-full text-center"
+								>Fungi Pesticide:</label
+							>
+							<div
+								class="flex flex-col"
+								v-for="el in cropData.fungiPesticide"
+							>
+								<select
+									v-model="el.pesticideid"
+									@change="fungiPesticideInputHandler(el.pesticideid)"
+									class="h-auto w-auto bg-green-100 rounded-md flex flex-col"
+								>
+									<option value="" disabled selected>
+										Enter Fungi Pesticide here
+									</option>
+									<option
+										v-for="item in fungiPesticides"
+										:key="item.id"
+										:value="item.id"
+									>
+										{{ item.name }}
+									</option>
+								</select>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="w-[10%]">
+					<div class="flex flex-col w-[100%] gap-2">
+						<div class="flex flex-col gap-2">
+							<label for="name" class="lg:w-full text-center"
+								>ZPT Pesticide:</label
+							>
+							<div
+								class="flex flex-col"
+								v-for="el in cropData.zptPesticide"
+								:key="el.id"
+							>
+								<select
+									v-model="el.pesticideid"
+									@change="zptPesticideInputHandler(el.pesticideid)"
+									class="h-auto w-auto bg-green-100 rounded-md flex flex-col"
+								>
+									<option value="" disabled selected>
+										Enter ZPT Pesticide here
+									</option>
+									<option
+										v-for="item in zptPesticides"
+										:key="item.id"
+										:value="item.id"
+									>
+										{{ item.name }}
+									</option>
+								</select>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="w-[10%]">
+					<div class="flex flex-col w-[100%] gap-2">
+						<div class="flex flex-col gap-2">
+							<label for="name" class="lg:w-full text-center"
+								>Insectide Pesticide:</label
+							>
+							<div
+								class="flex flex-col"
+								v-for="el in cropData.insecticidePesticide"
+								:key="el.id"
+							>
+								<select
+									v-model="el.pesticideid"
+									@change="insecticidePesticideInputHandler(el.pesticideid)"
+									class="h-auto w-auto bg-green-100 rounded-md flex flex-col"
+								>
+									<option value="" disabled selected>
+										Enter Insectide Pesticide here
+									</option>
+									<option
+										v-for="item in insecticidePesticides"
+										:key="item.id"
+										:value="item.id"
+									>
+										{{ item.name }}
+									</option>
+								</select>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="w-[10%]">
+					<div class="flex flex-col w-[100%] gap-2">
+						<div class="flex flex-col gap-2">
+							<label for="name" class="lg:w-full text-center"
+								>Perekat Pesticide:</label
+							>
+							<div
+								class="flex flex-col"
+								v-for="el in cropData.perekatPesticide"
+								:key="el.id"
+							>
+								<select
+									v-model="el.pesticideid"
+									@change="perekatPesticideInputHandler(el.pesticideid)"
+									class="h-auto w-auto bg-green-100 rounded-md flex flex-col"
+								>
+									<option value="" disabled selected>
+										Enter Perekat Pesticide here
+									</option>
+									<option
+										v-for="item in perekatPesticides"
+										:key="item.id"
+										:value="item.id"
+									>
+										{{ item.name }}
+									</option>
+								</select>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="w-[10%]">
+					<div class="flex flex-col w-[100%] gap-2">
+						<div class="flex flex-col gap-2">
+							<label for="name" class="lg:w-full text-center"
+								>Seed:</label
+							>
+							<div
+								class="flex flex-col"
+								v-for="el in cropData.seeds"
+								:key="el.id"
+							>
+								<select
+									v-model="el.seedid"
+									@change="seedInputHandler(el.seedid)"
+									class="h-auto w-auto bg-green-100 rounded-md flex flex-col"
+								>
+									<option value="" disabled selected>
+										Enter Seeds here
+									</option>
+									<option
+										v-for="item in seeds"
+										:key="item.id"
+										:value="item.id"
+									>
+										{{ item.name }}
+									</option>
+								</select>
+							</div>
 						</div>
 					</div>
 				</div>

@@ -6,24 +6,12 @@ export const useCropStore = defineStore("crop", {
 	state() {
 		return {
 			crop: [],
-			materials: [],
 			cropDetail: {},
 			editFlag: false,
 		};
 	},
 	actions: {
-		async fetchMaterial() {
-			try {
-				this.editFlag = false
-				const { data } = await axios({
-					url: `${baseUrl}/items/materials`,
-					method: "GET",
-				});
-				this.materials = data;
-			} catch (err) {
-				console.log(err);
-			}
-		},
+		
 		async fetchCrop() {
 			try {
 				this.editFlag = false
@@ -78,8 +66,9 @@ export const useCropStore = defineStore("crop", {
 		async postCrop(val) {
 			try {
 				console.log("masuk");
+				console.log(val,'val dari crop store');
 				const { data } = await axios({
-					url: `${baseUrl}/crops`,
+					url: `${baseUrl}/plantsheet`,
 					method: "POST",
 					data: val,
 				});

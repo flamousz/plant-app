@@ -21,7 +21,8 @@ module.exports = (sequelize, DataTypes) => {
   }
   PesticideConjunction.init({
     plantsheetid: DataTypes.INTEGER,
-    pesticideid: DataTypes.INTEGER
+    pesticideid: DataTypes.INTEGER,
+    dose: DataTypes.FLOAT
   }, {
     sequelize,
     modelName: 'PesticideConjunction',
