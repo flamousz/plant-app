@@ -23,13 +23,13 @@ export default {
 				materials: [
 					{
 						materialid: 0,
-						dose: 0,
+						dose: null,
 					},
 				],
 				fertilizers: [
 					{
 						fertilizerid: 0,
-						dose: 0,
+						dose: null,
 					},
 				],
 				pesticides: [
@@ -40,7 +40,7 @@ export default {
 				],
 				seeds: [
 					{
-						seedid: [],
+						seedid: 0,
 					},
 				],
 			},
@@ -66,15 +66,41 @@ export default {
 		buttonSelector(value) {
 			this.activeTab = value;
 		},
+		materialInputHandler(e, i, field) {
+			this.cropData.materials[i][field] = e;
+		},
+		fertilizerInputHandler(e, i, field) {
+			this.cropData.fertilizers[i][field] = e;
+		},
 		pesticideDoseInputHandler(e, i) {
 			this.cropData.pesticides[i].dose = e;
 		},
 		pesticideInputHandler(e, i) {
 			this.cropData.pesticides[i].pesticideid = e;
 		},
+		seedInputHandler(e, i) {
+			this.cropData.seeds[i].seedid = e;
+		},
+		addSeedColumn() {
+			this.cropData.seeds.push({
+				seedid: 0,
+			});
+		},
 		addPesticideColumn() {
 			this.cropData.pesticides.push({
 				pesticideid: 0,
+				dose: null,
+			});
+		},
+		addMaterialColumn() {
+			this.cropData.materials.push({
+				materialid: 0,
+				dose: null,
+			});
+		},
+		addFertilizerColumn() {
+			this.cropData.fertilizers.push({
+				fertilizerid: 0,
 				dose: null,
 			});
 		},
@@ -103,8 +129,8 @@ export default {
 </script>
 
 <template>
-	<pre>{{ cropData.pesticides }}</pre>
-	<section class="w-full">
+	<!-- <pre>{{ cropData.seeds }}</pre> -->
+	<section class="w-full bg-slate-100">
 		<form @submit.prevent="handlePutorPost">
 			<div class="flex flex-col px-10">
 				<div class="flex flex-row h-[100px] justify-between mb-3">
@@ -117,7 +143,6 @@ export default {
 						<div
 							class="w-[40%] flex justify-start items-end text-xl font-semibold"
 						>
-							<!-- disini -->
 							<select
 								v-model="cropData.plantid"
 								class="h-auto w-auto bg-yellow-200 rounded-md"
@@ -234,6 +259,7 @@ export default {
 									class="placeholder:text-xs w-[100%] hover:bg-yellow-400 rounded-md bg-yellow-300"
 									placeholder="Crop Production Weight..."
 									name="cropProdWeight"
+									step="0.01"
 									type="number"
 									v-model="cropData.cropProdWeight"
 								/>
@@ -293,82 +319,244 @@ export default {
 					<div class="pt-2">
 						<div
 							v-if="activeTab === 'fertilizers'"
-							class="bg-yellow-400 w-[90%] flex flex-col"
-						></div>
+							class="w-[90%] flex flex-col gap-2"
+						>
+							<div>
+								<div class="flex flex-row w-full">
+									<div class="w-[13%] text-center border-black border">
+										Name
+									</div>
+									<div class="w-[12%] border border-black text-center">
+										Dose
+									</div>
+								</div>
+								<div
+									v-for="(el, index) in cropData.fertilizers"
+									class="w-full flex flex-row"
+								>
+									<div class="w-[13%] border border-black">
+										<select
+											v-model="el.fertilizerid"
+											@change="
+												fertilizerInputHandler(
+													el.fertilizerid,
+													index,
+													'fertilizerid'
+												)
+											"
+											class="bg-yellow-200 hover:bg-yellow-300 rounded-md h-full flex flex-col"
+										>
+											<option value="" disabled selected>
+												Enter Material here
+											</option>
+											<option
+												class="text-center"
+												v-for="item in fertilizers"
+												:key="item.id"
+												:value="item.id"
+											>
+												{{ item.name }}
+											</option>
+										</select>
+									</div>
+									<div class="w-[12%]">
+										<input
+											id="dose"
+											type="number"
+											step="0.01"
+											v-model="el.dose"
+											@change="
+												fertilizerInputHandler(
+													el.dose,
+													index,
+													'dose'
+												)
+											"
+											placeholder="Input Dose here ..."
+											class="text-sm text-center h-full w-full bg-yellow-200 border border-black hover:bg-yellow-300"
+										/>
+									</div>
+								</div>
+							</div>
+							<button
+								class="bg-red-500 w-[10%] h-full rounded tracking-wide text-slate-200 text-sm hover:bg-red-800"
+								@click.prevent="addFertilizerColumn"
+							>
+								<span class="text-2xl font-extrabold">+</span>
+								Fertilizer
+							</button>
+						</div>
 						<div
 							v-if="activeTab === 'pesticides'"
-							class="w-[90%] flex flex-col"
+							class="w-[90%] flex flex-col gap-2"
 						>
-							<table>
-								<thead>
-									<tr class="flex flex-row w-full bg-red-600">
-										<th
-											class="w-[22%] bg-slate-400 border-black border"
+							<div>
+								<div class="flex flex-row w-full">
+									<div class="w-[13%] text-center border-black border">
+										Name
+									</div>
+									<div class="w-[12%] border border-black text-center">
+										Dose
+									</div>
+								</div>
+								<div
+									v-for="(el, index) in cropData.pesticides"
+									class="w-full flex flex-row"
+								>
+									<div class="w-[13%] border border-black">
+										<select
+											v-model="el.pesticideid"
+											@change="
+												pesticideInputHandler(el.pesticideid, index)
+											"
+											class="bg-yellow-200 hover:bg-yellow-300 rounded-md h-full flex flex-col"
 										>
-											Name
-										</th>
-										<th
-											class="w-[10%] bg-green-600 border-y border-black"
-										>
-											Dose
-										</th>
-									</tr>
-								</thead>
-								<tbody>
-									<tr v-for="(el, index) in cropData.pesticides" class="w-full  bg-slate-500">
-										<td  class="w-[80%] bg-red-400">
-											<select
-												v-model="el.pesticideid"
-												@change="
-													pesticideInputHandler(
-														el.pesticideid,
-														index
-													)
-												"
-												class="w-[22%] bg-yellow-200 rounded-md flex flex-col"
+											<option value="" disabled selected>
+												Enter Insectide Pesticide here
+											</option>
+											<option
+												class="text-center"
+												v-for="item in pesticides"
+												:key="item.id"
+												:value="item.id"
 											>
-												<option value="" disabled selected>
-													Enter Insectide Pesticide here
-												</option>
-												<option
-													v-for="item in pesticides"
-													:key="item.id"
-													:value="item.id"
-												>
-													{{ item.name }}
-												</option>
-											</select>
-										</td>
-										<td class="w-[40%] bg-green-400">
-											<input
-												id="dose"
-												type="number"
-												v-model="el.dose"
-												@change="
-													pesticideDoseInputHandler(el.dose, index)
-												"
-												placeholder="Input Dose here ..."
-												class=" text-sm text-center "
-											/>
-										</td>
-									</tr>
-								</tbody>
-							</table>
+												{{ item.name }}
+											</option>
+										</select>
+									</div>
+									<div class="w-[12%]">
+										<input
+											id="dose"
+											type="number"
+											step="0.01"
+											v-model="el.dose"
+											@change="
+												pesticideDoseInputHandler(el.dose, index)
+											"
+											placeholder="Input Dose here ..."
+											class="text-sm text-center h-full w-full bg-yellow-200 border border-black hover:bg-yellow-300"
+										/>
+									</div>
+								</div>
+							</div>
 							<button
-								class="bg-red-500 w-[10%] rounded"
+								class="bg-red-500 w-[10%] h-full rounded tracking-wide text-slate-200 text-sm hover:bg-red-800"
 								@click.prevent="addPesticideColumn"
 							>
-								add
+								<span class="text-2xl font-extrabold">+</span> Pesticide
 							</button>
 						</div>
 						<div
 							v-if="activeTab === 'materials'"
-							class="bg-yellow-400 w-[90%] flex flex-col"
-						></div>
+							class="w-[90%] flex flex-col gap-2"
+						>
+							<div>
+								<div class="flex flex-row w-full">
+									<div class="w-[13%] text-center border-black border">
+										Name
+									</div>
+									<div class="w-[12%] border border-black text-center">
+										Dose
+									</div>
+								</div>
+								<div
+									v-for="(el, index) in cropData.materials"
+									class="w-full flex flex-row"
+								>
+									<div class="w-[13%] border border-black">
+										<select
+											v-model="el.materialid"
+											@change="
+												materialInputHandler(
+													el.materialid,
+													index,
+													'materialid'
+												)
+											"
+											class="bg-yellow-200 hover:bg-yellow-300 rounded-md h-full flex flex-col"
+										>
+											<option value="" disabled selected>
+												Enter Material here
+											</option>
+											<option
+												class="text-center"
+												v-for="item in materials"
+												:key="item.id"
+												:value="item.id"
+											>
+												{{ item.name }}
+											</option>
+										</select>
+									</div>
+									<div class="w-[12%]">
+										<input
+											id="dose"
+											type="number"
+											step="0.01"
+											v-model="el.dose"
+											@change="
+												materialInputHandler(el.dose, index, 'dose')
+											"
+											placeholder="Input Dose here ..."
+											class="text-sm text-center h-full w-full bg-yellow-200 border border-black hover:bg-yellow-300"
+										/>
+									</div>
+								</div>
+							</div>
+							<button
+								class="bg-red-500 w-[10%] h-full rounded tracking-wide text-slate-200 text-sm hover:bg-red-800"
+								@click.prevent="addMaterialColumn"
+							>
+								<span class="text-2xl font-extrabold">+</span> Material
+							</button>
+						</div>
 						<div
 							v-if="activeTab === 'seeds'"
-							class="bg-yellow-400 w-[90%] flex flex-col"
-						></div>
+							class=" w-[90%] flex flex-col gap-2"
+						>
+							<div>
+								<div class="flex flex-row w-full">
+									<div class="w-[13%] text-center border-black border">
+										Name
+									</div>
+								</div>
+								<div
+									v-for="(el, index) in cropData.seeds"
+									class="w-full flex flex-row"
+								>
+									<div class="w-[13%] border border-black">
+										<select
+											v-model="el.seedid"
+											@change="
+												seedInputHandler(
+													el.seedid,
+													index
+												)
+											"
+											class="bg-yellow-200 hover:bg-yellow-300 rounded-md h-full flex flex-col w-full"
+										>
+											<option value="" disabled selected>
+												Enter Seed here
+											</option>
+											<option
+												class="text-center"
+												v-for="item in seeds"
+												:key="item.id"
+												:value="item.id"
+											>
+												{{ item.name }}
+											</option>
+										</select>
+									</div>
+								</div>
+							</div>
+							<button
+								class="bg-red-500 w-[10%] h-full rounded tracking-wide text-slate-200 text-sm hover:bg-red-800"
+								@click.prevent="addSeedColumn"
+							>
+								<span class="text-2xl font-extrabold">+</span> Seed
+							</button>
+						</div>
 					</div>
 				</div>
 			</div>

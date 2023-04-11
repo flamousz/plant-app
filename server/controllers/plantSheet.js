@@ -78,7 +78,7 @@ class PlantSheetController {
 					{ model: Item, as: "plant", attributes: ["name", "code"] },
 					{
 						model: SeedConjunction,
-						attributes: ["id"],
+						attributes: ["id", 'seedid', 'plantsheetid'],
 						include: {
 							model: Item,
 							attributes: ["name", "description", "standardqty"],
@@ -86,7 +86,7 @@ class PlantSheetController {
 					},
 					{
 						model: fertilizerConjunction,
-						attributes: ["id", 'dose'],
+						attributes: ["id", "dose", 'fertilizerid', 'plantsheetid'],
 						include: {
 							model: Item,
 							attributes: ["name", "standardqty", "description"],
@@ -100,7 +100,7 @@ class PlantSheetController {
 					},
 					{
 						model: PesticideConjunction,
-						attributes: ["id", 'dose'],
+						attributes: ["id", "dose", 'pesticideid', 'plantsheetid'],
 						include: {
 							model: Item,
 							attributes: ["name", "standardqty", "description"],
@@ -111,14 +111,14 @@ class PlantSheetController {
 								},
 								{
 									model: Category,
-									attributes: ['name']
-								}
+									attributes: ["name"],
+								},
 							],
 						},
 					},
 					{
 						model: materialConjunction,
-						attributes: ["id", 'dose'],
+						attributes: ["id", "dose", 'materialid', 'plantsheetid'],
 						include: {
 							model: Item,
 							attributes: ["name", "standardqty", "description"],
@@ -169,15 +169,6 @@ class PlantSheetController {
 				fertilizers,
 				seeds,
 			} = req.body;
-			
-			console.log(pesticides,'<< INI PESTICIDES');
-			// fertilizers.pop();
-			// fungiPesticide.pop();
-			// materials.pop();
-			// insecticidePesticide.pop();
-			// zptPesticide.pop();
-			// perekatPesticide.pop();
-			// seeds.pop()
 
 			const plantsheet = await PlantSheet.create({
 				plantid,
@@ -189,26 +180,34 @@ class PlantSheetController {
 				planttypeid,
 			});
 
-			// materials.forEach((el) => {
-			// 	el.plantsheetid = plantsheet.id;
-			// });
-
 			pesticides.forEach((el) => {
 				el.plantsheetid = plantsheet.id;
 			});
 
-			// seeds.forEach((el) => {
-			// 	el.plantsheetid = plantsheet.id
-			// })
-			
-			// fertilizers.forEach((el) => {
-			// 	el.plantsheetid = plantsheet.id;
-			// });
+			materials.forEach((el) => {
+				el.plantsheetid = plantsheet.id;
+			});
 
-			// await materialConjunction.bulkCreate(materials);
-			await PesticideConjunction.bulkCreate(pesticides);
-			// await SeedConjunction.bulkCreate(seeds)
-			// await fertilizerConjunction.bulkCreate(fertilizers);
+			fertilizers.forEach((el) => {
+				el.plantsheetid = plantsheet.id;
+			});
+
+			seeds.forEach((el) => {
+				el.plantsheetid = plantsheet.id;
+			});
+
+			if (materials[0].materialid !== 0) {
+				await materialConjunction.bulkCreate(materials);
+			}
+			if (pesticides[0].pesticideid !== 0) {
+				await PesticideConjunction.bulkCreate(pesticides);
+			}
+			if (fertilizers[0].fertilizerid !== 0) {
+				await fertilizerConjunction.bulkCreate(fertilizers);
+			}
+			if (seeds[0].seedid !== 0) {
+				await SeedConjunction.bulkCreate(seeds);
+			}
 
 			res.status(200).json("new plantsheet has been added");
 		} catch (err) {
@@ -234,6 +233,45 @@ class PlantSheetController {
 			});
 
 			res.status(200).json(`${data.plant.name} has been deleted`);
+		} catch (err) {
+			console.log(err);
+			next(err);
+		}
+	}
+
+	static async putPlantSheet(req, res, next) {
+		try {
+			const { id } = req.params;
+			let {
+				plantid,
+				seedlingAge,
+				harvestAge,
+				harvestTime,
+				cropAge,
+				cropProdWeight,
+				planttypeid,
+				PesticideConjunctions,
+				SeedConjunctions,
+				fertilizerConjunctions,
+				materialConjunctions,
+			} = req.body;
+
+			await PlantSheet.update({
+				plantid,
+				seedlingAge,
+				harvestAge,
+				harvestTime,
+				cropAge,
+				cropProdWeight,
+				planttypeid,
+			}, {
+				where: {id},
+				returning: true
+			})
+
+			PesticideConjunction.forEach(el => {
+				
+			})
 		} catch (err) {
 			console.log(err);
 			next(err);
