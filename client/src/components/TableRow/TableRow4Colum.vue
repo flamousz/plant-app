@@ -17,7 +17,7 @@ export default {
 	<tr v-if="pesticide" class="w-[100%] flex flex-row bg-purple-400">
 		<td class="bg-slate-300 w-[22%] text-left pl-1 border border-black h-[33px] pt-1">{{ pesticide.Item.name }}</td>
 		<td class="bg-slate-300 w-[21%] text-left pl-1 border border-black h-[33px] pt-1">{{ pesticide.Item.Category?.name }}</td>
-		<td class="bg-yellow-200 border border-black w-[10%] text-center pt-1">{{ pesticide.Item.standardqty }}</td>
+		<td class="bg-yellow-200 border border-black w-[10%] text-center pt-1">{{ pesticide.dose }}</td>
 		<td class="border border-black w-[10%] text-center pt-1">{{ pesticide.Item.Uom.name }}</td>
 		<td class="border border-black w-[37%] text-center pt-1">{{ pesticide.Item.description }}</td>
 	</tr>

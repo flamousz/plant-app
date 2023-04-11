@@ -29,7 +29,7 @@ export default {
 </script>
 
 <template>
-	<!-- <pre>{{ activeTab }}</pre> -->
+	<pre>{{ cropDetail }}</pre>
 	<section class="w-full">
 		<div class="flex flex-col px-10 bg-slate-100">
 			<div class="flex flex-row h-[100px] mb-3">
