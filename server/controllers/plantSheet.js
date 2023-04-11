@@ -169,7 +169,8 @@ class PlantSheetController {
 				fertilizers,
 				seeds,
 			} = req.body;
-
+			
+			console.log(pesticides,'<< INI PESTICIDES');
 			// fertilizers.pop();
 			// fungiPesticide.pop();
 			// materials.pop();
@@ -188,26 +189,26 @@ class PlantSheetController {
 				planttypeid,
 			});
 
-			materials.forEach((el) => {
-				el.plantsheetid = plantsheet.id;
-			});
+			// materials.forEach((el) => {
+			// 	el.plantsheetid = plantsheet.id;
+			// });
 
 			pesticides.forEach((el) => {
 				el.plantsheetid = plantsheet.id;
 			});
 
-			seeds.forEach((el) => {
-				el.plantsheetid = plantsheet.id
-			})
+			// seeds.forEach((el) => {
+			// 	el.plantsheetid = plantsheet.id
+			// })
 			
-			fertilizers.forEach((el) => {
-				el.plantsheetid = plantsheet.id;
-			});
+			// fertilizers.forEach((el) => {
+			// 	el.plantsheetid = plantsheet.id;
+			// });
 
-			await materialConjunction.bulkCreate(materials);
+			// await materialConjunction.bulkCreate(materials);
 			await PesticideConjunction.bulkCreate(pesticides);
-			await SeedConjunction.bulkCreate(seeds)
-			await fertilizerConjunction.bulkCreate(fertilizers);
+			// await SeedConjunction.bulkCreate(seeds)
+			// await fertilizerConjunction.bulkCreate(fertilizers);
 
 			res.status(200).json("new plantsheet has been added");
 		} catch (err) {

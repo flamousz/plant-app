@@ -9,6 +9,7 @@ import FertilizerPage from'../views/FertilizerPage.vue'
 import LoginPage from '../views/LoginPage.vue'
 import CropNew from '../components/Modals/CropNew.vue'
 import DetailPlant from '../views/DetailPlant.vue'
+import FormPlantSheet from '../components/Modals/FormPlantSheet.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -27,6 +28,11 @@ const router = createRouter({
       path: '/detailplant/:id',
       name: 'detailplant',
       component: DetailPlant
+    },
+    {
+      path: '/formplantsheet',
+      name: 'formplantsheet',
+      component: FormPlantSheet
     },
     {
       path: '/cropnew',
