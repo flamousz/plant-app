@@ -2,6 +2,32 @@ const { Op } = require("sequelize");
 const { Item, Category, Uom } = require("../models/index");
 
 class ItemController {
+	static async getItemAllPesticide(req, res, next){
+		try {
+			const data = await Item.findAll({
+				where: {
+					[Op.or]: [
+						{categoryid:3},
+						{categoryid:4},
+						{categoryid:5},
+						{categoryid:6},
+					]
+				},
+				attributes: ["name", 'id'],
+				order: [["createdAt", "DESC"]],
+			})
+			if (!data) {
+				throw {
+					name: "NotFound",
+				};
+			}
+			res.status(200).json(data);
+		} catch (err) {
+			console.log(err);
+		}
+	}
+
+
 	static async getItemPesticidesFungi(req, res, next) {
 		try {
 			const data = await Item.findAll({

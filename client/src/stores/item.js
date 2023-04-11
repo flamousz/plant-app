@@ -14,10 +14,23 @@ export const useItemStore = defineStore("items", {
 			insecticidePesticides: [],
 			zptPesticides: [],
 			perekatPesticides: [],
-			seeds: []
+			seeds: [],
+			pesticides: [],
 		};
 	},
 	actions: {
+		async fetchPesticide() {
+			try {
+				this.editFlag = false;
+				const { data } = await axios({
+					url: `${baseUrl}/items/pesticides`,
+				});
+				this.pesticides = data;
+			} catch (err) {
+				console.log(err);
+			}
+		},
+
 		async fetchPlant() {
 			try {
 				this.editFlag = false;
@@ -117,20 +130,17 @@ export const useItemStore = defineStore("items", {
 			}
 		},
 
-		async fetchSeed(){
+		async fetchSeed() {
 			try {
-				this.editFlag = false
-				const {data} = await axios({
+				this.editFlag = false;
+				const { data } = await axios({
 					url: `${baseUrl}/items/seeds`,
-					method: 'GET'
-				})
-				this.seeds = data
-				
+					method: "GET",
+				});
+				this.seeds = data;
 			} catch (err) {
 				console.log(err);
 			}
-		}
-
-
+		},
 	},
 });

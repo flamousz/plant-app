@@ -51,9 +51,9 @@ export default {
 				],
 				seeds: [
 					{
-						seedid: []
-					}
-				]
+						seedid: [],
+					},
+				],
 			},
 		};
 	},
@@ -75,7 +75,7 @@ export default {
 			"fetchInsecticidePesticide",
 			"fetchZptPesticide",
 			"fetchPerekatPesticide",
-			'fetchSeed'
+			"fetchSeed",
 		]),
 
 		materialInputHandler(e) {
@@ -119,11 +119,11 @@ export default {
 			});
 		},
 
-		seedInputHandler(e){
+		seedInputHandler(e) {
 			this.cropData.seeds.push({
-				seedid: e
-			})
-		}
+				seedid: e,
+			});
+		},
 	},
 
 	computed: {
@@ -137,11 +137,11 @@ export default {
 			"insecticidePesticides",
 			"zptPesticides",
 			"perekatPesticides",
-			'seeds'
+			"seeds",
 		]),
 	},
 	created() {
-		this.fetchSeed()
+		this.fetchSeed();
 		this.fetchPerekatPesticide();
 		this.fetchZptPesticide();
 		this.fetchInsecticidePesticide();
@@ -438,7 +438,9 @@ export default {
 							>
 								<select
 									v-model="el.pesticideid"
-									@change="insecticidePesticideInputHandler(el.pesticideid)"
+									@change="
+										insecticidePesticideInputHandler(el.pesticideid)
+									"
 									class="h-auto w-auto bg-green-100 rounded-md flex flex-col"
 								>
 									<option value="" disabled selected>
@@ -469,7 +471,9 @@ export default {
 							>
 								<select
 									v-model="el.pesticideid"
-									@change="perekatPesticideInputHandler(el.pesticideid)"
+									@change="
+										perekatPesticideInputHandler(el.pesticideid)
+									"
 									class="h-auto w-auto bg-green-100 rounded-md flex flex-col"
 								>
 									<option value="" disabled selected>

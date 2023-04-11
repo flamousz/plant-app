@@ -6,11 +6,6 @@ import BlueButton from "../components/Buttons/BlueButton.vue";
 
 export default {
 	name: "CropPage",
-	data() {
-		return {
-			blueButtonTrigger: "/crop",
-		};
-	},
 	methods: {
 		...mapActions(useCropStore, ["fetchCrop"]),
 	},
@@ -27,7 +22,7 @@ export default {
 <template>
 	<!-- <pre>{{ crop }}</pre> -->
 	<div class="z-40 fixed flex ">
-		<RouterLink to="/cropnew"
+		<RouterLink to="/formplantsheet"
 			><BlueButton :type="'button'" :text="'NEW CROP'"
 		/></RouterLink>
 	</div>
