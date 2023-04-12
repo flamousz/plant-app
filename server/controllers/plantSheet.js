@@ -78,7 +78,7 @@ class PlantSheetController {
 					{ model: Item, as: "plant", attributes: ["name", "code"] },
 					{
 						model: SeedConjunction,
-						attributes: ["id", 'seedid', 'plantsheetid'],
+						attributes: ["id", "seedid", "plantsheetid"],
 						include: {
 							model: Item,
 							attributes: ["name", "description", "standardqty"],
@@ -86,7 +86,7 @@ class PlantSheetController {
 					},
 					{
 						model: fertilizerConjunction,
-						attributes: ["id", "dose", 'fertilizerid', 'plantsheetid'],
+						attributes: ["id", "dose", "fertilizerid", "plantsheetid"],
 						include: {
 							model: Item,
 							attributes: ["name", "standardqty", "description"],
@@ -100,7 +100,7 @@ class PlantSheetController {
 					},
 					{
 						model: PesticideConjunction,
-						attributes: ["id", "dose", 'pesticideid', 'plantsheetid'],
+						attributes: ["id", "dose", "pesticideid", "plantsheetid"],
 						include: {
 							model: Item,
 							attributes: ["name", "standardqty", "description"],
@@ -118,7 +118,7 @@ class PlantSheetController {
 					},
 					{
 						model: materialConjunction,
-						attributes: ["id", "dose", 'materialid', 'plantsheetid'],
+						attributes: ["id", "dose", "materialid", "plantsheetid"],
 						include: {
 							model: Item,
 							attributes: ["name", "standardqty", "description"],
@@ -242,6 +242,7 @@ class PlantSheetController {
 	static async putPlantSheet(req, res, next) {
 		try {
 			const { id } = req.params;
+
 			let {
 				plantid,
 				seedlingAge,
@@ -256,22 +257,187 @@ class PlantSheetController {
 				materialConjunctions,
 			} = req.body;
 
-			await PlantSheet.update({
-				plantid,
-				seedlingAge,
-				harvestAge,
-				harvestTime,
-				cropAge,
-				cropProdWeight,
-				planttypeid,
-			}, {
-				where: {id},
-				returning: true
-			})
+			const initialPlantsheet = await PlantSheet.findByPk(id, {
+				include: [
+					{ model: Item, as: "plant", attributes: ["name", "code"] },
+					{
+						model: SeedConjunction,
+						attributes: ["id", "seedid", "plantsheetid"],
+					},
+					{
+						model: fertilizerConjunction,
+						attributes: ["id", "dose", "fertilizerid", "plantsheetid"],
+					},
+					{
+						model: PesticideConjunction,
+						attributes: ["id", "dose", "pesticideid", "plantsheetid"],
+					},
+					{
+						model: materialConjunction,
+						attributes: ["id", "dose", "materialid", "plantsheetid"],
+					},
+				],
+				attributes: {
+					exclude: ["createdAt", "updatedAt"],
+				},
+				order: [["createdAt", "DESC"]],
+			});
 
-			PesticideConjunction.forEach(el => {
-				
-			})
+			const initialIDofPesticide = initialPlantsheet.PesticideConjunctions.map((el) => el.id);
+			const initialIDofMaterial = initialPlantsheet.materialConjunctions.map((el) => el.id)
+			const initialIDofFertilizer = initialPlantsheet.fertilizerConjunctions.map((el) => el.id)
+			const initialIDofSeed = initialPlantsheet.SeedConjunctions.map((el) => el.id)
+			console.log(initialIDofSeed,'<<< initialIDofSeed');
+			
+			const pesticidesNotDeletedPlan = PesticideConjunctions.map( (el) => el.id );
+			const materialsNotDeletedPlan = materialConjunctions.map((el) => el.id)
+			const fertilizersNotDeletedPlan = fertilizerConjunctions.map((el) => el.id)
+			const seedsNotDeletedPlan = SeedConjunctions.map((el) => el.id)
+			console.log(seedsNotDeletedPlan,'<<< seedsNotDeletedPlan');
+			
+			const pesticidesDeletedPlan = initialIDofPesticide.filter((el) => !pesticidesNotDeletedPlan.includes(el));
+			const materialsDeletedPlan = initialIDofMaterial.filter(el => !materialsNotDeletedPlan.includes(el))
+			const fertilizersDeletedPlan = initialIDofFertilizer.filter(el => !fertilizersNotDeletedPlan.includes(el))
+			const seedsDeletedPlan = initialIDofSeed.filter(el => !seedsNotDeletedPlan.includes(el))
+			console.log(seedsDeletedPlan,'<<< seedsDeletedPlan');
+
+			// searching element that not have 'id' key
+			const newPesticideWithoutId = PesticideConjunctions.filter((el) => !el.hasOwnProperty("id"))
+			const newMaterialsWithoutId = materialConjunctions.filter(el => !el.hasOwnProperty('id'))
+			const newFertilizersWithoutId = fertilizerConjunctions.filter(el => !el.hasOwnProperty('id'))
+			const newSeedsWithoutId = SeedConjunctions.filter(el => !el.hasOwnProperty('id'))
+
+			// searching element that  have 'id' key
+			const newPesticideWithId = PesticideConjunctions.filter((el) => el.hasOwnProperty("id")); 
+			const newMaterialsWithId = materialConjunctions.filter(el => el.hasOwnProperty('id'))
+			const newFertilizersWithId = fertilizerConjunctions.filter(el => el.hasOwnProperty('id'))
+			const newSeedsWithId = SeedConjunctions.filter(el => el.hasOwnProperty('id'))
+
+			await PlantSheet.update(
+				{
+					plantid,
+					seedlingAge,
+					harvestAge,
+					harvestTime,
+					cropAge,
+					cropProdWeight,
+					planttypeid,
+				},
+				{
+					where: { id },
+					returning: true,
+				}
+			);
+
+			if (pesticidesDeletedPlan[0]) {
+				for (const el of pesticidesDeletedPlan) {
+					await PesticideConjunction.destroy({
+						where: {
+							id: el,
+						},
+					});
+				}
+			}
+			if (materialsDeletedPlan[0]) {
+				for (const el of materialsDeletedPlan) {
+					await materialConjunction.destroy({
+						where: {
+							id: el
+						}
+					})
+				}
+			}
+			if (fertilizersDeletedPlan[0]) {
+				for (const el of fertilizersDeletedPlan) {
+					await fertilizerConjunction.destroy({
+						where: {
+							id: el
+						}
+					})
+				}
+			}
+			if (seedsDeletedPlan[0]) {
+				for (const el of seedsDeletedPlan) {
+					await SeedConjunction.destroy({
+						where: {
+							id: el
+						}
+					})
+				}
+			}
+
+			if (newPesticideWithId[0]) {
+				for (const el of newPesticideWithId) {
+					await PesticideConjunction.update(
+						{
+							dose: el.dose,
+							pesticideid: el.pesticideid,
+						},
+						{
+							where: {
+								id: el.id,
+							},
+						}
+					);
+				}
+			}
+			if (newMaterialsWithId[0]) {
+				for (const el of newMaterialsWithId) {
+					await materialConjunction.update({
+						dose: el.dose,
+						materialid: el.materialid
+					}, 
+					{
+						where: {
+							id: el.id
+						}
+					})
+				}
+			}
+			if (newFertilizersWithId[0]) {
+				for (const el of newFertilizersWithId) {
+					await fertilizerConjunction.update({
+						dose: el.dose,
+						fertilizerid: el.fertilizerid
+					}, 
+					{
+						where: {
+							id: el.id
+						}
+					})
+				}
+			}
+			if (newSeedsWithId[0]) {
+				for (const el of newSeedsWithId) {
+					await SeedConjunction.update({
+						seedid: el.seedid
+					}, 
+					{
+						where: {
+							id: el.id
+						}
+					})
+				}
+			}
+			console.log(newSeedsWithoutId, '<< ini newSeedsWithoutId');
+			if (newPesticideWithoutId[0]) {
+				newPesticideWithoutId.forEach((el) => (el.plantsheetid = id));
+				await PesticideConjunction.bulkCreate(newPesticideWithoutId);
+			}
+			if (newMaterialsWithoutId[0]) {
+				newMaterialsWithoutId.forEach(el => el.plantsheetid = id)
+				await materialConjunction.bulkCreate(newMaterialsWithoutId)
+			}
+			if (newFertilizersWithoutId[0]) {
+				newFertilizersWithoutId.forEach(el => el.plantsheetid = id)
+				await fertilizerConjunction.bulkCreate(newFertilizersWithoutId)
+			}
+			if (newSeedsWithoutId[0]) {
+				newSeedsWithoutId.forEach(el => el.plantsheetid = id)
+				await SeedConjunction.bulkCreate(newSeedsWithoutId)
+			}
+
+			res.status(200).json(`plantsheet successfully updated`);
 		} catch (err) {
 			console.log(err);
 			next(err);
