@@ -50,7 +50,7 @@ export const useCropStore = defineStore("crop", {
 		},
 		async getCropById(id) {
 			try {
-				this.editFlag = true;
+				// this.editFlag = true;
 				console.log(`masuk dengan id ${id}`);
 				const { data } = await axios({
 					url: `${baseUrl}/plantsheet/${id}`,
@@ -58,6 +58,22 @@ export const useCropStore = defineStore("crop", {
 				});
 				console.log(data, 'ini data dari store');
 				this.cropDetail = data;
+				// console.log(this.cropDetail, "< crop detail");
+			} catch (err) {
+				console.log(err);
+			}
+		},
+		async getCropByIdForEdit(id) {
+			try {
+				this.editFlag = true;
+				console.log(`masuk dengan id ${id} untuk edit`);
+				const { data } = await axios({
+					url: `${baseUrl}/plantsheet/${id}`,
+					method: "GET",
+				});
+				console.log(data, 'ini data dari store');
+				this.cropDetail = data;
+				this.router.push('/formplantsheet')
 				// console.log(this.cropDetail, "< crop detail");
 			} catch (err) {
 				console.log(err);

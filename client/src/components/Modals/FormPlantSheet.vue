@@ -20,25 +20,25 @@ export default {
 				cropProdWeight: "",
 				planttypeid: "",
 				id: "",
-				materials: [
+				materialConjunctions: [
 					{
 						materialid: 0,
 						dose: null,
 					},
 				],
-				fertilizers: [
+				fertilizerConjunctions: [
 					{
 						fertilizerid: 0,
 						dose: null,
 					},
 				],
-				pesticides: [
+				PesticideConjunctions: [
 					{
 						pesticideid: 0,
 						dose: null,
 					},
 				],
-				seeds: [
+				SeedConjunctions: [
 					{
 						seedid: 0,
 					},
@@ -67,46 +67,46 @@ export default {
 			this.activeTab = value;
 		},
 		materialInputHandler(e, i, field) {
-			this.cropData.materials[i][field] = e;
+			this.cropData.materialConjunctions[i][field] = e;
 		},
 		fertilizerInputHandler(e, i, field) {
-			this.cropData.fertilizers[i][field] = e;
+			this.cropData.fertilizerConjunctions[i][field] = e;
 		},
 		pesticideDoseInputHandler(e, i) {
-			this.cropData.pesticides[i].dose = e;
+			this.cropData.PesticideConjunctions[i].dose = e;
 		},
 		pesticideInputHandler(e, i) {
-			this.cropData.pesticides[i].pesticideid = e;
+			this.cropData.PesticideConjunctions[i].pesticideid = e;
 		},
 		seedInputHandler(e, i) {
-			this.cropData.seeds[i].seedid = e;
+			this.cropData.SeedConjunctions[i].seedid = e;
 		},
 		addSeedColumn() {
-			this.cropData.seeds.push({
+			this.cropData.SeedConjunctions.push({
 				seedid: 0,
 			});
 		},
 		addPesticideColumn() {
-			this.cropData.pesticides.push({
+			this.cropData.PesticideConjunctions.push({
 				pesticideid: 0,
 				dose: null,
 			});
 		},
 		addMaterialColumn() {
-			this.cropData.materials.push({
+			this.cropData.materialConjunctions.push({
 				materialid: 0,
 				dose: null,
 			});
 		},
 		addFertilizerColumn() {
-			this.cropData.fertilizers.push({
+			this.cropData.fertilizerConjunctions.push({
 				fertilizerid: 0,
 				dose: null,
 			});
 		},
 	},
 	computed: {
-		...mapState(useCropStore, ["editFlag"]),
+		...mapState(useCropStore, ["editFlag", 'cropDetail']),
 		...mapState(useItemStore, [
 			"plants",
 			"plantTypes",
@@ -123,13 +123,32 @@ export default {
 		this.fetchPlant();
 		this.fetchPlantType();
 		this.fetchPesticide();
+
+		if (this.editFlag === true) {
+			this.cropData.plantid = this.cropDetail.plantid
+			this.cropData.seedlingAge = this.cropDetail.seedlingAge
+			this.cropData.harvestAge = this.cropDetail.harvestAge
+			this.cropData.harvestTime = this.cropDetail.harvestTime
+			this.cropData.cropAge = this.cropDetail.cropAge
+			this.cropData.id = this.cropDetail.id
+			this.cropData.cropProdWeight = this.cropDetail.cropProdWeight
+			this.cropData.planttypeid = this.cropDetail.planttypeid
+			this.cropData.materialConjunctions = this.cropDetail.materialConjunctions
+			this.cropData.fertilizerConjunctions = this.cropDetail.fertilizerConjunctions
+			this.cropData.PesticideConjunctions = this.cropDetail.PesticideConjunctions
+			this.cropData.SeedConjunctions = this.cropDetail.SeedConjunctions
+
+
+		}
 	},
 	components: { RedButton, TableRow4Colum, GreenButton },
 };
 </script>
 
 <template>
-	<!-- <pre>{{ cropData.seeds }}</pre> -->
+	<!-- <pre>{{ editFlag }}</pre> -->
+	<!-- <pre>{{ cropDetail }}</pre> -->
+	
 	<section class="w-full bg-slate-100">
 		<form @submit.prevent="handlePutorPost">
 			<div class="flex flex-col px-10">
@@ -331,7 +350,7 @@ export default {
 									</div>
 								</div>
 								<div
-									v-for="(el, index) in cropData.fertilizers"
+									v-for="(el, index) in cropData.fertilizerConjunctions"
 									class="w-full flex flex-row"
 								>
 									<div class="w-[13%] border border-black">
@@ -400,7 +419,7 @@ export default {
 									</div>
 								</div>
 								<div
-									v-for="(el, index) in cropData.pesticides"
+									v-for="(el, index) in cropData.PesticideConjunctions"
 									class="w-full flex flex-row"
 								>
 									<div class="w-[13%] border border-black">
@@ -460,7 +479,7 @@ export default {
 									</div>
 								</div>
 								<div
-									v-for="(el, index) in cropData.materials"
+									v-for="(el, index) in cropData.materialConjunctions"
 									class="w-full flex flex-row"
 								>
 									<div class="w-[13%] border border-black">
@@ -521,7 +540,7 @@ export default {
 									</div>
 								</div>
 								<div
-									v-for="(el, index) in cropData.seeds"
+									v-for="(el, index) in cropData.SeedConjunctions"
 									class="w-full flex flex-row"
 								>
 									<div class="w-[13%] border border-black">
@@ -561,5 +580,6 @@ export default {
 				</div>
 			</div>
 		</form>
+		<pre>{{ cropData }}</pre>
 	</section>
 </template>

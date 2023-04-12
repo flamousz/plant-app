@@ -156,6 +156,7 @@ class PlantSheetController {
 
 	static async postPlantSheet(req, res, next) {
 		try {
+			console.log(req.body,'<< ini req.body');
 			let {
 				plantid,
 				seedlingAge,
@@ -164,12 +165,12 @@ class PlantSheetController {
 				cropAge,
 				cropProdWeight,
 				planttypeid,
-				materials,
-				pesticides,
-				fertilizers,
-				seeds,
+				materialConjunctions,
+				PesticideConjunctions,
+				fertilizerConjunctions,
+				SeedConjunctions,
 			} = req.body;
-
+			
 			const plantsheet = await PlantSheet.create({
 				plantid,
 				seedlingAge,
@@ -180,33 +181,33 @@ class PlantSheetController {
 				planttypeid,
 			});
 
-			pesticides.forEach((el) => {
+			PesticideConjunctions.forEach((el) => {
 				el.plantsheetid = plantsheet.id;
 			});
 
-			materials.forEach((el) => {
+			materialConjunctions.forEach((el) => {
 				el.plantsheetid = plantsheet.id;
 			});
 
-			fertilizers.forEach((el) => {
+			fertilizerConjunctions.forEach((el) => {
 				el.plantsheetid = plantsheet.id;
 			});
 
-			seeds.forEach((el) => {
+			SeedConjunctions.forEach((el) => {
 				el.plantsheetid = plantsheet.id;
 			});
 
-			if (materials[0].materialid !== 0) {
-				await materialConjunction.bulkCreate(materials);
+			if (materialConjunctions[0].materialid !== 0) {
+				await materialConjunction.bulkCreate(materialConjunctions);
 			}
-			if (pesticides[0].pesticideid !== 0) {
-				await PesticideConjunction.bulkCreate(pesticides);
+			if (PesticideConjunctions[0].pesticideid !== 0) {
+				await PesticideConjunction.bulkCreate(PesticideConjunctions);
 			}
-			if (fertilizers[0].fertilizerid !== 0) {
-				await fertilizerConjunction.bulkCreate(fertilizers);
+			if (fertilizerConjunctions[0].fertilizerid !== 0) {
+				await fertilizerConjunction.bulkCreate(fertilizerConjunctions);
 			}
-			if (seeds[0].seedid !== 0) {
-				await SeedConjunction.bulkCreate(seeds);
+			if (SeedConjunctions[0].seedid !== 0) {
+				await SeedConjunction.bulkCreate(SeedConjunctions);
 			}
 
 			res.status(200).json("new plantsheet has been added");
@@ -242,7 +243,7 @@ class PlantSheetController {
 	static async putPlantSheet(req, res, next) {
 		try {
 			const { id } = req.params;
-
+			console.log(req.body,'<< ini req.body');
 			let {
 				plantid,
 				seedlingAge,

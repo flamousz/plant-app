@@ -13,13 +13,13 @@ export default {
 		};
 	},
 	methods: {
-		...mapActions(useCropStore, ["getCropById", "deleteCrop"]),
+		...mapActions(useCropStore, ["getCropById", "deleteCrop", 'getCropByIdForEdit']),
 		buttonSelector(value) {
 			this.activeTab = value;
 		},
 	},
 	computed: {
-		...mapState(useCropStore, ["cropDetail"]),
+		...mapState(useCropStore, ["cropDetail", 'editFlag']),
 	},
 	created() {
 		this.getCropById(this.$route.params.id);
@@ -29,7 +29,7 @@ export default {
 </script>
 
 <template>
-	<pre>{{ cropDetail }}</pre>
+	<!-- <pre>{{ editFlag }}</pre> -->
 	<section class="w-full">
 		<div class="flex flex-col px-10 bg-slate-100">
 			<div class="flex flex-row h-[100px] mb-3">
@@ -42,7 +42,7 @@ export default {
 					<div @click="deleteCrop(cropDetail.id)">
 						<RedButton :type="'button'" :text="'DELETE'" />
 					</div>
-					<div>
+					<div @click="getCropByIdForEdit(cropDetail.id)">
 						<BlueButton :type="'button'" :text="'EDIT'" />
 					</div>
 				</div>
