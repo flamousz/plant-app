@@ -8,18 +8,49 @@ export const useCropStore = defineStore("crop", {
 			crop: [],
 			cropDetail: {},
 			editFlag: false,
+			query: {
+                filter: '',
+            }
 		};
 	},
 	actions: {
-		
 		async fetchCrop() {
 			try {
-				this.editFlag = false
+				this.editFlag = false;
+				let queryCrop = this.query
+				this.router.replace({name: 'crop', query: queryCrop}) 
+
 				const { data } = await axios({
 					url: `${baseUrl}/plantsheet`,
 					method: "GET",
+					params: queryCrop
 				});
 				this.crop = data;
+			} catch (err) {
+				console.log(err);
+			}
+		},
+		async patchCrop(val) {
+			try {
+				console.log(val, "ini data patch");
+				const { id } = val;
+				const { data } = await axios({
+					url: `${baseUrl}/plantsheet/${id}`,
+					method: "PATCH",
+					data: val,
+				});
+				this.editFlag = false;
+				this.getCropById(id);
+				Toastify({
+					text: data,
+					gravity: "bottom", // `top` or `bottom`
+					position: "left",
+					style: {
+						background: "linear-gradient(to left, #58c389, #7dd382)",
+					},
+
+					duration: 2000,
+				}).showToast();
 			} catch (err) {
 				console.log(err);
 			}
@@ -27,14 +58,19 @@ export const useCropStore = defineStore("crop", {
 		async putCrop(val) {
 			try {
 				const { id } = val;
+				console.log(id, "<<< ini id");
+				console.log(
+					val,
+					"<<< ini cropData yg diambil dari halaman edit dan sampe di crop store"
+				);
 				const { data } = await axios({
-					url: `${baseUrl}/crops/${id}`,
+					url: `${baseUrl}/plantsheet/${id}`,
 					method: "PUT",
 					data: val,
 				});
 				this.editFlag = false;
-				this.fetchCrop();
-				this.router.push("/crop");
+				// this.fetchCrop();
+				this.router.push(`/detailplant/${id}`);
 				Toastify({
 					text: data,
 					style: {
@@ -43,21 +79,37 @@ export const useCropStore = defineStore("crop", {
 
 					duration: 2000,
 				}).showToast();
-				console.log(this.editFlag,'ini edit flad di crop store');
+				console.log(this.editFlag, "ini edit flad di crop store");
 			} catch (err) {
 				console.log(err);
 			}
 		},
 		async getCropById(id) {
 			try {
-				this.editFlag = true;
+				// this.editFlag = true;
 				console.log(`masuk dengan id ${id}`);
 				const { data } = await axios({
 					url: `${baseUrl}/plantsheet/${id}`,
 					method: "GET",
 				});
-				console.log(data, 'ini data dari store');
+				console.log(data, "ini data dari store");
 				this.cropDetail = data;
+				// console.log(this.cropDetail, "< crop detail");
+			} catch (err) {
+				console.log(err);
+			}
+		},
+		async getCropByIdForEdit(id) {
+			try {
+				this.editFlag = true;
+				console.log(`masuk dengan id ${id} untuk edit`);
+				const { data } = await axios({
+					url: `${baseUrl}/plantsheet/${id}`,
+					method: "GET",
+				});
+				console.log(data, "ini data dari store");
+				this.cropDetail = data;
+				this.router.push("/formplantsheet");
 				// console.log(this.cropDetail, "< crop detail");
 			} catch (err) {
 				console.log(err);
@@ -66,7 +118,7 @@ export const useCropStore = defineStore("crop", {
 		async postCrop(val) {
 			try {
 				console.log("masuk");
-				console.log(val,'val dari crop store');
+				console.log(val, "val dari crop store");
 				const { data } = await axios({
 					url: `${baseUrl}/plantsheet`,
 					method: "POST",
@@ -93,7 +145,7 @@ export const useCropStore = defineStore("crop", {
 				}).showToast();
 			}
 		},
-		
+
 		async deleteCrop(id) {
 			try {
 				console.log(`tanamanan dengan id ${id} masuk ke crop store`);

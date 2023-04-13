@@ -39,6 +39,8 @@ module.exports = (sequelize, DataTypes) => {
 			cropProdWeight: DataTypes.NUMERIC,
 			planttypeid: DataTypes.INTEGER,
 			plantid: DataTypes.INTEGER,
+			status: DataTypes.STRING,
+			arcStatus: DataTypes.STRING,
 		},
 		{
 			sequelize,
