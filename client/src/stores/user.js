@@ -5,7 +5,8 @@ import { baseUrl } from "./crop";
 export const useUserStore = defineStore("user", {
 	state() {
 		return {
-			access_token: localStorage.access_token || "",
+			access_token:  "",
+			role:  ''
 		};
 	},
 	actions: {
@@ -17,7 +18,9 @@ export const useUserStore = defineStore("user", {
 					data: val,
 				});
 				localStorage.setItem("access_token", data.access_token);
+				localStorage.setItem('role', data.role)
 				this.access_token = data.access_token;
+				this.role = data.role;
 				this.router.push("/crop");
                 Toastify({
                     text: "Welcome to Plantation App",

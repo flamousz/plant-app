@@ -26,6 +26,7 @@ export default {
 		<td class="h-14">{{ item?.harvestTime }}</td>
 		<td class="h-14">{{ item?.cropAge }}</td>
 		<td class="h-14">{{ item?.cropProdWeight }}</td>
+		<td class="h-14">{{ item?.arcStatus }}</td>
 		<td class="h-14">{{ item?.PlantType?.name }}</td>
 	</tr>
 </template>

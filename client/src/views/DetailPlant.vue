@@ -10,16 +10,43 @@ export default {
 	data() {
 		return {
 			activeTab: "",
+			role: localStorage.getItem("role"),
+			cropData: {
+				id: 0,
+				arcStatus: "",
+			},
 		};
 	},
 	methods: {
-		...mapActions(useCropStore, ["getCropById", "deleteCrop", 'getCropByIdForEdit']),
+		...mapActions(useCropStore, [
+			"getCropById",
+			"deleteCrop",
+			"getCropByIdForEdit",
+			"patchCrop",
+		]),
 		buttonSelector(value) {
 			this.activeTab = value;
 		},
+		patchLocal() {
+			this.cropData.id = this.cropDetail.id;
+			if (this.cropDetail.arcStatus === "archived") {
+				this.cropData.arcStatus = "avail";
+			} else {
+				this.cropData.arcStatus = "archived";
+			}
+			console.log(this.cropData, "<<< ini cropData");
+			this.patchCrop(this.cropData);
+		},
 	},
 	computed: {
-		...mapState(useCropStore, ["cropDetail", 'editFlag']),
+		...mapState(useCropStore, ["cropDetail", "editFlag"]),
+		archive() {
+			if (this.cropDetail.arcStatus === "archived") {
+				return 'avail'
+			} else {
+				return 'archived'
+			}
+		},
 	},
 	created() {
 		this.getCropById(this.$route.params.id);
@@ -29,20 +56,34 @@ export default {
 </script>
 
 <template>
-	<!-- <pre>{{ editFlag }}</pre> -->
+	<!-- <pre>{{ role }}</pre> -->
 	<section class="w-full">
 		<div class="flex flex-col px-10 bg-slate-100">
-			<div class="flex flex-row h-[100px] mb-3">
+			<div class="w-full flex justify-end items-end pt-4">
+				<div class="text-2xl font-bold w-[8%]">STATUS:</div>
+				<div
+					class="w-[13%] border-[3px] rounded-md border-slate-800 bg-yellow-300 font-semibold text-center tracking-wide"
+				>
+					{{ cropDetail.status }} - {{ cropDetail.arcStatus }}
+				</div>
+			</div>
+			<div class="flex flex-row h-[50px] mb-3">
 				<div
 					class="w-[40%] flex justify-start items-end text-5xl font-bold"
 				>
-					{{ cropDetail.plant.name }}
+					{{ cropDetail?.plant?.name }}
 				</div>
 				<div class="w-[60%] flex flex-row justify-end items-end gap-3">
-					<div @click="deleteCrop(cropDetail.id)">
+					<div @click="patchLocal">
+						<RedButton :type="'button'" :text="archive" />
+					</div>
+					<div @click="deleteCrop(cropDetail.id)" v-if="role === 'super'">
 						<RedButton :type="'button'" :text="'DELETE'" />
 					</div>
-					<div @click="getCropByIdForEdit(cropDetail.id)">
+					<div
+						@click="getCropByIdForEdit(cropDetail.id)"
+						v-if="role === 'super' || cropDetail.status === 'draft'"
+					>
 						<BlueButton :type="'button'" :text="'EDIT'" />
 					</div>
 				</div>
@@ -154,66 +195,114 @@ export default {
 					</button>
 				</div>
 				<div class="pt-2">
-					<div v-if="activeTab === 'fertilizers'" class="bg-yellow-400 w-[90%] flex flex-col ">
+					<div
+						v-if="activeTab === 'fertilizers'"
+						class="bg-yellow-400 w-[90%] flex flex-col"
+					>
 						<thead>
-							<tr class="flex flex-row w-full bg-red-600 ">
-								<th class="w-[43%] bg-slate-400 border-black border">Name</th>
-								<th class="w-[10%] bg-green-600 border-y border-black">Dose</th>
-								<th class="w-[10%] bg-white border border-black">UOM</th>
+							<tr class="flex flex-row w-full bg-red-600">
+								<th class="w-[43%] bg-slate-400 border-black border">
+									Name
+								</th>
+								<th class="w-[10%] bg-green-600 border-y border-black">
+									Dose
+								</th>
+								<th class="w-[10%] bg-white border border-black">
+									UOM
+								</th>
 								<th class="w-[37%] border border-black">Description</th>
 							</tr>
 						</thead>
-						<tbody >
-							<TableRow4Colum 
-							v-for="(fertilizer, index) in cropDetail.fertilizerConjunctions" 
-							:key="fertilizer.id" :fertilizer="fertilizer" :index="index" 
+						<tbody>
+							<TableRow4Colum
+								v-for="(
+									fertilizer, index
+								) in cropDetail.fertilizerConjunctions"
+								:key="fertilizer.id"
+								:fertilizer="fertilizer"
+								:index="index"
 							/>
 						</tbody>
 					</div>
-					<div v-if="activeTab === 'pesticides'" class="bg-yellow-400 w-[90%] flex flex-col ">
+					<div
+						v-if="activeTab === 'pesticides'"
+						class="bg-yellow-400 w-[90%] flex flex-col"
+					>
 						<thead>
-							<tr class="flex flex-row w-full bg-red-600 ">
-								<th class="w-[22%] bg-slate-400 border-black border">Name</th>
-								<th class="w-[21%] bg-slate-400 border-black border">Category</th>
-								<th class="w-[10%] bg-green-600 border-y border-black">Dose</th>
-								<th class="w-[10%] bg-white border border-black">UOM</th>
+							<tr class="flex flex-row w-full bg-red-600">
+								<th class="w-[22%] bg-slate-400 border-black border">
+									Name
+								</th>
+								<th class="w-[21%] bg-slate-400 border-black border">
+									Category
+								</th>
+								<th class="w-[10%] bg-green-600 border-y border-black">
+									Dose
+								</th>
+								<th class="w-[10%] bg-white border border-black">
+									UOM
+								</th>
 								<th class="w-[37%] border border-black">Description</th>
 							</tr>
 						</thead>
-						<tbody >
-							<TableRow4Colum 
-							v-for="(pesticide, index) in cropDetail.PesticideConjunctions" 
-							:key="pesticide.id" :pesticide="pesticide" :index="index" 
+						<tbody>
+							<TableRow4Colum
+								v-for="(
+									pesticide, index
+								) in cropDetail.PesticideConjunctions"
+								:key="pesticide.id"
+								:pesticide="pesticide"
+								:index="index"
 							/>
 						</tbody>
 					</div>
-					<div v-if="activeTab === 'materials'" class="bg-yellow-400 w-[90%] flex flex-col ">
+					<div
+						v-if="activeTab === 'materials'"
+						class="bg-yellow-400 w-[90%] flex flex-col"
+					>
 						<thead>
-							<tr class="flex flex-row w-full bg-red-600 ">
-								<th class="w-[43%] bg-slate-400 border-black border">Name</th>
-								<th class="w-[10%] bg-green-600 border-y border-black">Dose</th>
-								<th class="w-[10%] bg-white border border-black">UOM</th>
+							<tr class="flex flex-row w-full bg-red-600">
+								<th class="w-[43%] bg-slate-400 border-black border">
+									Name
+								</th>
+								<th class="w-[10%] bg-green-600 border-y border-black">
+									Dose
+								</th>
+								<th class="w-[10%] bg-white border border-black">
+									UOM
+								</th>
 								<th class="w-[37%] border border-black">Description</th>
 							</tr>
 						</thead>
-						<tbody >
-							<TableRow4Colum 
-							v-for="(materials, index) in cropDetail.materialConjunctions" 
-							:key="materials.id" :material="materials" :index="index" 
+						<tbody>
+							<TableRow4Colum
+								v-for="(
+									materials, index
+								) in cropDetail.materialConjunctions"
+								:key="materials.id"
+								:material="materials"
+								:index="index"
 							/>
 						</tbody>
 					</div>
-					<div v-if="activeTab === 'seeds'" class="bg-yellow-400 w-[90%] flex flex-col ">
+					<div
+						v-if="activeTab === 'seeds'"
+						class="bg-yellow-400 w-[90%] flex flex-col"
+					>
 						<thead>
-							<tr class="flex flex-row w-full bg-red-600 ">
-								<th class="w-[43%] bg-slate-400 border-black border">Name</th>
+							<tr class="flex flex-row w-full bg-red-600">
+								<th class="w-[43%] bg-slate-400 border-black border">
+									Name
+								</th>
 								<th class="w-[57%] border border-black">Brand</th>
 							</tr>
 						</thead>
-						<tbody >
-							<TableRow4Colum 
-							v-for="(seed, index) in cropDetail.SeedConjunctions" 
-							:key="seed.id" :seed="seed" :index="index" 
+						<tbody>
+							<TableRow4Colum
+								v-for="(seed, index) in cropDetail.SeedConjunctions"
+								:key="seed.id"
+								:seed="seed"
+								:index="index"
 							/>
 						</tbody>
 					</div>

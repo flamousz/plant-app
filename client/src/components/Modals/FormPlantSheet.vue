@@ -4,7 +4,9 @@ import RedButton from "../Buttons/RedButton.vue";
 import TableRow4Colum from "../TableRow/TableRow4Colum.vue";
 import { useCropStore } from "../../stores/crop";
 import { useItemStore } from "../../stores/item";
+import { useUserStore } from "../../stores/user";
 import GreenButton from "../Buttons/GreenButton.vue";
+import BlueButton from "../Buttons/BlueButton.vue";
 
 export default {
 	name: "FormPlantSheet",
@@ -20,6 +22,7 @@ export default {
 				cropProdWeight: "",
 				planttypeid: "",
 				id: "",
+				status: "",
 				materialConjunctions: [
 					{
 						materialid: 0,
@@ -47,7 +50,7 @@ export default {
 		};
 	},
 	methods: {
-		...mapActions(useCropStore, ["postCrop"]),
+		...mapActions(useCropStore, ["postCrop", "putCrop"]),
 		...mapActions(useItemStore, [
 			"fetchPlant",
 			"fetchPlantType",
@@ -56,12 +59,18 @@ export default {
 			"fetchSeed",
 			"fetchPesticide",
 		]),
+		handleDeletedConjunctions(key, index) {
+			this.cropData[`${key}Conjunctions`].splice(index, 1);
+		},
 		handlePutorPost() {
 			if (this.editFlag === true) {
 				this.putCrop(this.cropData);
 			} else if (this.editFlag === false) {
 				this.postCrop(this.cropData);
 			}
+		},
+		handleStatus(value) {
+			this.cropData.status = value;
 		},
 		buttonSelector(value) {
 			this.activeTab = value;
@@ -106,7 +115,7 @@ export default {
 		},
 	},
 	computed: {
-		...mapState(useCropStore, ["editFlag", 'cropDetail']),
+		...mapState(useCropStore, ["editFlag", "cropDetail"]),
 		...mapState(useItemStore, [
 			"plants",
 			"plantTypes",
@@ -115,6 +124,7 @@ export default {
 			"seeds",
 			"pesticides",
 		]),
+		...mapState(useUserStore, ["role", "access_token"]),
 	},
 	created() {
 		this.fetchSeed();
@@ -125,34 +135,45 @@ export default {
 		this.fetchPesticide();
 
 		if (this.editFlag === true) {
-			this.cropData.plantid = this.cropDetail.plantid
-			this.cropData.seedlingAge = this.cropDetail.seedlingAge
-			this.cropData.harvestAge = this.cropDetail.harvestAge
-			this.cropData.harvestTime = this.cropDetail.harvestTime
-			this.cropData.cropAge = this.cropDetail.cropAge
-			this.cropData.id = this.cropDetail.id
-			this.cropData.cropProdWeight = this.cropDetail.cropProdWeight
-			this.cropData.planttypeid = this.cropDetail.planttypeid
-			this.cropData.materialConjunctions = this.cropDetail.materialConjunctions
-			this.cropData.fertilizerConjunctions = this.cropDetail.fertilizerConjunctions
-			this.cropData.PesticideConjunctions = this.cropDetail.PesticideConjunctions
-			this.cropData.SeedConjunctions = this.cropDetail.SeedConjunctions
-
-
+			this.cropData.plantid = this.cropDetail.plantid;
+			this.cropData.seedlingAge = this.cropDetail.seedlingAge;
+			this.cropData.harvestAge = this.cropDetail.harvestAge;
+			this.cropData.harvestTime = this.cropDetail.harvestTime;
+			this.cropData.cropAge = this.cropDetail.cropAge;
+			this.cropData.id = this.cropDetail.id;
+			this.cropData.cropProdWeight = this.cropDetail.cropProdWeight;
+			this.cropData.planttypeid = this.cropDetail.planttypeid;
+			this.cropData.materialConjunctions =
+				this.cropDetail.materialConjunctions;
+			this.cropData.fertilizerConjunctions =
+				this.cropDetail.fertilizerConjunctions;
+			this.cropData.PesticideConjunctions =
+				this.cropDetail.PesticideConjunctions;
+			this.cropData.SeedConjunctions = this.cropDetail.SeedConjunctions;
+			this.cropData.status = this.cropDetail.status;
 		}
 	},
-	components: { RedButton, TableRow4Colum, GreenButton },
+	components: { RedButton, TableRow4Colum, GreenButton, BlueButton },
 };
 </script>
 
 <template>
+	<!-- <pre>{{ cropDetail }}</pre>
+	<pre>{{ role }}</pre> -->
 	<!-- <pre>{{ editFlag }}</pre> -->
-	<!-- <pre>{{ cropDetail }}</pre> -->
-	
+
 	<section class="w-full bg-slate-100">
 		<form @submit.prevent="handlePutorPost">
 			<div class="flex flex-col px-10">
-				<div class="flex flex-row h-[100px] justify-between mb-3">
+				<div class="w-full flex justify-end items-end pt-4" v-if="editFlag === true">
+					<div class="text-2xl font-bold w-[8%]">STATUS:</div>
+					<div
+						class="w-[6%] border-[3px] rounded-md border-slate-800 bg-yellow-300 font-semibold text-center tracking-wide"
+					>
+						{{ cropDetail.status }}
+					</div>
+				</div>
+				<div class="flex flex-row h-[50px] justify-between mb-3">
 					<div class="flex flex-row w-[50%]">
 						<div
 							class="w-[22%] flex justify-start items-end text-5xl font-bold"
@@ -179,10 +200,34 @@ export default {
 					</div>
 
 					<div class="flex gap-3 flex-row items-end">
-						<GreenButton :type="'submit'" :text="'Submit'" />
+						<div @click="handleStatus('confirm')">
+							<BlueButton
+								:type="'submit'"
+								:text="'Confirm'"
+								v-if="role !== 'super' && editFlag === true"
+							/>
+						</div>
+						<div @click="handleStatus('draft')">
+							<GreenButton
+								:type="'submit'"
+								:text="'Draft'"
+								v-if="role !== 'super' && editFlag === true"
+							/>
+						</div>
+						<GreenButton
+							:type="'submit'"
+							:text="'Submit'"
+							v-if="role === 'super' || editFlag === false"
+						/>
+
+						<button
+							class=" bg-red-500 rounded flex hover:bg-red-900 justify-center items-center font-semibold text-[11px] text-slate-100 lg:h-[30px] w-[90px]" @click.prevent="this.$router.push(`/detailplant/${cropDetail.id}`)" v-if="editFlag === true"
+						>
+							Cancel
+						</button>
 						<RouterLink to="/crop">
 							<button
-								class="bg-[#c52b2b] rounded flex hover:bg-red-900 justify-center items-center font-semibold text-[11px] text-slate-100 lg:h-[30px] w-[90px]"
+								class=" bg-red-500 rounded flex hover:bg-red-900 justify-center items-center font-semibold text-[11px] text-slate-100 lg:h-[30px] w-[90px]" v-if="editFlag === false"
 							>
 								Cancel
 							</button>
@@ -348,9 +393,14 @@ export default {
 									<div class="w-[12%] border border-black text-center">
 										Dose
 									</div>
+									<div class="w-[12%] border border-black text-center">
+										Action
+									</div>
 								</div>
 								<div
-									v-for="(el, index) in cropData.fertilizerConjunctions"
+									v-for="(
+										el, index
+									) in cropData.fertilizerConjunctions"
 									class="w-full flex flex-row"
 								>
 									<div class="w-[13%] border border-black">
@@ -395,6 +445,21 @@ export default {
 											class="text-sm text-center h-full w-full bg-yellow-200 border border-black hover:bg-yellow-300"
 										/>
 									</div>
+									<div
+										class="w-[12%] border border-black flex flex-col justify-center items-center bg-yellow-200"
+									>
+										<button
+											class="bg-red-500 w-[50%] rounded text-slate-200 tracking-wide font-semibold text-center text-sm hover:bg-red-800"
+											@click.prevent="
+												handleDeletedConjunctions(
+													'fertilizer',
+													index
+												)
+											"
+										>
+											DELETE
+										</button>
+									</div>
 								</div>
 							</div>
 							<button
@@ -416,6 +481,9 @@ export default {
 									</div>
 									<div class="w-[12%] border border-black text-center">
 										Dose
+									</div>
+									<div class="w-[12%] border border-black text-center">
+										Action
 									</div>
 								</div>
 								<div
@@ -456,6 +524,21 @@ export default {
 											class="text-sm text-center h-full w-full bg-yellow-200 border border-black hover:bg-yellow-300"
 										/>
 									</div>
+									<div
+										class="w-[12%] border border-black flex flex-col justify-center items-center bg-yellow-200"
+									>
+										<button
+											class="bg-red-500 w-[50%] rounded text-slate-200 tracking-wide font-semibold text-center text-sm hover:bg-red-800"
+											@click.prevent="
+												handleDeletedConjunctions(
+													'Pesticide',
+													index
+												)
+											"
+										>
+											DELETE
+										</button>
+									</div>
 								</div>
 							</div>
 							<button
@@ -476,6 +559,9 @@ export default {
 									</div>
 									<div class="w-[12%] border border-black text-center">
 										Dose
+									</div>
+									<div class="w-[12%] border border-black text-center">
+										Action
 									</div>
 								</div>
 								<div
@@ -520,6 +606,18 @@ export default {
 											class="text-sm text-center h-full w-full bg-yellow-200 border border-black hover:bg-yellow-300"
 										/>
 									</div>
+									<div
+										class="w-[12%] border border-black flex flex-col justify-center items-center bg-yellow-200"
+									>
+										<button
+											class="bg-red-500 w-[50%] rounded text-slate-200 tracking-wide font-semibold text-center text-sm hover:bg-red-800"
+											@click.prevent="
+												handleDeletedConjunctions('material', index)
+											"
+										>
+											DELETE
+										</button>
+									</div>
 								</div>
 							</div>
 							<button
@@ -531,12 +629,15 @@ export default {
 						</div>
 						<div
 							v-if="activeTab === 'seeds'"
-							class=" w-[90%] flex flex-col gap-2"
+							class="w-[90%] flex flex-col gap-2"
 						>
 							<div>
 								<div class="flex flex-row w-full">
 									<div class="w-[13%] text-center border-black border">
 										Name
+									</div>
+									<div class="w-[12%] border border-black text-center">
+										Action
 									</div>
 								</div>
 								<div
@@ -546,12 +647,7 @@ export default {
 									<div class="w-[13%] border border-black">
 										<select
 											v-model="el.seedid"
-											@change="
-												seedInputHandler(
-													el.seedid,
-													index
-												)
-											"
+											@change="seedInputHandler(el.seedid, index)"
 											class="bg-yellow-200 hover:bg-yellow-300 rounded-md h-full flex flex-col w-full"
 										>
 											<option value="" disabled selected>
@@ -567,6 +663,18 @@ export default {
 											</option>
 										</select>
 									</div>
+									<div
+										class="w-[12%] border border-black flex flex-col justify-center items-center bg-yellow-200"
+									>
+										<button
+											class="bg-red-500 w-[50%] rounded text-slate-200 tracking-wide font-semibold text-center text-sm hover:bg-red-800"
+											@click.prevent="
+												handleDeletedConjunctions('Seed', index)
+											"
+										>
+											DELETE
+										</button>
+									</div>
 								</div>
 							</div>
 							<button
@@ -580,6 +688,6 @@ export default {
 				</div>
 			</div>
 		</form>
-		<pre>{{ cropData }}</pre>
+		<!-- <pre>{{ cropData }}</pre> -->
 	</section>
 </template>
