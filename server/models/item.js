@@ -50,6 +50,8 @@ module.exports = (sequelize, DataTypes) => {
 			categoryid: DataTypes.INTEGER,
 			uomid: DataTypes.INTEGER,
 			standardqty: DataTypes.NUMERIC,
+			status: DataTypes.STRING,
+			arcStatus: DataTypes.STRING,
 		},
 		{
 			sequelize,
