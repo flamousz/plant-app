@@ -84,7 +84,7 @@ export default {
 					{{ cropDetail?.plant?.name }}
 				</div>
 				<div class="w-[60%] flex flex-row justify-end items-end gap-3">
-					<div @click="patchLocal">
+					<div @click="patchLocal" v-if="role !== 'super'">
 						<RedButton :type="'button'" :text="archive" />
 					</div>
 					<div @click="deleteCrop(cropDetail.id)" v-if="role === 'super'">

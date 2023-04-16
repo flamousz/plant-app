@@ -1,6 +1,4 @@
 <script>
-import BlueButton from "../Buttons/BlueButton.vue";
-import RedButton from "../Buttons/RedButton.vue";
 import { mapActions } from "pinia";
 import { useCropStore } from "../../stores/crop";
 
@@ -10,7 +8,7 @@ export default {
 	methods: {
 		...mapActions(useCropStore, ["getCropById"]),
 	},
-	components: { RedButton, BlueButton },
+
 };
 </script>
 

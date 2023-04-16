@@ -18,6 +18,7 @@ itemRouter.post('/', ItemController.postItem)
 itemRouter.get('/:id', ItemController.getItemById)
 itemRouter.put('/:id', ItemController.putItem)
 itemRouter.delete('/:id', ItemController.deleteItem)
+itemRouter.patch('/:id', ItemController.patchArcStatusItem)
 
 
 

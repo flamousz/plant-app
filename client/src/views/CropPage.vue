@@ -33,7 +33,7 @@ export default {
 			><BlueButton :type="'button'" :text="'NEW CROP'"
 		/></RouterLink>
 	</div>
-	<div class="bg-blue-100 p-4 h-full">
+	<div class="bg-blue-100 p-4 w-full">
 		<div class="overflow-auto rounded-lg shadow">
 			<div class="flex flex-row justify-end items-end gap-3 pr-1 mb-2">
 				<div class="flex flex-row gap-1">

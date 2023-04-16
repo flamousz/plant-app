@@ -10,19 +10,37 @@ import LoginPage from '../views/LoginPage.vue'
 import CropNew from '../components/Modals/CropNew.vue'
 import DetailPlant from '../views/DetailPlant.vue'
 import FormPlantSheet from '../components/Modals/FormPlantSheet.vue'
+import ItemPage from '../views/ItemPage.vue'
+import ItemDetailPage from '../views/ItemDetailPage.vue'
+import ItemFormPage from '../views/ItemFormPage.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    {
+      path: '/itemform',
+      name: 'itemform',
+      component: ItemFormPage
+    },
     {
       path: '/croparea',
       name: 'cropArea',
       component: CropAreaPage
     },
     {
+      name: 'item',
+      path: '/item',
+      component: ItemPage
+    },
+    {
       path: '/crop',
       name: 'crop',
       component: CropPage
+    },
+    {
+      path: '/itemdetail/:id',
+      name: 'itemdetail',
+      component: ItemDetailPage
     },
     {
       path: '/detailplant/:id',
