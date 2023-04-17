@@ -13,10 +13,22 @@ import FormPlantSheet from '../components/Modals/FormPlantSheet.vue'
 import ItemPage from '../views/ItemPage.vue'
 import ItemDetailPage from '../views/ItemDetailPage.vue'
 import ItemFormPage from '../views/ItemFormPage.vue'
+import CropAreaDetailPage from '../views/CropAreaDetailPage.vue'
+import CropFormPage from '../views/CropFormPage.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    {
+      path: '/cropareadetail/:id',
+      name: 'cropareadetail',
+      component: CropAreaDetailPage
+    },
+    {
+      path: '/cropareaform',
+      name: 'cropareaform',
+      component: CropFormPage
+    },
     {
       path: '/itemform',
       name: 'itemform',

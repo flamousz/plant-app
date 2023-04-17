@@ -6,6 +6,7 @@ cropAreRouter.get('/', CropAreaController.getCropArea)
 cropAreRouter.post('/', CropAreaController.postCropArea)
 cropAreRouter.get('/:id', CropAreaController.getCropAreaById)
 cropAreRouter.put('/:id', CropAreaController.putCropArea)
+cropAreRouter.patch('/:id', CropAreaController.patchArcStatusCropArea)
 cropAreRouter.delete('/:id', CropAreaController.deleteCropArea)
 
 module.exports=cropAreRouter

@@ -5,8 +5,8 @@ class CropAreaController {
 	static async getCropArea(req, res, next) {
 		try {
 			const { filter, search, page } = req.query;
-
-			let limit = 5;
+			console.log(req.query, "<< ini req query");
+			let limit = 8;
 			let offset = 0;
 
 			const opt = {
@@ -21,7 +21,7 @@ class CropAreaController {
 					[Op.eq]: item,
 				}));
 				opt.where = {
-					detailplace: { [Op.or]: query },
+					arcStatus: { [Op.or]: query },
 				};
 			}
 
@@ -70,8 +70,11 @@ class CropAreaController {
 	static async postCropArea(req, res, next) {
 		try {
 			let { name, area, type, detailPlace, map } = req.body;
-
+			let status = "draft";
+			let arcStatus = "avail";
 			let data = await CropArea.create({
+				status,
+				arcStatus,
 				name,
 				area,
 				type,
@@ -88,7 +91,7 @@ class CropAreaController {
 	static async putCropArea(req, res, next) {
 		try {
 			let { id } = req.params;
-			let { name, area, type, detailPlace, map } = req.body;
+			let { name, area, type, detailPlace, map, status } = req.body;
 			let findData = await CropArea.findByPk(id);
 			if (!findData) {
 				throw {
@@ -102,6 +105,7 @@ class CropAreaController {
 					type,
 					detailPlace,
 					map,
+					status
 				},
 				{
 					where: { id },
@@ -131,6 +135,32 @@ class CropAreaController {
 
 			res.status(200).json(`${findData.name} has been deleted`);
 		} catch (err) {
+			next(err);
+		}
+	}
+
+	static async patchArcStatusCropArea(req, res, next) {
+		try {
+			console.log(req.body, "<<< ini req.body");
+			const { id } = req.params;
+			const { arcStatus } = req.body;
+			const data = await CropArea.findByPk(id);
+			if (!data) {
+				throw {
+					name: "NotFound",
+				};
+			}
+
+			await CropArea.update(
+				{ arcStatus },
+				{
+					where: { id },
+				}
+			);
+
+			res.status(200).json("Crop Area status successfully changed ");
+		} catch (err) {
+			console.log(err);
 			next(err);
 		}
 	}
