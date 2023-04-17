@@ -7,6 +7,7 @@ employeeRouter.post('/',EmployeeController.postEmployee)
 employeeRouter.delete('/:id',EmployeeController.deleteEmployee)
 employeeRouter.get('/:id', EmployeeController.getEmployeeById)
 employeeRouter.put('/:id', EmployeeController.putEmployee)
+employeeRouter.patch('/:id', EmployeeController.patchArcStatusEmployee)
 
 
 

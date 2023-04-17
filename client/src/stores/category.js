@@ -2,29 +2,30 @@ import axios from "axios";
 import { defineStore } from "pinia";
 import { baseUrl } from "./crop";
 
-export const useEmployeeStore = defineStore("employee", {
-	state() {
-		return {
-			employees: [],
-			employeeDetail: {},
-			editFlag: false,
-			query: {
-                filter: '',
-            },
-		};
-	},
-	actions: {
-		async patchEmployee(val) {
+
+export const useCategoryStore = defineStore('category', {
+    state() {
+        return {
+            categories: [],
+            categoryDetail: {},
+            editFlag: false,
+            query: {
+                filter: ''
+            }
+        }
+    },
+    actions: {
+        async patchCategory(val) {
 			try {
 				console.log(val, "ini data patch");
 				const { id } = val;
 				const { data } = await axios({
-					url: `${baseUrl}/employees/${id}`,
+					url: `${baseUrl}/categories/${id}`,
 					method: "PATCH",
 					data: val,
 				});
 				this.editFlag = false;
-				this.getEmployeeById(id)
+				this.getCategoryById(id)
 				Toastify({
 					text: data,
 					gravity: "bottom", // `top` or `bottom`
@@ -38,52 +39,52 @@ export const useEmployeeStore = defineStore("employee", {
 				console.log(err);
 			}
 		},
-		async getEmployeeById(id) {
+        async getCategoryById(id) {
 			try {
 				// this.editFlag = true;
 				console.log(`masuk dengan id ${id}`);
 				const { data } = await axios({
-					url: `${baseUrl}/employees/${id}`,
+					url: `${baseUrl}/categories/${id}`,
 					method: "GET",
 				});
 				console.log(data, "ini data dari store");
-				this.employeeDetail = data;
+				this.categoryDetail = data;
 				// console.log(this.cropDetail, "< crop detail");
 			} catch (err) {
 				console.log(err);
 			}
 		},
-		async getEmployeeByIdForEdit(id) {
+        async getCategoryByIdForEdit(id) {
 			try {
 				console.log(`masuk dengan id ${id} untuk edit`);
 				const { data } = await axios({
-					url: `${baseUrl}/employees/${id}`,
+					url: `${baseUrl}/categories/${id}`,
 					method: "GET",
 				});
 				this.editFlag = true;
 				console.log(data, "ini data dari store");
-				this.employeeDetail = data;
-				this.router.push(`/employeeform`);
+				this.categoryDetail = data;
+				this.router.push(`/categoryform`);
 				// console.log(this.cropDetail, "< crop detail");
 			} catch (err) {
 				console.log(err);
 			}
 		},
-		async putEmployee(val) {
+        async putCategory(val) {
 			try {
 				const { id } = val;
 				console.log(id, "<<< ini id");
 				console.log(
 					val,
-					"<<< ini cropData yg diambil dari halaman edit dan sampe di employee store"
+					"<<< ini cropData yg diambil dari halaman edit dan sampe di uom store"
 				);
 				const { data } = await axios({
-					url: `${baseUrl}/employees/${id}`,
+					url: `${baseUrl}/categories/${id}`,
 					method: "PUT",
 					data: val,
 				});
 				this.editFlag = false;
-				this.router.push(`/employeedetail/${id}`);
+				this.router.push(`/categorydetail/${id}`);
 				Toastify({
 					text: data,
 					style: {
@@ -92,34 +93,34 @@ export const useEmployeeStore = defineStore("employee", {
 
 					duration: 2000,
 				}).showToast();
-				console.log(this.editFlag, "ini edit flag di employee store");
+				console.log(this.editFlag, "ini edit flag di uom store");
 			} catch (err) {
 				console.log(err);
 			}
 		},
-		async fetchEmployee() {
+        async fetchCategory() {
 			try {
-				let queryEmployee = this.query
-				this.router.replace({name: 'employee', query: queryEmployee})
+				let queryCategory = this.query
+				this.router.replace({name: 'category', query: queryCategory})
 
 				const { data } = await axios({
-					url: `${baseUrl}/employees`,
+					url: `${baseUrl}/categories`,
 					method: "GET",
-					params: queryEmployee
+					params: queryCategory
 				});
-				this.employees = data.rows;
+				this.categories = data.rows;
 			} catch (err) {
 				console.log(err);
 			}
 		},
-		async postEmployee(val) {
+        async postCategory(val) {
 			try {
 				const { data } = await axios({
-					url: `${baseUrl}/employees`,
+					url: `${baseUrl}/categories`,
 					method: 'POST',
 					data: val,
 				});
-				this.router.push("/employee");
+				this.router.push("/category");
 				Toastify({
 					text: data,
 					style: {
@@ -140,13 +141,13 @@ export const useEmployeeStore = defineStore("employee", {
 				}).showToast();
 			}
 		},
-		async deleteEmployee(id){
+        async deleteCategory(id){
 			try {
 				const {data}=await axios({
-					url: `${baseUrl}/employees/${id}`,
+					url: `${baseUrl}/categories/${id}`,
 					method: 'DELETE'
 				})
-				this.router.push('/employee')
+				this.router.push('/category')
 				Toastify({
 					text: data,
 					style: {
@@ -168,5 +169,5 @@ export const useEmployeeStore = defineStore("employee", {
 				}).showToast();
 			}
 		}
-	},
-});
+    }
+})

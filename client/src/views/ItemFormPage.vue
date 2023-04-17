@@ -132,7 +132,7 @@ export default {
 					class="flex flex-col p-4 bg-slate-100 mt-5 h-full border-2 border-black rounded tracking-wide gap-4"
 				>
 					<div class="flex flex-row gap-2">
-						<div class="flex justify-center items-center">Name :</div>
+						<div class="flex justify-start items-center  w-[13%]">Name :</div>
 						<input
 							id="name"
 							class="placeholder:text-xs p-[6px] border border-gray-300 rounded-md bg-green-100"
@@ -143,7 +143,7 @@ export default {
 						/>
 					</div>
 					<div class="flex flex-row gap-2">
-						<div>Category :</div>
+						<div class="flex justify-start items-center  w-[13%]">Category :</div>
 						<select
 							v-model="cropData.categoryid"
 							class="h-auto w-auto bg-green-100 rounded-md"
@@ -159,7 +159,7 @@ export default {
 						</select>
 					</div>
 					<div class="flex flex-row gap-2">
-						<div>Description :</div>
+						<div class="flex justify-start items-center  w-[13%]">Description :</div>
 						<div>
 							<input
 								id="description"
@@ -172,7 +172,7 @@ export default {
 						</div>
 					</div>
 					<div class="flex flex-row gap-2">
-						<div>Standard Quantity :</div>
+						<div class="flex justify-start items-center  w-[13%]">Standard Quantity :</div>
 						<div>
 							<input
 								id="standardQuantity"
@@ -185,7 +185,7 @@ export default {
 						</div>
 					</div>
 					<div class="flex flex-row gap-2">
-						<div>Unit of Measurement :</div>
+						<div class="flex justify-start items-center  w-[13.5%]">Unit of Measurement :</div>
 						<div>
 							<select
 								v-model="cropData.uomid"

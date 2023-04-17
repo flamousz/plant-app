@@ -15,10 +15,40 @@ import ItemDetailPage from '../views/ItemDetailPage.vue'
 import ItemFormPage from '../views/ItemFormPage.vue'
 import CropAreaDetailPage from '../views/CropAreaDetailPage.vue'
 import CropFormPage from '../views/CropFormPage.vue'
+import EmployeeDetailPage from '../views/EmployeeDetailPage.vue'
+import EmployeeFormPage from '../views/EmployeeFormPage.vue'
+import UomPage from '../views/UomPage.vue'
+import UomDetailPage from '../views/UomDetailPage.vue'
+import UomFormPage from '../views/UomFormPage.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    {
+      path: '/uomform',
+      name: 'uomform',
+      component: UomFormPage
+    },
+    {
+      path: '/uomdetail/:id',
+      name: 'uomdetail',
+      component: UomDetailPage
+    },
+    {
+      path: '/uom',
+      name: 'uom',
+      component: UomPage
+    },
+    {
+      path: '/employeeform',
+      name: 'employeeform',
+      component: EmployeeFormPage
+    },
+    {
+      path: '/employeedetail/:id',
+      name: 'employeedetail',
+      component: EmployeeDetailPage
+    },
     {
       path: '/cropareadetail/:id',
       name: 'cropareadetail',

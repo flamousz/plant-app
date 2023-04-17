@@ -1,10 +1,10 @@
 <script>
 import { mapActions, mapState, mapWritableState } from "pinia";
-import { useEmployeeStore } from "../stores/employee";
+import { useCategoryStore } from "../stores/category";
 import BlueButton from '../components/Buttons/BlueButton.vue'
 
 export default {
-	name: "EmployeePage",
+	name: "CategoryPage",
 	data(){
 		return{
 			itemsData: {
@@ -16,26 +16,25 @@ export default {
 		}
 	},
 	methods: {
-		...mapActions(useEmployeeStore, ["fetchEmployee"]),
+		...mapActions(useCategoryStore, ['fetchCategory']),
 		queryAction(params, val) {
 			console.log(params, val, "ini query action");
 			if (params === "filter") {
-				this.queries.page = 1;
 				this.queries.filter = val;
 			}
 			
 			this.query = {
 				filter: this.queries.filter,
 			};
-			this.fetchEmployee();
+			this.fetchCategory();
 		}
 	},
 	computed: {
-		...mapWritableState(useEmployeeStore, ['query']),
-		...mapState(useEmployeeStore, ["employees"]),
+		...mapWritableState(useCategoryStore, ['query']),
+		...mapState(useCategoryStore, ["categories"]),
 	},
 	created() {
-		this.fetchEmployee();
+		this.fetchCategory();
 	},
 	components: {BlueButton}
 };
@@ -45,8 +44,8 @@ export default {
     <!-- <pre>{{ employees }}</pre> -->
 	<div class="bg-blue-100 p-4 w-full h-full flex flex-col static">
 		<div class="z-40 fixed bottom-6 right-7 flex opacity-50 hover:opacity-90">
-			<RouterLink to="/employeeform"
-				><BlueButton :type="'button'" :text="'+ Employee'"
+			<RouterLink to="/uomform"
+				><BlueButton :type="'button'" :text="'+ Uom'"
 			/></RouterLink>
 		</div>
 		<div class="flex flex-row justify-end items-end gap-2 mb-2">
@@ -71,8 +70,7 @@ export default {
 				<tr class="rounded-t-3xl">
 					<th class="rounded-tl-md w-2">No</th>
 					<th class="w-10">Name</th>
-					<th class="w-10">NIK</th>
-					<th class="w-10">Gender</th>
+					<th class="w-10">Description</th>
 					<th class="w-10">Status</th>
 				</tr>
 			</thead>
@@ -81,16 +79,15 @@ export default {
 			>
 				<tr
 					class="whitespace-nowrap hover:bg-slate-200"
-					v-for="(item, index) in employees"
-					@click.prevent="this.$router.push(`/employeedetail/${item.id}`)"
+					v-for="(item, index) in uoms"
+					@click.prevent="this.$router.push(`/uomdetail/${item.id}`)"
 					:key="item.id"
 				>
 					<td class="h-14">
 						{{ index+1 }}
 					</td>
 					<td class="h-14">{{ item?.name }}</td>
-					<td class="h-14">{{ item?.nik }}</td>
-					<td class="h-14">{{ item?.gender }}</td>
+					<td class="h-14">{{ item?.description }}</td>
 					<td class="h-14">{{ item?.arcStatus }}</td>
 				</tr>
 			</tbody>		
