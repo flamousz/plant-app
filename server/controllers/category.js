@@ -135,14 +135,14 @@ class CategoryController {
 				};
 			}
 
-			await UoCategorym.update(
+			await Category.update(
 				{ arcStatus },
 				{
 					where: { id },
 				}
 			);
 
-			res.status(200).json("Uom status successfully changed ");
+			res.status(200).json("Category status successfully changed ");
 		} catch (err) {
 			console.log(err);
 			next(err);

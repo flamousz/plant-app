@@ -41,11 +41,11 @@ export default {
 </script>
 
 <template>
-    <!-- <pre>{{ employees }}</pre> -->
+    <pre>{{ employees }}</pre>
 	<div class="bg-blue-100 p-4 w-full h-full flex flex-col static">
 		<div class="z-40 fixed bottom-6 right-7 flex opacity-50 hover:opacity-90">
-			<RouterLink to="/uomform"
-				><BlueButton :type="'button'" :text="'+ Uom'"
+			<RouterLink to="/categoryform"
+				><BlueButton :type="'button'" :text="'+ Category'"
 			/></RouterLink>
 		</div>
 		<div class="flex flex-row justify-end items-end gap-2 mb-2">
@@ -56,7 +56,7 @@ export default {
 						v-model="itemsData.status"
 						@change="queryAction('filter', itemsData.status)"
 					>
-						<option value="" disabled>---Select Status---</option>
+						<option value="" disabled selected>---Select Status---</option>
 						<option value="avail">Available</option>
 						<option value="archived">Archived</option>
 					</select>
@@ -79,8 +79,8 @@ export default {
 			>
 				<tr
 					class="whitespace-nowrap hover:bg-slate-200"
-					v-for="(item, index) in uoms"
-					@click.prevent="this.$router.push(`/uomdetail/${item.id}`)"
+					v-for="(item, index) in categories"
+					@click.prevent="this.$router.push(`/categorydetail/${item.id}`)"
 					:key="item.id"
 				>
 					<td class="h-14">

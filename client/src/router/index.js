@@ -20,10 +20,28 @@ import EmployeeFormPage from '../views/EmployeeFormPage.vue'
 import UomPage from '../views/UomPage.vue'
 import UomDetailPage from '../views/UomDetailPage.vue'
 import UomFormPage from '../views/UomFormPage.vue'
+import CategoryPage from '../views/CategoryPage.vue'
+import CategoryDetailPage from '../views/CategoryDetailPage.vue'
+import CategoryFormPage from '../views/CategoryFormPage.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    {
+      path: '/categoryform',
+      name: 'categoryform',
+      component: CategoryFormPage
+    },
+    {
+      path: '/categorydetail/:id',
+      name: 'categorydetail',
+      component: CategoryDetailPage
+    },
+    {
+      path: '/category',
+      name: 'category',
+      component: CategoryPage
+    },
     {
       path: '/uomform',
       name: 'uomform',
