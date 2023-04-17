@@ -23,9 +23,6 @@ export default {
 	},
 	methods: {
 		...mapActions(useItemStore, [
-			"getItemById",
-			"patchItem",
-			"getItemByIdForEdit",
 			"postItem",
 			"putItem",
 			"fetchCategory",
@@ -121,8 +118,8 @@ export default {
 								</button>
 								<RouterLink to="/item">
 									<button
-										class="bg-[#c52b2b] rounded flex hover:bg-red-900 justify-center items-center font-semibold text-[11px] text-slate-100 lg:h-[30px] w-[90px]"
-										v-if="editFlag === false"
+									v-if="editFlag === false"
+									class="bg-[#c52b2b] rounded flex hover:bg-red-900 justify-center items-center font-semibold text-[11px] text-slate-100 lg:h-[30px] w-[90px]"
 									>
 										Cancel
 									</button>
