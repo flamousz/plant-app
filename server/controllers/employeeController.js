@@ -1,21 +1,33 @@
+const { Op } = require("sequelize");
 const { Employee } = require("../models/index");
 
 class EmployeeController {
     static async getEmployee(req, res, next) {
 		try {
-			const data = await Employee.findAll({
+			const { filter } = req.query;
+			const opt = {
 				attributes: {
 					exclude: ["createdAt", "updatedAt"],
 				},
 				order: [["createdAt", "DESC"]],
-			});
-			if (!data) {
-				throw {
-					name: "NotFound",
+			}
+			
+			if (filter !== "" && typeof filter !== "undefined") {
+				const query = filter.split(",").map((item) => ({
+					[Op.eq]: item,
+				}));
+				opt.where = {
+					arcStatus: { [Op.or]: query },
 				};
+			}
+
+			let data = await Employee.findAndCountAll(opt);
+			if (!data) {
+				throw { name: "NotFound" };
 			}
 			res.status(200).json(data);
 		} catch (err) {
+			console.log(err);
 			next(err);
 		}
 	}
@@ -42,11 +54,14 @@ class EmployeeController {
 	static async postEmployee(req, res, next) {
 		try {
 			let { name, nik, gender } = req.body;
-
+			let status = "draft";
+			let arcStatus = "avail";
 			let data = await Employee.create({
 				name,
 				nik,
-				gender
+				gender,
+				status,
+				arcStatus
 			});
 
 			res.status(201).json(`${data.name} has been added`);
@@ -58,7 +73,7 @@ class EmployeeController {
 	static async putEmployee(req, res, next) {
 		try {
 			let { id } = req.params;
-			let { name, nik, gender } = req.body;
+			let { name, nik, gender, status } = req.body;
 			let findData = await Employee.findByPk(id);
 			if (!findData) {
 				throw {
@@ -69,7 +84,8 @@ class EmployeeController {
 				{
 					name,
 					nik,
-					gender
+					gender,
+					status
 				},
 				{
 					where: { id },
@@ -103,6 +119,31 @@ class EmployeeController {
 		}
 	}
 
+	static async patchArcStatusEmployee(req, res, next) {
+		try {
+			console.log(req.body, "<<< ini req.body");
+			const { id } = req.params;
+			const { arcStatus } = req.body;
+			const data = await Employee.findByPk(id);
+			if (!data) {
+				throw {
+					name: "NotFound",
+				};
+			}
+
+			await Employee.update(
+				{ arcStatus },
+				{
+					where: { id },
+				}
+			);
+
+			res.status(200).json("Employee status successfully changed ");
+		} catch (err) {
+			console.log(err);
+			next(err);
+		}
+	}
 }
 
 module.exports = EmployeeController;

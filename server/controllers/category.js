@@ -1,14 +1,25 @@
+const { Op } = require("sequelize");
 const { Category } = require("../models/index");
 
 class CategoryController {
 	static async getCategory(req, res, next) {
 		try {
-			const data = await Category.findAll({
+			const { filter } = req.query;
+			const opt = {
 				attributes: {
 					exclude: ["createdAt", "updatedAt"],
 				},
 				order: [["createdAt", "DESC"]],
-			});
+			};
+			if (filter !== "" && typeof filter !== "undefined") {
+				const query = filter.split(",").map((item) => ({
+					[Op.eq]: item,
+				}));
+				opt.where = {
+					arcStatus: { [Op.or]: query },
+				};
+			}
+			let data = await Category.findAndCountAll(opt);
 			if (!data) {
 				throw {
 					name: "NotFound",
@@ -41,12 +52,20 @@ class CategoryController {
 
 	static async postCategory(req, res, next) {
 		try {
-			let { name, code, description } = req.body;
+			let { name, description } = req.body;
+			let status = "draft";
+			let arcStatus = "avail";
+			const min = 1121;
+			const max = 9999;
+			const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
 
+			let code = `${name}${randomNumber}`
 			let data = await Category.create({
 				name,
 				code,
 				description,
+				status,
+				arcStatus,
 			});
 
 			res.status(201).json(`${data.name} has been added`);
@@ -58,7 +77,7 @@ class CategoryController {
 	static async putCategory(req, res, next) {
 		try {
 			let { id } = req.params;
-			let { name, code, description } = req.body;
+			let { name, code, description, status } = req.body;
 			let findData = await Category.findByPk(id);
 			if (!findData) {
 				throw {
@@ -70,6 +89,7 @@ class CategoryController {
 					name,
 					code,
 					description,
+					status
 				},
 				{
 					where: { id },
@@ -99,6 +119,32 @@ class CategoryController {
 
 			res.status(200).json(`${findData.name} has been deleted`);
 		} catch (err) {
+			next(err);
+		}
+	}
+
+	static async patchArcStatusCategory(req, res, next) {
+		try {
+			console.log(req.body, "<<< ini req.body");
+			const { id } = req.params;
+			const { arcStatus } = req.body;
+			const data = await Category.findByPk(id);
+			if (!data) {
+				throw {
+					name: "NotFound",
+				};
+			}
+
+			await Category.update(
+				{ arcStatus },
+				{
+					where: { id },
+				}
+			);
+
+			res.status(200).json("Category status successfully changed ");
+		} catch (err) {
+			console.log(err);
 			next(err);
 		}
 	}

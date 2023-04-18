@@ -136,6 +136,7 @@ export default {
 					<th class="rounded-tl-md w-2">No</th>
 					<th class="w-10">Name</th>
 					<th class="w-10">Code</th>
+					<th class="w-10">Description</th>
 					<th class="w-10">Category</th>
 					<th class="w-10">Status</th>
 				</tr>
@@ -154,6 +155,7 @@ export default {
 					</td>
 					<td class="h-14">{{ item?.name }}</td>
 					<td class="h-14">{{ item?.code }}</td>
+					<td class="h-14">{{ item?.description }}</td>
 					<td class="h-14">{{ item?.Category?.name }}</td>
 					<td class="h-14">{{ item?.arcStatus }}</td>
 				</tr>

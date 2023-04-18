@@ -24,7 +24,9 @@ module.exports = (sequelize, DataTypes) => {
         msg: "Code has been exists",
       },
     },
-    description: DataTypes.STRING
+    description: DataTypes.STRING,
+    status: DataTypes.STRING,
+    arcStatus: DataTypes.STRING,
   }, {
     sequelize,
     modelName: 'Category',
