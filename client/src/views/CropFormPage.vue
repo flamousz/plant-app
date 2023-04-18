@@ -59,7 +59,7 @@ export default {
 </script>
 
 <template>
-	<pre>{{ editFlag }}</pre>
+	<!-- <pre>{{ editFlag }}</pre> -->
 	<section class="w-full">
 		<form @submit.prevent="handlePutorPost">
 			<div class="flex flex-col px-10">

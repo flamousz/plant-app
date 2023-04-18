@@ -23,10 +23,16 @@ import UomFormPage from '../views/UomFormPage.vue'
 import CategoryPage from '../views/CategoryPage.vue'
 import CategoryDetailPage from '../views/CategoryDetailPage.vue'
 import CategoryFormPage from '../views/CategoryFormPage.vue'
+import PlantSchedulePage from '../views/PlantSchedulePage.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    {
+      path: '/plantschedule',
+      name: 'plantschedule',
+      component: PlantSchedulePage
+    },
     {
       path: '/categoryform',
       name: 'categoryform',

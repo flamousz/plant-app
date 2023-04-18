@@ -4,83 +4,83 @@ import { useItemStore } from "../stores/item";
 import BlueButton from "../components/Buttons/BlueButton.vue";
 
 export default {
-    name: "ItemPage",
-    data() {
-        return {
-            itemsData: {
-                category: null,
-                status: null,
-            },
-            pageSize: 8,
-            currentPage: 1,
-            queries: {
-                filter: "",
-                filterStatus: "",
-                search: "",
-                page: 1,
-            },
-        };
-    },
-    methods: {
-        ...mapActions(useItemStore, ["fetchItem", "fetchCategory"]),
-        getDisplayedPageNumbers() {
-            const maxDisplayedPages = 3;
-            let startPage = this.currentPage - Math.floor(maxDisplayedPages / 2);
-            if (startPage < 1) {
-                startPage = 1;
-            }
-            let endPage = startPage + maxDisplayedPages - 1;
-            if (endPage > this.allpage) {
-                endPage = this.allpage;
-                startPage = endPage - maxDisplayedPages + 1;
-                if (startPage < 1) {
-                    startPage = 1;
-                }
-            }
-            let displayedPages = [];
-            for (let i = startPage; i <= endPage; i++) {
-                displayedPages.push(i);
-            }
-            return displayedPages;
-        },
-        queryAction(params, val) {
-            console.log(params, val, "ini query action");
-            if (params === "filter") {
-				this.queries.page = 1
-                this.queries.filter = val;
-            }
-            if (params === "filterStatus") {
-				this.queries.page = 1
-                this.queries.filterStatus = val;
-            }
-            if (params === "page") {
-                console.log(params, "masuk ke if params page");
-                this.currentPage = val;
-                this.queries.page = val;
-            }
-            if (params === "search") {
-				this.queries.page = 1
-                this.queries.search = val;
-            }
-            this.query = {
-                filter: this.queries.filter,
-                filterStatus: this.queries.filterStatus,
-                page: this.queries.page,
-                search: this.queries.search,
-            };
-            this.fetchItem();
-        },
-    },
-    computed: {
-        ...mapState(useItemStore, ["items", "allpage", "categories"]),
-        ...mapWritableState(useItemStore, ["query"]),
-    },
-    created() {
-        this.fetchItem();
-        this.fetchCategory();
-        console.log(this.query, "<< query");
-    },
-    components: { BlueButton }
+	name: "ItemPage",
+	data() {
+		return {
+			itemsData: {
+				category: null,
+				status: null,
+			},
+			pageSize: 8,
+			currentPage: 1,
+			queries: {
+				filter: "",
+				filterStatus: "",
+				search: "",
+				page: 1,
+			},
+		};
+	},
+	methods: {
+		...mapActions(useItemStore, ["fetchItem", "fetchCategory"]),
+		getDisplayedPageNumbers() {
+			const maxDisplayedPages = 3;
+			let startPage = this.currentPage - Math.floor(maxDisplayedPages / 2);
+			if (startPage < 1) {
+				startPage = 1;
+			}
+			let endPage = startPage + maxDisplayedPages - 1;
+			if (endPage > this.allpage) {
+				endPage = this.allpage;
+				startPage = endPage - maxDisplayedPages + 1;
+				if (startPage < 1) {
+					startPage = 1;
+				}
+			}
+			let displayedPages = [];
+			for (let i = startPage; i <= endPage; i++) {
+				displayedPages.push(i);
+			}
+			return displayedPages;
+		},
+		queryAction(params, val) {
+			console.log(params, val, "ini query action");
+			if (params === "filter") {
+				this.queries.page = 1;
+				this.queries.filter = val;
+			}
+			if (params === "filterStatus") {
+				this.queries.page = 1;
+				this.queries.filterStatus = val;
+			}
+			if (params === "page") {
+				console.log(params, "masuk ke if params page");
+				this.currentPage = val;
+				this.queries.page = val;
+			}
+			if (params === "search") {
+				this.queries.page = 1;
+				this.queries.search = val;
+			}
+			this.query = {
+				filter: this.queries.filter,
+				filterStatus: this.queries.filterStatus,
+				page: this.queries.page,
+				search: this.queries.search,
+			};
+			this.fetchItem();
+		},
+	},
+	computed: {
+		...mapState(useItemStore, ["items", "allpage", "categories"]),
+		...mapWritableState(useItemStore, ["query"]),
+	},
+	created() {
+		this.fetchItem();
+		this.fetchCategory();
+		console.log(this.query, "<< query");
+	},
+	components: { BlueButton },
 };
 </script>
 
