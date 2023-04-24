@@ -9,7 +9,9 @@ export const usePlantScheduleStore = defineStore('plantschedule', {
             plantSchedules: [],
             plantSchedulesDetail: {},
             query: {
-                filter: ''
+                filterPlant: '',
+                filterLocation: '',
+                commonDate: null
             }
         }
     },

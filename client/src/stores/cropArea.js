@@ -18,6 +18,17 @@ export const useCropAreaStore = defineStore('cropArea', {
         }
     },
     actions: {
+		async fetchAllCropArea(){
+			try {
+				const {data} = await axios({
+					url: `${baseUrl}/cropareas/all`,
+					method: 'GET'
+				})
+				this.cropArea = data
+			} catch (error) {
+				console.log(error);
+			}
+		},
         async putCropArea(val) {
 			try {
 				const { id } = val;

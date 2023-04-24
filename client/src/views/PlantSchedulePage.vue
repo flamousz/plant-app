@@ -1,11 +1,27 @@
 <script>
-import { mapActions, mapState } from "pinia";
+import { mapActions, mapState, mapWritableState } from "pinia";
 import { usePlantScheduleStore } from "../stores/plantschedule";
+import { useItemStore } from "../stores/item";
+import { useCropAreaStore } from "../stores/cropArea";
+import BlueButton from "../components/Buttons/BlueButton.vue";
+import VueDatePicker from "@vuepic/vue-datepicker";
+import "@vuepic/vue-datepicker/dist/main.css";
 
 export default {
 	name: "PlantSchedulePage",
+	data() {
+		return {
+			itemsData: {
+				filterPlant: "",
+				filterLocation: "",
+				commonDate: null,
+			},
+		};
+	},
 	methods: {
 		...mapActions(usePlantScheduleStore, ["fetchPlantSchedules"]),
+		...mapActions(useItemStore, ["fetchPlant"]),
+		...mapActions(useCropAreaStore, ["fetchAllCropArea"]),
 		formatDate(date) {
 			if (!date) {
 				return "";
@@ -17,19 +33,46 @@ export default {
 				day: "numeric",
 			});
 		},
+		queryAction(params, value) {
+			console.log("masuk query action");
+			console.log(params, value, "<<< params, value");
+			console.log(this.itemsData.commonDate, "<< commonDate");
+			if (params === "filterPlant") {
+				this.itemsData.filterPlant = value;
+			}
+			if (params === "filterLocation") {
+				this.itemsData.filterLocation = value;
+			}
+			if (params === "commonDate") {
+				this.itemsData.commonDate = value;
+			}
+			this.query = {
+				filterPlant: this.itemsData.filterPlant,
+				filterLocation: this.itemsData.filterLocation,
+				commonDate: this.itemsData.commonDate,
+			};
+			this.fetchPlantSchedules();
+		},
 	},
 	computed: {
 		...mapState(usePlantScheduleStore, ["plantSchedules"]),
+		...mapState(useItemStore, ["plants"]),
+		...mapWritableState(usePlantScheduleStore, ["query"]),
+		...mapState(useCropAreaStore, ["cropArea"]),
 	},
 	created() {
+		this.fetchAllCropArea();
+		this.fetchPlant();
 		this.fetchPlantSchedules();
+		// console.log(typeof this.plantSchedules[0].seedlingDate, '<<< seedlingDate');
 	},
+	components: { BlueButton },
 };
 </script>
 
 <template>
-	<!-- <pre>{{ plantSchedules }}</pre> -->
-	<div class="bg-blue-100 p-4 w-full h-full flex flex-col static">
+	<pre>{{ itemsData.commonDate }}</pre>
+	<div class="bg-blue-100 p-4 w-full h-screen flex flex-col static">
 		<div class="z-40 fixed bottom-6 right-7 flex opacity-50 hover:opacity-90">
 			<RouterLink to="/categoryform"
 				><BlueButton :type="'button'" :text="'+ Schedule'"
@@ -40,33 +83,49 @@ export default {
 				<div class="flex flex-row gap-1">
 					<div>Location:</div>
 					<div>
-						<select @change="queryAction('filter', itemsData.status)">
+						<select
+							@change="queryAction('filter', itemsData.filterLocation)"
+							v-model="itemsData.filterLocation"
+						>
 							<option value="" disabled selected>
 								--Select Location--
 							</option>
-							<option value="avail">Available</option>
-							<option value="archived">Archived</option>
+							<option v-for="item in cropArea" :value="item.name">
+								{{ item.name }}
+							</option>
 						</select>
 					</div>
 				</div>
 				<div class="flex flex-row gap-1">
 					<div>Date:</div>
 					<div>
-						<select @change="queryAction('filter', itemsData.status)">
-							<option value="" disabled selected>--Select Date--</option>
-							<option value="avail">Available</option>
-							<option value="archived">Archived</option>
-						</select>
+						<input
+							type="date"
+							name="seedlingDate"
+							v-model="itemsData.commonDate"
+							@change="queryAction('commonDate', itemsData.commonDate)"
+						/>
 					</div>
+				</div>
+				<div class="flex flex-row gap-1">
+					<VueDatePicker v-model="itemsData.commonDate" range ></VueDatePicker>
 				</div>
 			</div>
 			<div class="flex flex-row gap-1">
 				<div>Plant:</div>
 				<div>
-					<select @change="queryAction('filter', itemsData.status)">
+					<select
+						@change="queryAction('filterPlant', itemsData.filterPlant)"
+						v-model="itemsData.filterPlant"
+					>
 						<option value="" disabled selected>---Select Plant---</option>
-						<option value="avail">Available</option>
-						<option value="archived">Archived</option>
+						<option
+							v-for="item in plants"
+							:key="item.id"
+							:value="item.name"
+						>
+							{{ item.name }}
+						</option>
 					</select>
 				</div>
 			</div>
@@ -83,6 +142,7 @@ export default {
 					<th class="w-10">Harvest Date</th>
 					<th class="w-10">Unload Date</th>
 					<th class="w-10">Location</th>
+					<th class="w-10">Population</th>
 				</tr>
 			</thead>
 			<tbody
@@ -103,6 +163,7 @@ export default {
 					<td class="h-14">{{ formatDate(item?.harvestDate) }}</td>
 					<td class="h-14">{{ formatDate(item?.unloadDate) }}</td>
 					<td class="h-14">{{ item?.CropArea.name }}</td>
+					<td class="h-14">{{ item?.totalPopulation }}</td>
 				</tr>
 			</tbody>
 		</table>
