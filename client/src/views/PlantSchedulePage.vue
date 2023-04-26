@@ -6,6 +6,7 @@ import { useCropAreaStore } from "../stores/cropArea";
 import BlueButton from "../components/Buttons/BlueButton.vue";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
+import { ref } from "vue";
 
 export default {
 	name: "PlantSchedulePage",
@@ -15,6 +16,7 @@ export default {
 				filterPlant: "",
 				filterLocation: "",
 				commonDate: null,
+				filterDate: "",
 			},
 		};
 	},
@@ -33,20 +35,26 @@ export default {
 				day: "numeric",
 			});
 		},
-		queryAction(params, value) {
+		queryAction(params, value, selectedDate) {
 			console.log("masuk query action");
 			console.log(params, value, "<<< params, value");
 			console.log(this.itemsData.commonDate, "<< commonDate");
 			if (params === "filterPlant") {
+				console.log("masuk ke if filterPlant");
 				this.itemsData.filterPlant = value;
 			}
 			if (params === "filterLocation") {
+				console.log("masuk ke if filterLocation");
 				this.itemsData.filterLocation = value;
 			}
 			if (params === "commonDate") {
+				console.log("masuk ke if commondate");
+				console.log(value, "<< ini value");
+				this.itemsData.filterDate = selectedDate;
 				this.itemsData.commonDate = value;
 			}
 			this.query = {
+				filterDate: this.itemsData.filterDate,
 				filterPlant: this.itemsData.filterPlant,
 				filterLocation: this.itemsData.filterLocation,
 				commonDate: this.itemsData.commonDate,
@@ -71,20 +79,21 @@ export default {
 </script>
 
 <template>
-	<pre>{{ itemsData.commonDate }}</pre>
+	<pre>{{ itemsData.filterDate }}</pre>
 	<div class="bg-blue-100 p-4 w-full h-screen flex flex-col static">
 		<div class="z-40 fixed bottom-6 right-7 flex opacity-50 hover:opacity-90">
 			<RouterLink to="/categoryform"
 				><BlueButton :type="'button'" :text="'+ Schedule'"
 			/></RouterLink>
 		</div>
-		<div class="flex flex-row justify-between items-end gap-2 mb-2">
+		<div class="flex flex-row justify-between items-start gap-2 mb-2">
 			<div class="flex flex-row gap-2">
 				<div class="flex flex-row gap-1">
-					<div>Location:</div>
 					<div>
 						<select
-							@change="queryAction('filter', itemsData.filterLocation)"
+							@change="
+								queryAction('filterLocation', itemsData.filterLocation)
+							"
 							v-model="itemsData.filterLocation"
 						>
 							<option value="" disabled selected>
@@ -96,23 +105,43 @@ export default {
 						</select>
 					</div>
 				</div>
-				<div class="flex flex-row gap-1">
-					<div>Date:</div>
-					<div>
-						<input
-							type="date"
-							name="seedlingDate"
-							v-model="itemsData.commonDate"
-							@change="queryAction('commonDate', itemsData.commonDate)"
-						/>
+				<div class="flex flex-row gap-1 pl-4">
+					<div class="flex flex-col">
+						<div >
+							<select v-model="itemsData.filterDate" >
+								<option value="" disabled selected>
+									--Select Date Type--
+								</option>
+								<option value="seedlingDate">Seedling Date</option>
+								<option value="plantingDate">Planting Date</option>
+								<option value="harvestDate">Harvest Date</option>
+								<option value="unloadDate">Unload Date</option>
+							</select>
+						</div>
 					</div>
-				</div>
-				<div class="flex flex-row gap-1">
-					<VueDatePicker v-model="itemsData.commonDate" range ></VueDatePicker>
+					<VueDatePicker
+						v-model="itemsData.commonDate"
+						range
+						:enable-time-picker="false"
+						@update:model-value="
+							queryAction(
+								'commonDate',
+								itemsData.commonDate,
+								itemsData.filterDate
+							)
+						"
+					>
+						<template #trigger>
+							<img
+								class="cursor-pointer w-[42%]"
+								src="../assets/icons8-baby-calendar-64.png"
+								alt="baby calendar"
+							/>
+						</template>
+					</VueDatePicker>
 				</div>
 			</div>
 			<div class="flex flex-row gap-1">
-				<div>Plant:</div>
 				<div>
 					<select
 						@change="queryAction('filterPlant', itemsData.filterPlant)"

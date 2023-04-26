@@ -11,7 +11,8 @@ export const usePlantScheduleStore = defineStore('plantschedule', {
             query: {
                 filterPlant: '',
                 filterLocation: '',
-                commonDate: null
+                commonDate: null,
+                filterDate: ''
             }
         }
     },
@@ -22,6 +23,7 @@ export const usePlantScheduleStore = defineStore('plantschedule', {
                     name: 'plantschedule',
                     query: this.query
                 })
+                console.log(this.query,'<< query dari store plant schedule');
                 const {data} = await axios({
                     url: `${baseUrl}/plantschedule`,
                     method: 'GET',

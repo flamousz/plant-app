@@ -10,8 +10,12 @@ const {
 class PlantScheduleController {
 	static async getSchedule(req, res, next) {
 		try {
-			const { filterPlant, filterLocation, commonDate } = req.query;
+			const { filterPlant, filterLocation, commonDate, filterDate } =
+				req.query;
 			console.log(commonDate, "<< commonDate");
+			console.log(filterDate, "<< filterDate");
+			console.log(filterPlant, "<< filterPlant");
+			console.log(filterLocation, "<< filterLocation");
 			const opt = {
 				include: [
 					{
@@ -42,26 +46,150 @@ class PlantScheduleController {
 				commonDate !== "" &&
 				typeof commonDate !== "undefined"
 			) {
+				console.log('masuk ke if 3 perbandingan');
 				const query = filterPlant.split(",").map((item) => ({
 					[Op.eq]: item,
 				}));
 				const queryLocation = filterLocation.split(",").map((item) => ({
 					[Op.eq]: item,
 				}));
-				opt.where = {
-					"$PlantSheet.plant.name$": {
-						[Op.or]: query,
-					},
-					"$CropArea.name$": {
-						[Op.or]: queryLocation,
-					},
-				};
+
+				if (commonDate.length > 1) {
+					console.log('masuk ke if 3 perbandingan dengan commonDate.length > 1');
+					opt.where = {
+						"$PlantSheet.plant.name$": {
+							[Op.or]: query,
+						},
+						"$CropArea.name$": {
+							[Op.or]: queryLocation,
+						},
+						[Op.and]: [
+							sequelize.where(
+								sequelize.fn("DATE", sequelize.col(filterDate)),
+								">=",
+								commonDate[0]
+							),
+							sequelize.where(
+								sequelize.fn("DATE", sequelize.col(filterDate)),
+								"<=",
+								commonDate[1]
+							),
+						],
+					};
+				} else {
+					console.log('masuk ke if 3 perbandingan dengan commonDate.length < 2')
+					opt.where = {
+						"$PlantSheet.plant.name$": {
+							[Op.or]: query,
+						},
+						"$CropArea.name$": {
+							[Op.or]: queryLocation,
+						},
+						[Op.and]: sequelize.where(
+							sequelize.fn("DATE", sequelize.col(filterDate)),
+							"=",
+							commonDate[0]
+						),
+					};
+				}
+				
+			} else if (
+				filterPlant !== "" &&
+				typeof filterPlant !== "undefined" &&
+				commonDate !== "" &&
+				typeof commonDate !== "undefined"
+			) {
+				console.log('masuk ke if 2 perbandingan antara filterPlant dan commonDate')
+				const query = filterPlant.split(",").map((item) => ({
+					[Op.eq]: item,
+				}));
+
+				if (commonDate.length > 1) {
+					console.log('masuk ke if 2 perbandingan antara filterPlant dan commonDate dengan commonDate.length > 1');
+					opt.where = {
+						"$PlantSheet.plant.name$": {
+							[Op.or]: query,
+						},
+						[Op.and]: [
+							sequelize.where(
+								sequelize.fn("DATE", sequelize.col(filterDate)),
+								">=",
+								commonDate[0]
+							),
+							sequelize.where(
+								sequelize.fn("DATE", sequelize.col(filterDate)),
+								"<=",
+								commonDate[1]
+							),
+						],
+					};
+				} else {
+					console.log('masuk ke if 2 perbandingan antara filterLocation dan commonDate dengan commonDate.length < 2')
+					opt.where = {
+						"$PlantSheet.plant.name$": {
+							[Op.or]: query,
+						},
+						[Op.and]: sequelize.where(
+							sequelize.fn("DATE", sequelize.col(filterDate)),
+							"=",
+							commonDate[0]
+						),
+					};
+				}
+				
+			} else if (
+				filterLocation !== "" &&
+				typeof filterLocation !== "undefined" &&
+				commonDate !== "" &&
+				typeof commonDate !== "undefined"
+			) {
+				
+				console.log('masuk ke if 2 perbandingan antara filterLocation dan commonDate')
+				const queryLocation = filterLocation.split(",").map((item) => ({
+					[Op.eq]: item,
+				}));
+
+				if (commonDate.length > 1) {
+					console.log('masuk ke if 2 perbandingan dengan commonDate.length > 1');
+				
+					opt.where = {
+						"$CropArea.name$": {
+							[Op.or]: queryLocation,
+						},
+						[Op.and]: [
+							sequelize.where(
+								sequelize.fn("DATE", sequelize.col(filterDate)),
+								">=",
+								commonDate[0]
+							),
+							sequelize.where(
+								sequelize.fn("DATE", sequelize.col(filterDate)),
+								"<=",
+								commonDate[1]
+							),
+						],
+					};
+				} else {
+					console.log('masuk ke if 2 perbandingan dengan commonDate.length < 2')
+					opt.where = {
+						"$CropArea.name$": {
+							[Op.or]: queryLocation,
+						},
+						[Op.and]: sequelize.where(
+							sequelize.fn("DATE", sequelize.col(filterDate)),
+							"=",
+							commonDate[0]
+						),
+					};
+				}
+				
 			} else if (
 				filterPlant !== "" &&
 				typeof filterPlant !== "undefined" &&
 				filterLocation !== "" &&
 				typeof filterLocation !== "undefined"
 			) {
+				console.log('masuk ke if 2 perbandingan antara filterLocation dan filterPlant')
 				const query = filterPlant.split(",").map((item) => ({
 					[Op.eq]: item,
 				}));
@@ -81,6 +209,7 @@ class PlantScheduleController {
 				filterLocation !== "" &&
 				typeof filterLocation !== "undefined"
 			) {
+				console.log('masuk ke perbandingan hanya location');
 				const query = filterLocation.split(",").map((item) => ({
 					[Op.eq]: item,
 				}));
@@ -90,6 +219,7 @@ class PlantScheduleController {
 					},
 				};
 			} else if (filterPlant !== "" && typeof filterPlant !== "undefined") {
+				console.log('masuk ke perbandingan hanya filterPlant');
 				const query = filterPlant.split(",").map((item) => ({
 					[Op.eq]: item,
 				}));
@@ -98,21 +228,54 @@ class PlantScheduleController {
 						[Op.or]: query,
 					},
 				};
-			} else if (commonDate !== "" && typeof commonDate !== "undefined") {
+			} else if (
+				commonDate !== "" &&
+				typeof commonDate !== "undefined" &&
+				filterDate !== "" &&
+				typeof filterDate !== "undefined"
+			) {
 				// const query = commonDate.split(",").map((item) => ({
 				// 	[Op.eq]: item,
 				// }));
 				// console.log(query, "<<< INI QUERY");
+				console.log('masuk ke perbandingan hanya tanggal');
+				console.log(commonDate.length, "<<< INI commonDate.length");
 				console.log(commonDate, "<<< INI commonDate original");
-				console.log(typeof commonDate, "<<< typeof commonDate sebelum di convert");
-				const realCommonDate = new Date(commonDate)
-				console.log(realCommonDate, typeof realCommonDate, '<<< realCommonDate');
-				opt.where = {
-					[Op.and]: sequelize.where(
-						sequelize.fn('DATE', sequelize.col('seedlingDate')),
-						'=', commonDate
-					)
-				};
+				console.log(
+					typeof commonDate,
+					"<<< typeof commonDate sebelum di convert"
+				);
+
+				if (commonDate.length > 1) {
+					opt.where = {
+						[Op.and]: [
+							sequelize.where(
+								sequelize.fn("DATE", sequelize.col(filterDate)),
+								">=",
+								commonDate[0]
+							),
+							sequelize.where(
+								sequelize.fn("DATE", sequelize.col(filterDate)),
+								"<=",
+								commonDate[1]
+							),
+						],
+					};
+				} else {
+					opt.where = {
+						[Op.and]: sequelize.where(
+							sequelize.fn("DATE", sequelize.col(filterDate)),
+							"=",
+							commonDate[0]
+						),
+					};
+				}
+				// const oneDay = 24 * 60 * 60 * 1000; // number of milliseconds in a day
+				// const newDates = commonDate.map((date) => {
+				// 	const oldDate = new Date(date);
+				// 	const newDate = new Date(oldDate.getTime() + oneDay);
+				// 	return newDate.toISOString();
+				// });
 			}
 
 			const data = await PlantSchedule.findAll(opt);
