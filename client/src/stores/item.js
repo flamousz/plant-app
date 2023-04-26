@@ -193,7 +193,7 @@ export const useItemStore = defineStore("items", {
 					url: `${baseUrl}/categories`,
 					method: 'GET'
 				})
-				this.categories = data
+				this.categories = data.rows
 			} catch (error) {
 				console.log(error);
 			}

@@ -9,6 +9,9 @@ module.exports = (sequelize, DataTypes) => {
 		 */
 		static associate(models) {
 			// define association here
+			CropArea.hasMany(models.PlantSchedule, {
+				foreignKey: 'CropAreaId'
+			})
 		}
 	}
 	CropArea.init(

@@ -16,6 +16,9 @@ module.exports = (sequelize, DataTypes) => {
 			PlantSheet.belongsTo(models.PlantType, {
 				foreignKey: 'planttypeid'
 			})
+			PlantSheet.hasMany(models.PlantSchedule, {
+				foreignKey: 'PlantsheetId'
+			})
 			PlantSheet.hasMany(models.materialConjunction, {
 				foreignKey: 'plantsheetid'
 			})

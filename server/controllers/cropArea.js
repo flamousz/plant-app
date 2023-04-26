@@ -2,6 +2,21 @@ const { Op } = require("sequelize");
 const { CropArea } = require("../models/index");
 
 class CropAreaController {
+	static async getAllCropArea(req, res, next){
+		try {
+			const data = await CropArea.findAll()
+			if (!data) {
+				throw{
+					name: 'NotFound'
+				}
+			}
+			res.status(200).json(data)
+		} catch (error) {
+			console.log(error);
+			next(error)
+		}
+	}
+
 	static async getCropArea(req, res, next) {
 		try {
 			const { filter, search, page } = req.query;
