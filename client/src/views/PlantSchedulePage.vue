@@ -6,7 +6,6 @@ import { useCropAreaStore } from "../stores/cropArea";
 import BlueButton from "../components/Buttons/BlueButton.vue";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
-import { ref } from "vue";
 
 export default {
 	name: "PlantSchedulePage",

@@ -14,6 +14,19 @@ export const useCropStore = defineStore("crop", {
 		};
 	},
 	actions: {
+		async fetchCropPlain() {
+			try {
+				this.editFlag = false;
+
+				const { data } = await axios({
+					url: `${baseUrl}/plantsheet`,
+					method: "GET",
+				});
+				this.crop = data;
+			} catch (err) {
+				console.log(err);
+			}
+		},
 		async fetchCrop() {
 			try {
 				this.editFlag = false;

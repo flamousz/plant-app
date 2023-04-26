@@ -24,22 +24,28 @@ import CategoryPage from '../views/CategoryPage.vue'
 import CategoryDetailPage from '../views/CategoryDetailPage.vue'
 import CategoryFormPage from '../views/CategoryFormPage.vue'
 import PlantSchedulePage from '../views/PlantSchedulePage.vue'
+import PlantScheduleFormPage from '../views/PlantScheduleFormPage.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    {
+      path: '/plantschedule/form',
+      name: 'plantscheduleform',
+      component: PlantScheduleFormPage
+    },
     {
       path: '/plantschedule',
       name: 'plantschedule',
       component: PlantSchedulePage
     },
     {
-      path: '/categoryform',
+      path: '/category/form',
       name: 'categoryform',
       component: CategoryFormPage
     },
     {
-      path: '/categorydetail/:id',
+      path: '/category/detail/:id',
       name: 'categorydetail',
       component: CategoryDetailPage
     },
@@ -49,12 +55,12 @@ const router = createRouter({
       component: CategoryPage
     },
     {
-      path: '/uomform',
+      path: '/uom/form',
       name: 'uomform',
       component: UomFormPage
     },
     {
-      path: '/uomdetail/:id',
+      path: '/uom/detail/:id',
       name: 'uomdetail',
       component: UomDetailPage
     },
@@ -64,27 +70,27 @@ const router = createRouter({
       component: UomPage
     },
     {
-      path: '/employeeform',
+      path: '/employee/form',
       name: 'employeeform',
       component: EmployeeFormPage
     },
     {
-      path: '/employeedetail/:id',
+      path: '/employee/detail/:id',
       name: 'employeedetail',
       component: EmployeeDetailPage
     },
     {
-      path: '/cropareadetail/:id',
+      path: '/croparea/detail/:id',
       name: 'cropareadetail',
       component: CropAreaDetailPage
     },
     {
-      path: '/cropareaform',
+      path: '/croparea/form',
       name: 'cropareaform',
       component: CropFormPage
     },
     {
-      path: '/itemform',
+      path: '/item/form',
       name: 'itemform',
       component: ItemFormPage
     },
@@ -104,7 +110,7 @@ const router = createRouter({
       component: CropPage
     },
     {
-      path: '/itemdetail/:id',
+      path: '/item/detail/:id',
       name: 'itemdetail',
       component: ItemDetailPage
     },
