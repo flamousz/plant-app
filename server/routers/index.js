@@ -10,6 +10,7 @@ const itemRouter = require("./item");
 const plantDataRouter = require("./plantData");
 const plantSheetRouter = require("./plantSheet");
 const plantScheduleRouter = require("./plantSchedule");
+const harvestOutcomeRouter = require("./harvestOutcome");
 const router = express.Router();
 
 router.use("/", userRouter);
@@ -23,6 +24,7 @@ router.use('/items', itemRouter)
 router.use('/plantdata', plantDataRouter)
 router.use('/plantsheet', plantSheetRouter)
 router.use('/plantschedule', plantScheduleRouter)
+router.use('/harvestoutcome', harvestOutcomeRouter)
 
 
 

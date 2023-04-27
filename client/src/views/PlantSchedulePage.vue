@@ -81,7 +81,7 @@ export default {
 	<pre>{{ itemsData.filterDate }}</pre>
 	<div class="bg-blue-100 p-4 w-full h-screen flex flex-col static">
 		<div class="z-40 fixed bottom-6 right-7 flex opacity-50 hover:opacity-90">
-			<RouterLink to="/categoryform"
+			<RouterLink to="/plantschedule/form"
 				><BlueButton :type="'button'" :text="'+ Schedule'"
 			/></RouterLink>
 		</div>
@@ -179,7 +179,7 @@ export default {
 				<tr
 					class="whitespace-nowrap hover:bg-slate-200"
 					v-for="(item, index) in plantSchedules"
-					@click.prevent="this.$router.push(`/categorydetail/${item.id}`)"
+					@click.prevent="this.$router.push(`/plantschedule/${item.id}`)"
 					:key="item.id"
 				>
 					<td class="h-14">

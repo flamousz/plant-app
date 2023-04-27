@@ -5,6 +5,14 @@ const {
 	CropArea,
 	Item,
 	sequelize,
+	HarvestOutcome,
+	PlantType,
+	SeedConjunction,
+	fertilizerConjunction,
+	PesticideConjunction,
+	materialConjunction,
+	Uom,
+	Category,
 } = require("../models/index");
 
 class PlantScheduleController {
@@ -309,7 +317,7 @@ class PlantScheduleController {
 
 	static async postSchedule(req, res, next) {
 		try {
-			console.log(req.body,'<< ini req.body');
+			console.log(req.body, "<< ini req.body");
 			const {
 				seedlingDate,
 				plantingDate,
@@ -319,7 +327,7 @@ class PlantScheduleController {
 				CropAreaId,
 				totalPopulation,
 			} = req.body;
-			
+
 			await PlantSchedule.create({
 				seedlingDate,
 				plantingDate,
@@ -327,10 +335,120 @@ class PlantScheduleController {
 				unloadDate,
 				PlantsheetId,
 				CropAreaId,
-				totalPopulation
-			})
-			res.status(201).json('New Plant Schedule successfully added')
+				totalPopulation,
+			});
+			res.status(201).json("New Plant Schedule successfully added");
+		} catch (error) {
+			console.log(error);
+			next(error);
+		}
+	}
 
+	static async getScheduleById(req, res, next) {
+		try {
+			const { id } = req.params;
+			const opt = {
+				include: [
+					{
+						model: PlantSheet,
+						include: [
+							{
+								model: Item,
+								as: "plant",
+								attributes: ["name", "code"],
+							},
+							{
+								model: PlantType,
+								attributes: ["name"],
+							},
+							{
+								model: SeedConjunction,
+								attributes: ["id", "seedid", "plantsheetid"],
+								include: {
+									model: Item,
+									attributes: ["name", "description", "standardqty"],
+								},
+							},
+							{
+								model: fertilizerConjunction,
+								attributes: [
+									"id",
+									"dose",
+									"fertilizerid",
+									"plantsheetid",
+								],
+								include: {
+									model: Item,
+									attributes: ["name", "standardqty", "description"],
+									include: [
+										{
+											model: Uom,
+											attributes: ["name"],
+										},
+									],
+								},
+							},
+							{
+								model: PesticideConjunction,
+								attributes: [
+									"id",
+									"dose",
+									"pesticideid",
+									"plantsheetid",
+								],
+								include: {
+									model: Item,
+									attributes: ["name", "standardqty", "description"],
+									include: [
+										{
+											model: Uom,
+											attributes: ["name"],
+										},
+										{
+											model: Category,
+											attributes: ["name"],
+										},
+									],
+								},
+							},
+							{
+								model: materialConjunction,
+								attributes: [
+									"id",
+									"dose",
+									"materialid",
+									"plantsheetid",
+								],
+								include: {
+									model: Item,
+									attributes: ["name", "standardqty", "description"],
+									include: [
+										{
+											model: Uom,
+											attributes: ["name"],
+										},
+									],
+								},
+							},
+						],
+						attributes: {
+							exclude: ["createdAt", "updatedAt"],
+						},
+					},
+					{
+						model: HarvestOutcome,
+						attributes: {
+							exclude: ["createdAt", "updatedAt"],
+						},
+					},
+				],
+				attributes: {
+					exclude: ["createdAt", "updatedAt"],
+				},
+			};
+			const data = await PlantSchedule.findByPk(id, opt);
+
+			res.status(200).json(data);
 		} catch (error) {
 			console.log(error);
 			next(error);

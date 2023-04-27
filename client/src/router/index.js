@@ -25,10 +25,16 @@ import CategoryDetailPage from '../views/CategoryDetailPage.vue'
 import CategoryFormPage from '../views/CategoryFormPage.vue'
 import PlantSchedulePage from '../views/PlantSchedulePage.vue'
 import PlantScheduleFormPage from '../views/PlantScheduleFormPage.vue'
+import DetailPlantSchedule from '../views/DetailPlantSchedule.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    {
+      path: '/plantschedule/:id',
+      name: 'detailplantschedule',
+      component: DetailPlantSchedule
+    },
     {
       path: '/plantschedule/form',
       name: 'plantscheduleform',

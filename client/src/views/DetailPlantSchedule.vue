@@ -4,9 +4,10 @@ import { useCropStore } from "../stores/crop";
 import RedButton from "../components/Buttons/RedButton.vue";
 import BlueButton from "../components/Buttons/BlueButton.vue";
 import TableRow4Colum from "../components/TableRow/TableRow4Colum.vue";
+import { usePlantScheduleStore } from "../stores/plantschedule";
 
 export default {
-	name: "DetailPlant",
+	name: "DetailPlantSchedule",
 	data() {
 		return {
 			activeTab: "",
@@ -18,12 +19,7 @@ export default {
 		};
 	},
 	methods: {
-		...mapActions(useCropStore, [
-			"getCropById",
-			"deleteCrop",
-			"getCropByIdForEdit",
-			"patchCrop",
-		]),
+		...mapActions(usePlantScheduleStore, ["fetchPlantSchedulesById"]),
 		buttonSelector(value) {
 			this.activeTab = value;
 		},
@@ -39,7 +35,7 @@ export default {
 		},
 	},
 	computed: {
-		...mapState(useCropStore, ["cropDetail", "editFlag"]),
+		...mapState(usePlantScheduleStore, ["plantSchedulesDetail"]),
 		archive() {
 			if (this.cropDetail.arcStatus === "archived") {
 				return "avail";
@@ -47,212 +43,222 @@ export default {
 				return "archived";
 			}
 		},
-		firstPlantAge(){
-			let total = this.cropDetail.seedlingAge + this.cropDetail.harvestAge
+		firstPlantAge() {
+			let total = this.plantSchedulesDetail.PlantSheet.harvestAge + this.plantSchedulesDetail?.PlantSheet?.seedlingAge;
 
-			return total
+			return total;
 		},
-		finalPlantAge(){
-			let total = this.firstPlantAge + this.cropDetail.harvestTime
+		finalPlantAge() {
+			let total = this.firstPlantAge + this.plantSchedulesDetail?.PlantSheet?.harvestTime;
 
-			return total
-		}
+			return total;
+		},
 	},
 	created() {
-		this.getCropById(this.$route.params.id);
+		// this.getCropById(this.$route.params.id);
+		this.fetchPlantSchedulesById(this.$route.params.id);
 	},
 	components: { RedButton, BlueButton, TableRow4Colum },
 };
 </script>
 
 <template>
-	<!-- <pre>{{ role }}</pre> -->
+	<!-- <pre>{{ plantSchedulesDetail }}</pre> -->
+	<!-- <pre>{{ cropDetail }}</pre> -->
 	<section class="w-full">
 		<div class="flex flex-col px-10 bg-slate-100">
-			<div class="w-full flex justify-end items-end pt-4">
+			<!-- <div class="w-full flex justify-end items-end pt-4">
 				<div class="text-2xl font-bold w-[8%]">STATUS:</div>
 				<div
 					class="w-[13%] border-[3px] rounded-md border-slate-800 bg-yellow-300 font-semibold text-center tracking-wide"
 				>
 					{{ cropDetail.status }} - {{ cropDetail.arcStatus }}
 				</div>
-			</div>
+			</div> -->
 			<div class="flex flex-row h-[50px] mb-3">
 				<div
 					class="w-[40%] flex justify-start items-end text-5xl font-bold"
 				>
-					{{ cropDetail?.plant?.name }}
+					{{ plantSchedulesDetail?.PlantSheet?.plant?.name }}
 				</div>
 				<div class="w-[60%] flex flex-row justify-end items-end gap-3">
-					<div @click="patchLocal" v-if="role !== 'super'">
+					<!-- <div @click="patchLocal" v-if="role !== 'super'">
 						<RedButton :type="'button'" :text="archive" />
 					</div>
 					<div @click="deleteCrop(cropDetail.id)" v-if="role === 'super'">
 						<RedButton :type="'button'" :text="'DELETE'" />
-					</div>
-					<div
+					</div> -->
+					<!-- <div
 						@click="getCropByIdForEdit(cropDetail.id)"
 						v-if="role === 'super' || cropDetail.status === 'draft'"
 					>
 						<BlueButton :type="'button'" :text="'EDIT'" />
+					</div> -->
+					<div>
+						<BlueButton :type="'button'" :text="'EDIT'" />
 					</div>
 				</div>
 			</div>
-			<div class="h-[490px] flex flex-col-reverse border-2 border-black bg-slate-300">
-				<div
-					class="w-[30%] h-[190px] bg-yellow-500 border-black border-[3px] rounded-lg m-2 p-0  flex flex-col justify-center items-center gap-2"
-				>
-					<div class="flex flex-row gap-2 justify-end items-end w-[90%] ">
+			<div
+				class="h-[443px] flex flex-col-reverse border-2 border-black bg-slate-300"
+			>
+				<div class="flex flex-row justify-center items-center mb-2">
+					<div
+						class="bg-yellow-500 h-[90px] border-black border-[3px] w-[18%] rounded-lg m-2 p-0 flex flex-col justify-center items-center gap-2"
+					>
 						<div
-							class="flex flex-col border-2 bg-yellow-300 border-black px-3 rounded-lg w-[80%]"
+							class="flex flex-col border-2 bg-yellow-300 border-black px-3 rounded-lg w-[85%]"
 						>
-							<div class="text-xl font-bold">Code</div>
+							<div class="text-xl font-bold pl-[5px]">Code</div>
 							<div class="text-lg font-semibold text-center">
-								{{ cropDetail?.plant?.code }}
+								{{ plantSchedulesDetail?.PlantSheet?.plant?.code }}
 							</div>
 						</div>
+					</div>
+					<div
+						class="bg-yellow-500 h-[90px] border-black border-[3px] w-[29%] rounded-lg m-2 p-0 flex flex-col justify-center items-center gap-2"
+					>
 						<div
-							class="flex flex-col border-2 bg-yellow-300 border-black px-1 rounded-lg w-[80%]"
+							class="flex flex-col border-2 bg-yellow-300 border-black px-3 rounded-lg w-[83%]"
+						>
+							<div class="text-xl font-bold">
+								Production Weight per Plant
+							</div>
+							<div class="text-lg font-semibold">
+								{{
+									plantSchedulesDetail?.PlantSheet?.cropProdWeight
+								}}
+								Kg
+							</div>
+						</div>
+					</div>
+					<div
+						class="bg-yellow-500 h-[90px] border-black border-[3px] w-[16.5%] rounded-lg m-2 p-0 flex flex-col justify-center items-center gap-2"
+					>
+						<div
+							class="flex flex-col border-2 justify-center items-center bg-yellow-300 border-black rounded-lg w-[70%]"
 						>
 							<div class="text-xl font-bold">Type of Plant</div>
 							<div class="text-lg font-semibold">
-								{{ cropDetail?.PlantType?.name }}
+								{{ plantSchedulesDetail?.PlantSheet?.PlantType?.name }}
 							</div>
 						</div>
 					</div>
-
 					<div
-						class="flex flex-col border-2 bg-yellow-300 border-black pl-2 rounded-lg w-[90%]"
+						class="bg-yellow-500 h-[90px] border-black border-[3px] w-[16.5%] rounded-lg m-2 p-0 flex flex-col justify-center items-center gap-2"
 					>
-						<div class="text-xl font-bold">
-							Production Weight per Plant
-						</div>
-						<div class="text-lg font-semibold">
-							{{ cropDetail?.cropProdWeight }} Kg
+						<div
+							class="flex flex-col border-2 justify-center items-center bg-yellow-300 border-black rounded-lg w-[70%]"
+						>
+							<div class="text-xl font-bold">Population</div>
+							<div class="text-lg font-semibold">
+								{{ plantSchedulesDetail?.totalPopulation }}
+							</div>
 						</div>
 					</div>
 				</div>
 				<div
-					class=" h-[300px] bg-slate-100 border-black border-[3px] pt-14 rounded-lg m-2 flex flex-row justify-center items-center gap-1 p-2"
+					class="h-[300px] bg-slate-100 border-black border-[3px] pt-14 rounded-lg m-2 flex flex-row justify-center items-center gap-1 p-2"
 				>
-					<div class="flex flex-col  w-[11%] ">
-						<div class="w-[100%]  h-full">
-							<img src="../assets/Initialseedling.png" alt="Initial seedling">
+					<div class="flex flex-col w-[11%]">
+						<div class="w-[100%] h-full">
+							<img
+								src="../assets/Initialseedling.png"
+								alt="Initial seedling"
+							/>
 						</div>
-						<div class=" w-full text-sm text-center">
-							(HSS + HST)
+						<div class="w-full text-sm text-center">(HSS + HST)</div>
+						<div class="w-full text-center h-full">1st Day</div>
+					</div>
+					<div class="w-[11%] h-[132px]">
+						<div class="w-[100%] text-sm text-center">(HSS)</div>
+						<div class="w-full text-center">
+							1 - {{ plantSchedulesDetail?.PlantSheet?.seedlingAge }} Day
 						</div>
-						<div class=" w-full text-center h-full">
-							1st Day
+						<div class="w-full">
+							<img src="../assets/arrow.png" alt="arrow" />
 						</div>
 					</div>
-					<div class="w-[11%] h-[132px] ">
-						<div class="w-[100%]  text-sm text-center">
-							(HSS)
-						</div>
-						<div class=" w-full text-center ">
-							1 - {{ cropDetail?.seedlingAge }} Day
-						</div>
-						<div class=" w-full ">
-							<img src="../assets/arrow.png" alt="arrow">
-						</div>
-					</div>
-					<div class="w-[11%]  h-[250px] text-center mb-6">
-						<div class="w-[100%]  font-bold ">
-							Seedling Age
-						</div>
+					<div class="w-[11%] h-[250px] text-center mb-6">
+						<div class="w-[100%] font-bold">Seedling Age</div>
 						<div class="  ">
-							{{ cropDetail?.seedlingAge }}th Day (HSS)
+							{{ plantSchedulesDetail?.PlantSheet?.seedlingAge }}th Day (HSS)
 						</div>
 						<div class="">
-							<img src="../assets/2nd-process.png" alt="Initial seedling">
+							<img
+								src="../assets/2nd-process.png"
+								alt="Initial seedling"
+							/>
 						</div>
-						<div class="">
-							(HSS+ HST)
-						</div>
-						<div class="">
-							{{ cropDetail?.seedlingAge }}th Day
+						<div class="">(HSS+ HST)</div>
+						<div class="">{{ plantSchedulesDetail?.PlantSheet?.seedlingAge }}th Day</div>
+					</div>
+					<div class="w-[11%] h-[132px]">
+						<div class="w-full mt-11">
+							<img src="../assets/arrow.png" alt="arrow" />
 						</div>
 					</div>
-					<div class="w-[11%] h-[132px] ">
-						<div class=" w-full mt-11 ">
-							<img src="../assets/arrow.png" alt="arrow">
+					<div class="w-[11%] text-center mb-28">
+						<div class="h-full font-bold">Plant storage displacement</div>
+						<div class="h-full">0 Day (HST)</div>
+						<div class="w-[100%] h-full">
+							<img
+								src="../assets/3rd-process.png"
+								alt="Initial seedling"
+							/>
 						</div>
 					</div>
-					<div class="w-[11%]  text-center mb-28" >
-						<div class=" h-full font-bold ">
-							Plant storage displacement
+					<div class="w-[11%] h-[132px]">
+						<div class="w-[100%] text-sm text-center">(HST)</div>
+						<div class="w-full text-center">
+							1 - {{ plantSchedulesDetail?.PlantSheet?.harvestAge }} Day
 						</div>
-						<div class=" h-full">
-							0 Day (HST)
-						</div>
-						<div class="w-[100%]  h-full">
-							<img src="../assets/3rd-process.png" alt="Initial seedling">
+						<div class="w-full">
+							<img src="../assets/arrow.png" alt="arrow" />
 						</div>
 					</div>
-					<div class="w-[11%] h-[132px] ">
-						<div class="w-[100%]  text-sm text-center">
-							(HST)
-						</div>
-						<div class="w-full text-center ">
-							1 - {{ cropDetail?.harvestAge }} Day
-						</div>
-						<div class=" w-full ">
-							<img src="../assets/arrow.png" alt="arrow">
-						</div>
-					</div>
-					<div class="w-[11%]  h-[250px] text-center mb-6">
-						<div class="w-[100%]  font-bold">
-							Harvest Age
-						</div>
-						<div class="  ">
-							{{ cropDetail?.harvestAge }}th Day (HST)
-						</div>
+					<div class="w-[11%] h-[250px] text-center mb-6">
+						<div class="w-[100%] font-bold">Harvest Age</div>
+						<div class="  ">{{ plantSchedulesDetail?.PlantSheet?.harvestAge }}th Day (HST)</div>
 						<div class="">
-							<img src="../assets/4th-process.png" alt="Initial seedling">
+							<img
+								src="../assets/4th-process.png"
+								alt="Initial seedling"
+							/>
 						</div>
-						<div class="">
-							(HSS + HST)
-						</div>
-						<div class="">
-							{{ firstPlantAge }}th Day
-						</div>
+						<div class="">(HSS + HST)</div>
+						<div class="">{{ firstPlantAge }}th Day</div>
 					</div>
-					<div class="w-[11%] h-[132px]  mb-9">
-						<div class="w-[100%]  text-sm text-center font-bold">
+					<div class="w-[11%] h-[132px] mb-9">
+						<div class="w-[100%] text-sm text-center font-bold">
 							Harvest Time
 						</div>
-						<div class="w-[100%]  text-sm text-center">
-							(HST)
+						<div class="w-[100%] text-sm text-center">(HST)</div>
+						<div class="w-full text-center">
+							{{ plantSchedulesDetail?.PlantSheet?.harvestTime }} Day
 						</div>
-						<div class=" w-full text-center ">
-							{{ cropDetail?.harvestTime }} Day
-						</div>
-						<div class=" w-full ">
-							<img src="../assets/arrow.png" alt="arrow">
+						<div class="w-full">
+							<img src="../assets/arrow.png" alt="arrow" />
 						</div>
 					</div>
-					<div class="w-[11%]  h-[250px] text-center mb-6">
-						<div class="w-[100%]  font-bold">
-							Plant Age 
-						</div>
-						<div class="  ">
-							{{ cropDetail?.cropAge }}th Day (HST)
-						</div>
+					<div class="w-[11%] h-[250px] text-center mb-6">
+						<div class="w-[100%] font-bold">Plant Age</div>
+						<div class="  ">{{ plantSchedulesDetail?.PlantSheet?.cropAge }}th Day (HST)</div>
 						<div class="">
-							<img src="../assets/5th-process.png" alt="Initial seedling">
+							<img
+								src="../assets/5th-process.png"
+								alt="Initial seedling"
+							/>
 						</div>
-						<div class="">
-							(HSS+ HST)
-						</div>
-						<div class="">
-							{{ finalPlantAge }}th Day
-						</div>
+						<div class="">(HSS+ HST)</div>
+						<div class="">{{ finalPlantAge }}th Day</div>
 					</div>
 				</div>
 			</div>
-			<div class="flex flex-col mt-3 relative  bg-slate-300 mb-4 h-[300px] p-2 border-2 border-black rounded overflow-auto">
-				<div class="flex flex-row w-full gap-2 sticky top-0 bg-slate-300 ">
+			<div
+				class="flex flex-col mt-3 relative bg-slate-300 mb-4 h-[300px] p-2 border-2 border-black rounded overflow-auto"
+			>
+				<div class="flex flex-row w-full gap-2 sticky top-0 bg-slate-300">
 					<button
 						@click.prevent="buttonSelector('pesticides')"
 						type="button"
@@ -282,7 +288,7 @@ export default {
 						Seeds
 					</button>
 				</div>
-				<div class="pt-2 ">
+				<div class="pt-2">
 					<div
 						v-if="activeTab === 'fertilizers'"
 						class="bg-yellow-400 w-[90%] flex flex-col"
@@ -305,7 +311,7 @@ export default {
 							<TableRow4Colum
 								v-for="(
 									fertilizer, index
-								) in cropDetail.fertilizerConjunctions"
+								) in plantSchedulesDetail?.PlantSheet?.fertilizerConjunctions"
 								:key="fertilizer.id"
 								:fertilizer="fertilizer"
 								:index="index"
@@ -314,7 +320,7 @@ export default {
 					</div>
 					<div
 						v-if="activeTab === 'pesticides'"
-						class="bg-yellow-400 w-[90%] flex flex-col " 
+						class="bg-yellow-400 w-[90%] flex flex-col"
 					>
 						<thead>
 							<tr class="flex flex-row w-full bg-red-600">
@@ -337,7 +343,7 @@ export default {
 							<TableRow4Colum
 								v-for="(
 									pesticide, index
-								) in cropDetail.PesticideConjunctions"
+								) in plantSchedulesDetail?.PlantSheet?.PesticideConjunctions"
 								:key="pesticide.id"
 								:pesticide="pesticide"
 								:index="index"
@@ -366,7 +372,7 @@ export default {
 							<TableRow4Colum
 								v-for="(
 									materials, index
-								) in cropDetail.materialConjunctions"
+								) in plantSchedulesDetail?.PlantSheet?.materialConjunctions"
 								:key="materials.id"
 								:material="materials"
 								:index="index"
@@ -387,7 +393,7 @@ export default {
 						</thead>
 						<tbody>
 							<TableRow4Colum
-								v-for="(seed, index) in cropDetail.SeedConjunctions"
+								v-for="(seed, index) in plantSchedulesDetail?.PlantSheet?.SeedConjunctions"
 								:key="seed.id"
 								:seed="seed"
 								:index="index"

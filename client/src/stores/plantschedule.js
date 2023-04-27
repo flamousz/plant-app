@@ -65,6 +65,18 @@ export const usePlantScheduleStore = defineStore('plantschedule', {
             } catch (error) {
                 console.log(error);
             }
+        },
+        async fetchPlantSchedulesById(id){
+            try {
+                const {data} = await axios({
+                    url: `${baseUrl}/plantschedule/${id}`,
+                    method: 'GET'
+                })
+
+                this.plantSchedulesDetail = data
+            } catch (error) {
+                console.log(error)
+            }
         }
     }
 })
