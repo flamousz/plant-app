@@ -22,6 +22,10 @@ export default {
 				CropAreaId: 0,
 				totalPopulation: null,
 			},
+			isDateDisabled: {
+				seedlingDate: false,
+				plantingDate: false,
+			},
 		};
 	},
 	methods: {
@@ -38,14 +42,34 @@ export default {
 		fetchSelectedPlantsheet(value) {
 			this.getCropById(value);
 		},
-		seedOrPlant(){
-			console.log('masuk ke seedOrPlant');
+		seedOrPlant() {
+			console.log("masuk ke seedOrPlant");
 			if (this.cropData.seedlingDate) {
-				this.cropData.plantingDate = this.cropData.seedlingDate + this.cropDetail.seedlingAge
-			} else if(this.cropData.plantingDate){
-				this.cropData.seedlingDate = this.cropData.plantingDate - this.cropDetail.seedlingAge
+				const startingDate = new Date(this.cropData.seedlingDate);
+				const resultDate = new Date(startingDate);
+				if (!this.cropDetail.seedlingAge) {
+					return null;
+				}
+				resultDate.setDate(
+					startingDate.getDate() + this.cropDetail.seedlingAge
+				);
+				const formattedDate = resultDate.toISOString().slice(0, 10);
+				this.cropData.plantingDate = formattedDate;
+				this.isDateDisabled.plantingDate = true;
+			} else if (this.cropData.plantingDate) {
+				const startingDate = new Date(this.cropData.plantingDate);
+				const resultDate = new Date(startingDate);
+				if (!this.cropDetail.seedlingAge) {
+					return null;
+				}
+				resultDate.setDate(
+					startingDate.getDate() - this.cropDetail.seedlingAge
+				);
+				const formattedDate = resultDate.toISOString().slice(0, 10);
+				this.cropData.seedlingDate = formattedDate;
+				this.isDateDisabled.seedlingDate = true
 			}
-		}
+		},
 	},
 	computed: {
 		...mapState(useCropStore, ["crop", "cropDetail"]),
@@ -91,7 +115,7 @@ export default {
 			this.cropData.unloadDate = formattedDate;
 
 			return formattedDate;
-		}
+		},
 	},
 	created() {
 		this.fetchAllCropArea();
@@ -110,9 +134,9 @@ export default {
 </script>
 
 <template>
-	<pre>{{ cropData }}</pre>
-	<pre>{{ this.cropDetail.seedlingAge }}</pre>
-	 <!-- <pre>ini tanggal tanam {{ cropData.plantingDate }}</pre>
+	<!-- <pre>{{ cropData }}</pre>
+	<pre>{{ this.cropDetail.seedlingAge }}</pre> -->
+	<!-- <pre>ini tanggal tanam {{ cropData.plantingDate }}</pre>
 	<pre>ini cropdetail umur panen {{ cropDetail.harvestAge }} hari</pre> -->
 	<!-- <pre>ini hasil harvestDateCalculation {{ harvestDateCalculation }}</pre> -->
 	<!-- <pre>ini harvestDate {{ cropData.harvestDate }} </pre>
@@ -207,16 +231,21 @@ export default {
 							class="p-[6px] border border-gray-300 rounded-md bg-green-100"
 							name="seedlingDate"
 							type="date"
+							:disabled="isDateDisabled.seedlingDate"
 							v-model="cropData.seedlingDate"
 							@change="seedOrPlant"
 						/>
 					</div>
 					<div class="flex flex-row gap-2">
-						<label class="flex justify-start items-center w-[13%]">
+						<label
+							for="plantingDate"
+							class="flex justify-start items-center w-[13%]"
+						>
 							Planting Date :
 						</label>
 						<input
 							id="plantingDate"
+							:disabled="isDateDisabled.plantingDate"
 							class="p-[6px] border border-gray-300 rounded-md bg-green-100"
 							name="plantingDate"
 							type="date"
