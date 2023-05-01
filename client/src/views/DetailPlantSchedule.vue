@@ -19,7 +19,11 @@ export default {
 		};
 	},
 	methods: {
-		...mapActions(usePlantScheduleStore, ["fetchPlantSchedulesById"]),
+		...mapActions(usePlantScheduleStore, [
+			"fetchPlantSchedulesById",
+			"fetchHarvestRealization",
+			'fetchPlantSchedulesByIdForEdit'
+		]),
 		buttonSelector(value) {
 			this.activeTab = value;
 		},
@@ -35,7 +39,10 @@ export default {
 		},
 	},
 	computed: {
-		...mapState(usePlantScheduleStore, ["plantSchedulesDetail"]),
+		...mapState(usePlantScheduleStore, [
+			"plantSchedulesDetail",
+			"harvestRealization",
+		]),
 		archive() {
 			if (this.cropDetail.arcStatus === "archived") {
 				return "avail";
@@ -43,28 +50,45 @@ export default {
 				return "archived";
 			}
 		},
-		firstPlantAge() {
-			let total = this.plantSchedulesDetail.PlantSheet.harvestAge + this.plantSchedulesDetail?.PlantSheet?.seedlingAge;
+		harvestTotalExpectation() {
+			const value =
+				this.plantSchedulesDetail.PlantSheet.cropProdWeight *
+				this.plantSchedulesDetail.totalPopulation;
 
+			return value;
+		},
+		harvestPerDayExpectation() {
+			const value =
+				this.harvestTotalExpectation /
+				this.plantSchedulesDetail.PlantSheet.harvestTime;
+
+			return value;
+		},
+		firstPlantAge() {
+			let total =
+				this.plantSchedulesDetail?.PlantSheet?.harvestAge +
+				this.plantSchedulesDetail?.PlantSheet?.seedlingAge;
 			return total;
 		},
 		finalPlantAge() {
-			let total = this.firstPlantAge + this.plantSchedulesDetail?.PlantSheet?.harvestTime;
+			let total =
+				this.firstPlantAge +
+				this.plantSchedulesDetail?.PlantSheet?.harvestTime;
 
 			return total;
 		},
 	},
 	created() {
-		// this.getCropById(this.$route.params.id);
 		this.fetchPlantSchedulesById(this.$route.params.id);
+		this.fetchHarvestRealization(this.$route.params.id);
 	},
 	components: { RedButton, BlueButton, TableRow4Colum },
 };
 </script>
 
 <template>
-	<!-- <pre>{{ plantSchedulesDetail }}</pre> -->
-	<!-- <pre>{{ cropDetail }}</pre> -->
+	<!-- <pre>{{ harvestTotalExpectation }}</pre>
+	<pre>{{ harvestPerDayExpectation }}</pre> -->
 	<section class="w-full">
 		<div class="flex flex-col px-10 bg-slate-100">
 			<!-- <div class="w-full flex justify-end items-end pt-4">
@@ -94,8 +118,10 @@ export default {
 					>
 						<BlueButton :type="'button'" :text="'EDIT'" />
 					</div> -->
-					<div>
-						<BlueButton :type="'button'" :text="'EDIT'" />
+					<div
+						@click="fetchPlantSchedulesByIdForEdit(plantSchedulesDetail.id)"
+					>
+						<BlueButton :type="'button'" :text="'VALIDATION'" />
 					</div>
 				</div>
 			</div>
@@ -125,9 +151,7 @@ export default {
 								Production Weight per Plant
 							</div>
 							<div class="text-lg font-semibold">
-								{{
-									plantSchedulesDetail?.PlantSheet?.cropProdWeight
-								}}
+								{{ plantSchedulesDetail?.PlantSheet?.cropProdWeight }}
 								Kg
 							</div>
 						</div>
@@ -182,7 +206,8 @@ export default {
 					<div class="w-[11%] h-[250px] text-center mb-6">
 						<div class="w-[100%] font-bold">Seedling Age</div>
 						<div class="  ">
-							{{ plantSchedulesDetail?.PlantSheet?.seedlingAge }}th Day (HSS)
+							{{ plantSchedulesDetail?.PlantSheet?.seedlingAge }}th Day
+							(HSS)
 						</div>
 						<div class="">
 							<img
@@ -191,7 +216,9 @@ export default {
 							/>
 						</div>
 						<div class="">(HSS+ HST)</div>
-						<div class="">{{ plantSchedulesDetail?.PlantSheet?.seedlingAge }}th Day</div>
+						<div class="">
+							{{ plantSchedulesDetail?.PlantSheet?.seedlingAge }}th Day
+						</div>
 					</div>
 					<div class="w-[11%] h-[132px]">
 						<div class="w-full mt-11">
@@ -219,7 +246,10 @@ export default {
 					</div>
 					<div class="w-[11%] h-[250px] text-center mb-6">
 						<div class="w-[100%] font-bold">Harvest Age</div>
-						<div class="  ">{{ plantSchedulesDetail?.PlantSheet?.harvestAge }}th Day (HST)</div>
+						<div class="  ">
+							{{ plantSchedulesDetail?.PlantSheet?.harvestAge }}th Day
+							(HST)
+						</div>
 						<div class="">
 							<img
 								src="../assets/4th-process.png"
@@ -243,7 +273,9 @@ export default {
 					</div>
 					<div class="w-[11%] h-[250px] text-center mb-6">
 						<div class="w-[100%] font-bold">Plant Age</div>
-						<div class="  ">{{ plantSchedulesDetail?.PlantSheet?.cropAge }}th Day (HST)</div>
+						<div class="  ">
+							{{ plantSchedulesDetail?.PlantSheet?.cropAge }}th Day (HST)
+						</div>
 						<div class="">
 							<img
 								src="../assets/5th-process.png"
@@ -258,37 +290,124 @@ export default {
 			<div
 				class="flex flex-col mt-3 relative bg-slate-300 mb-4 h-[300px] p-2 border-2 border-black rounded overflow-auto"
 			>
-				<div class="flex flex-row w-full gap-2 sticky top-0 bg-slate-300">
+				<div class="flex flex-row w-full gap-2 sticky top-0">
 					<button
 						@click.prevent="buttonSelector('pesticides')"
 						type="button"
-						class="border active:bg-red-300 hover:bg-red-400 focus:bg-red-500 border-black p-1 w-[7%] text-center rounded-md focus:text-red-100"
+						class="border bg-slate-300 active:bg-red-300 hover:bg-red-400 focus:bg-red-500 border-black p-1 w-[7%] text-center rounded-md focus:text-red-100"
 					>
 						Pesticides
 					</button>
 					<button
 						@click.prevent="buttonSelector('fertilizers')"
 						type="button"
-						class="border border-black p-1 w-[7%] text-center rounded-md active:bg-red-300 hover:bg-red-400 focus:bg-red-500 focus:text-red-100"
+						class="border bg-slate-300 border-black p-1 w-[7%] text-center rounded-md active:bg-red-300 hover:bg-red-400 focus:bg-red-500 focus:text-red-100"
 					>
 						Fertilizers
 					</button>
 					<button
 						@click.prevent="buttonSelector('materials')"
 						type="button"
-						class="border border-black p-1 w-[7%] text-center rounded-md active:bg-red-300 hover:bg-red-400 focus:bg-red-500 focus:text-red-100"
+						class="border bg-slate-300 border-black p-1 w-[7%] text-center rounded-md active:bg-red-300 hover:bg-red-400 focus:bg-red-500 focus:text-red-100"
 					>
 						Materials
 					</button>
 					<button
 						@click.prevent="buttonSelector('seeds')"
 						type="button"
-						class="border border-black p-1 w-[7%] text-center rounded-md active:bg-red-300 hover:bg-red-400 focus:bg-red-500 focus:text-red-100"
+						class="border bg-slate-300 border-black p-1 w-[7%] text-center rounded-md active:bg-red-300 hover:bg-red-400 focus:bg-red-500 focus:text-red-100"
 					>
 						Seeds
 					</button>
+					<button
+						@click.prevent="buttonSelector('realization')"
+						type="button"
+						class="border bg-slate-300 border-black p-1 w-[7%] text-center rounded-md active:bg-red-300 hover:bg-red-400 focus:bg-red-500 focus:text-red-100"
+					>
+						Realization
+					</button>
+					<button
+						@click.prevent="buttonSelector('estimation')"
+						type="button"
+						class="border bg-slate-300 border-black p-1 w-[7%] text-center rounded-md active:bg-red-300 hover:bg-red-400 focus:bg-red-500 focus:text-red-100"
+					>
+						Estimation
+					</button>
 				</div>
 				<div class="pt-2">
+					<div
+						v-if="activeTab === 'estimation'"
+						class="bg-slate-400 bg-opacity-50 w-[100%] h-[220px] rounded-md mt-2 flex flex-row justify-center items-center gap-3"
+					>
+						<div
+							class="bg-yellow-300 h-[120px] border-black border-[3px] w-[18%] rounded-lg  flex flex-col justify-center items-center gap-2"
+						>
+							<div
+								class="flex flex-col border-2 bg-yellow-500 border-black px-3 rounded-lg w-[85%]"
+							>
+								<div class="text-xl font-bold pl-[5px] text-center">Total Harvest Estimation</div>
+								<div class="text-lg font-semibold text-center">
+									{{ harvestTotalExpectation }} Kg
+								</div>
+							</div>
+						</div>
+						<div
+						class="bg-yellow-300 h-[120px] border-black border-[3px] w-[18%] rounded-lg  flex flex-col justify-center items-center gap-2"
+					>
+						<div
+							class="flex flex-col border-2 bg-yellow-500 border-black px-3 rounded-lg w-[85%]"
+						>
+							<div class="text-xl font-bold pl-[5px] text-center">Harvest per Day Estimation</div>
+							<div class="text-lg font-semibold text-center">
+								{{ harvestPerDayExpectation }} Kg
+							</div>
+						</div>
+					</div>
+					</div>
+					<div
+						v-if="activeTab === 'realization'"
+						class="w-[90%] flex flex-col"
+					>
+						<RouterLink
+							:to="{
+								path: '/harvestoutcome/form',
+								query: {
+									id: $route.params.id,
+									harvestExpectation: harvestPerDayExpectation,
+								},
+							}"
+							class="z-40 fixed bottom-7 left-13 flex opacity-50 hover:opacity-90"
+						>
+							<BlueButton :type="'button'" :text="'+ Realization'" />
+						</RouterLink>
+						<thead>
+							<tr class="flex flex-row w-full">
+								<th class="w-[4.661%] bg-slate-400 border-black border">
+									No
+								</th>
+								<th class="w-[20.89%] bg-slate-400 border border-black">
+									Harvest Date
+								</th>
+								<th class="w-[15%] bg-slate-400 border border-black">
+									Letter Number
+								</th>
+								<th class="w-[20%] border bg-slate-400 border-black">
+									Harvest Weight Estimation
+								</th>
+								<th class="w-[20%] border bg-slate-400 border-black">
+									Harvest Weight Realization
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							<TableRow4Colum
+								v-for="(realization, index) in harvestRealization"
+								:key="realization.id"
+								:realization="realization"
+								:index="index"
+							/>
+						</tbody>
+					</div>
 					<div
 						v-if="activeTab === 'fertilizers'"
 						class="bg-yellow-400 w-[90%] flex flex-col"
@@ -309,9 +428,8 @@ export default {
 						</thead>
 						<tbody>
 							<TableRow4Colum
-								v-for="(
-									fertilizer, index
-								) in plantSchedulesDetail?.PlantSheet?.fertilizerConjunctions"
+								v-for="(fertilizer, index) in plantSchedulesDetail
+									?.PlantSheet?.fertilizerConjunctions"
 								:key="fertilizer.id"
 								:fertilizer="fertilizer"
 								:index="index"
@@ -341,9 +459,8 @@ export default {
 						</thead>
 						<tbody>
 							<TableRow4Colum
-								v-for="(
-									pesticide, index
-								) in plantSchedulesDetail?.PlantSheet?.PesticideConjunctions"
+								v-for="(pesticide, index) in plantSchedulesDetail
+									?.PlantSheet?.PesticideConjunctions"
 								:key="pesticide.id"
 								:pesticide="pesticide"
 								:index="index"
@@ -370,9 +487,8 @@ export default {
 						</thead>
 						<tbody>
 							<TableRow4Colum
-								v-for="(
-									materials, index
-								) in plantSchedulesDetail?.PlantSheet?.materialConjunctions"
+								v-for="(materials, index) in plantSchedulesDetail
+									?.PlantSheet?.materialConjunctions"
 								:key="materials.id"
 								:material="materials"
 								:index="index"
@@ -393,7 +509,8 @@ export default {
 						</thead>
 						<tbody>
 							<TableRow4Colum
-								v-for="(seed, index) in plantSchedulesDetail?.PlantSheet?.SeedConjunctions"
+								v-for="(seed, index) in plantSchedulesDetail?.PlantSheet
+									?.SeedConjunctions"
 								:key="seed.id"
 								:seed="seed"
 								:index="index"

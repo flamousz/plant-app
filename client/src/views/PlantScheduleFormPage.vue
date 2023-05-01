@@ -67,14 +67,14 @@ export default {
 				);
 				const formattedDate = resultDate.toISOString().slice(0, 10);
 				this.cropData.seedlingDate = formattedDate;
-				this.isDateDisabled.seedlingDate = true
+				this.isDateDisabled.seedlingDate = true;
 			}
 		},
 	},
 	computed: {
 		...mapState(useCropStore, ["crop", "cropDetail"]),
 		...mapState(useCropAreaStore, ["cropArea"]),
-		...mapState(usePlantScheduleStore, ["editFlag"]),
+		...mapState(usePlantScheduleStore, ["editFlag", "plantSchedulesDetail"]),
 		heading() {
 			if (this.editFlag === true) {
 				return "Edit";
@@ -83,9 +83,12 @@ export default {
 			}
 		},
 		harvestDateCalculation() {
+			console.log('masuk ke harvestDateCalculation');
+			console.log(this.cropData.plantingDate,'<< ini this.cropData.plantingDate');
 			if (!this.cropData.plantingDate) {
 				return null;
 			}
+			console.log('masuk ke harvestDateCalculation setelah if pertama');
 			const startingDate = new Date(this.cropData.plantingDate);
 			const resultDate = new Date(startingDate);
 			if (!this.cropDetail.harvestAge) {
@@ -97,9 +100,11 @@ export default {
 
 			const formattedDate = resultDate.toISOString().slice(0, 10);
 			this.cropData.harvestDate = formattedDate;
+			console.log('masuk ke harvestDateCalculation sebelum formattedDate')
 			return formattedDate;
 		},
 		unloadDateCalculation() {
+			console.log('masuk ke unloadDateCalculation');
 			if (!this.cropData.harvestDate) {
 				return null;
 			}
@@ -121,12 +126,18 @@ export default {
 		this.fetchAllCropArea();
 		this.fetchCropPlain();
 		if (this.editFlag === true) {
-			this.cropData.name = this.itemDetail.name;
-			this.cropData.description = this.itemDetail.description;
-			this.cropData.categoryid = this.itemDetail.categoryid;
-			this.cropData.uomid = this.itemDetail.uomid;
-			this.cropData.standardqty = this.itemDetail.standardqty;
-			this.cropData.id = this.itemDetail.id;
+			this.cropData.id = this.plantSchedulesDetail.id;
+
+			this.cropData.seedlingDate =
+				this.plantSchedulesDetail.seedlingDate.slice(0, 10);
+			this.cropData.plantingDate =
+				this.plantSchedulesDetail.plantingDate.slice(0, 10);
+			// this.cropData.harvestDate = this.plantSchedulesDetail.harvestDate.slice(0, 10)
+			// this.cropData.unloadDate = this.plantSchedulesDetail.unloadDate.slice(0, 10)
+			this.cropData.PlantsheetId = this.plantSchedulesDetail.PlantsheetId;
+			this.cropData.CropAreaId = this.plantSchedulesDetail.CropAreaId;
+			this.cropData.totalPopulation =
+				this.plantSchedulesDetail.totalPopulation;
 		}
 	},
 	components: { RedButton, BlueButton, GreenButton },
@@ -134,15 +145,6 @@ export default {
 </script>
 
 <template>
-	<!-- <pre>{{ cropData }}</pre>
-	<pre>{{ this.cropDetail.seedlingAge }}</pre> -->
-	<!-- <pre>ini tanggal tanam {{ cropData.plantingDate }}</pre>
-	<pre>ini cropdetail umur panen {{ cropDetail.harvestAge }} hari</pre> -->
-	<!-- <pre>ini hasil harvestDateCalculation {{ harvestDateCalculation }}</pre> -->
-	<!-- <pre>ini harvestDate {{ cropData.harvestDate }} </pre>
-	<pre>ini cropdetail masa panen {{ cropDetail.harvestTime }} hari</pre> -->
-	<!-- <pre>ini hasil unloadDateCalculation {{ unloadDateCalculation }}</pre> -->
-	<!-- <pre>ini unloadDate {{ cropData.unloadDate }} </pre>  -->
 	<section class="w-full">
 		<form @submit.prevent="handlePutorPost">
 			<div class="flex flex-col px-10">
@@ -164,13 +166,13 @@ export default {
 										v-if="role !== 'super' && editFlag === true"
 									/>
 								</div>
-								<div @click="handleStatus('draft')">
+								<!-- <div @click="handleStatus('draft')">
 									<GreenButton
 										:type="'submit'"
 										:text="'Draft'"
 										v-if="role !== 'super' && editFlag === true"
 									/>
-								</div>
+								</div> -->
 								<GreenButton
 									:type="'submit'"
 									:text="'Submit'"
@@ -180,7 +182,9 @@ export default {
 								<button
 									class="bg-red-500 rounded flex hover:bg-red-900 justify-center items-center font-semibold text-[11px] text-slate-100 lg:h-[30px] w-[90px]"
 									@click.prevent="
-										this.$router.push(`/item/detail/${itemDetail.id}`)
+										this.$router.push(
+											`/plantschedule/${plantSchedulesDetail.id}`
+										)
 									"
 									v-if="editFlag === true"
 								>
@@ -222,7 +226,7 @@ export default {
 						</select>
 					</div>
 
-					<div class="flex flex-row gap-2">
+					<div class="flex flex-row gap-2" v-if="!editFlag">
 						<div class="flex justify-start items-center w-[13%]">
 							Seedling Date :
 						</div>
@@ -235,6 +239,14 @@ export default {
 							v-model="cropData.seedlingDate"
 							@change="seedOrPlant"
 						/>
+					</div>
+					<div class="flex flex-row gap-2" v-if="editFlag">
+						<div class="flex justify-start items-center w-[13%]">
+							Seedling Date :
+						</div>
+						<p>
+							{{ cropData.seedlingDate }}
+						</p>
 					</div>
 					<div class="flex flex-row gap-2">
 						<label
@@ -277,23 +289,24 @@ export default {
 						</div>
 					</div>
 					<div class="flex flex-row gap-2">
-						<div class="flex justify-start items-center w-[13.5%]">
-							Harvest Date :
+							<div class="flex justify-start items-center w-[13.5%]">
+								Harvest Date :
+							</div>
+							<div>
+								{{ harvestDateCalculation }}
+							</div>
 						</div>
-						<div>
-							{{ harvestDateCalculation }}
+						<div class="flex flex-row gap-2">
+							<div class="flex justify-start items-center w-[13.5%]">
+								Unload Date :
+							</div>
+							<div>
+								{{ unloadDateCalculation }}
+							</div>
 						</div>
-					</div>
-					<div class="flex flex-row gap-2">
-						<div class="flex justify-start items-center w-[13.5%]">
-							Unload Date :
-						</div>
-						<div>
-							{{ unloadDateCalculation }}
-						</div>
-					</div>
 				</div>
 			</div>
 		</form>
+		<pre>{{ cropData }}</pre>
 	</section>
 </template>

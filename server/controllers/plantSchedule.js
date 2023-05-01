@@ -16,6 +16,44 @@ const {
 } = require("../models/index");
 
 class PlantScheduleController {
+	static async putSchedule(req, res, next) {
+		try {
+			console.log(req.body, '<<<<<<< ini req.body');
+			const {
+				seedlingDate,
+				plantingDate,
+				harvestDate,
+				unloadDate,
+				PlantsheetId,
+				CropAreaId,
+				totalPopulation,
+				id,
+			} = req.body;
+			const findData = await PlantSchedule.findByPk(id);
+			if (!findData) {
+				throw {
+					name: "NotFound",
+				};
+			}
+			await PlantSchedule.update({
+				seedlingDate,
+				plantingDate,
+				harvestDate,
+				unloadDate,
+				PlantsheetId,
+				CropAreaId,
+				totalPopulation,
+			}, {
+				where: {id},
+				returning: true
+			})
+			res.status(200).json(`Schedule has been validated`)
+		} catch (error) {
+			console.log();
+			next(error);
+		}
+	}
+
 	static async getSchedule(req, res, next) {
 		try {
 			const { filterPlant, filterLocation, commonDate, filterDate } =
