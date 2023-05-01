@@ -14,6 +14,19 @@ export const useCropStore = defineStore("crop", {
 		};
 	},
 	actions: {
+		async fetchCropPlain() {
+			try {
+				this.editFlag = false;
+
+				const { data } = await axios({
+					url: `${baseUrl}/plantsheet`,
+					method: "GET",
+				});
+				this.crop = data;
+			} catch (err) {
+				console.log(err);
+			}
+		},
 		async fetchCrop() {
 			try {
 				this.editFlag = false;
@@ -87,12 +100,12 @@ export const useCropStore = defineStore("crop", {
 		async getCropById(id) {
 			try {
 				// this.editFlag = true;
-				console.log(`masuk dengan id ${id}`);
+				// console.log(`masuk dengan id ${id}`);
 				const { data } = await axios({
 					url: `${baseUrl}/plantsheet/${id}`,
 					method: "GET",
 				});
-				console.log(data, "ini data dari store");
+				// console.log(data, "ini data dari store");
 				this.cropDetail = data;
 				// console.log(this.cropDetail, "< crop detail");
 			} catch (err) {

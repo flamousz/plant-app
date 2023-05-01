@@ -128,7 +128,7 @@ export default {
 							Production Weight per Plant
 						</div>
 						<div class="text-lg font-semibold">
-							{{ cropDetail?.cropProdWeight }}
+							{{ cropDetail?.cropProdWeight }} Kg
 						</div>
 					</div>
 				</div>

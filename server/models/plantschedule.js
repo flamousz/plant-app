@@ -17,6 +17,7 @@ module.exports = (sequelize, DataTypes) => {
       PlantSchedule.belongsTo(models.CropArea,  {
 				foreignKey: 'CropAreaId'
 			})
+      PlantSchedule.hasMany(models.HarvestOutcome)
     }
   }
   PlantSchedule.init({

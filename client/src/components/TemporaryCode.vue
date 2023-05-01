@@ -13,6 +13,41 @@ console.log(myArray); // Output: ["apple", "banana", "date"]
 </script>
 
 <template>
+	<!-- KOLOM KUNING DI SCHEDULE PLANT -->
+	<div
+		class="w-[30%] h-[190px] bg-yellow-500 border-black border-[3px] rounded-lg m-2 p-0 flex flex-col justify-center items-center gap-2"
+	>
+		<div class="flex flex-row gap-2 justify-end items-end w-[90%]">
+			<div
+				class="flex flex-col border-2 bg-yellow-300 border-black px-3 rounded-lg w-[80%]"
+			>
+				<div class="text-xl font-bold">Code</div>
+				<div class="text-lg font-semibold text-center">
+					{{ plantSchedulesDetail?.PlantSheet?.plant?.code }}
+				</div>
+			</div>
+			<div
+				class="flex flex-col border-2 bg-yellow-300 border-black px-1 rounded-lg w-[80%]"
+			>
+				<div class="text-xl font-bold">Type of Plant</div>
+				<div class="text-lg font-semibold">
+					{{ plantSchedulesDetail?.PlantSheet?.PlantType?.name }}
+				</div>
+			</div>
+		</div>
+
+		<div
+			class="flex flex-col border-2 bg-yellow-300 border-black pl-2 rounded-lg w-[90%]"
+		>
+			<div class="text-xl font-bold">Production Weight per Plant</div>
+			<div class="text-lg font-semibold">
+				{{ plantSchedulesDetail?.PlantSheet?.cropProdWeight }}
+				Kg
+			</div>
+		</div>
+	</div>
+	<!--  -->
+
 	<div
 		v-if="activeTab === 'pesticides'"
 		class="bg-yellow-400 w-[80%] flex flex-col"

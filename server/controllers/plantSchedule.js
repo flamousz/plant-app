@@ -5,9 +5,55 @@ const {
 	CropArea,
 	Item,
 	sequelize,
+	HarvestOutcome,
+	PlantType,
+	SeedConjunction,
+	fertilizerConjunction,
+	PesticideConjunction,
+	materialConjunction,
+	Uom,
+	Category,
 } = require("../models/index");
 
 class PlantScheduleController {
+	static async putSchedule(req, res, next) {
+		try {
+			console.log(req.body, '<<<<<<< ini req.body');
+			const {
+				seedlingDate,
+				plantingDate,
+				harvestDate,
+				unloadDate,
+				PlantsheetId,
+				CropAreaId,
+				totalPopulation,
+				id,
+			} = req.body;
+			const findData = await PlantSchedule.findByPk(id);
+			if (!findData) {
+				throw {
+					name: "NotFound",
+				};
+			}
+			await PlantSchedule.update({
+				seedlingDate,
+				plantingDate,
+				harvestDate,
+				unloadDate,
+				PlantsheetId,
+				CropAreaId,
+				totalPopulation,
+			}, {
+				where: {id},
+				returning: true
+			})
+			res.status(200).json(`Schedule has been validated`)
+		} catch (error) {
+			console.log();
+			next(error);
+		}
+	}
+
 	static async getSchedule(req, res, next) {
 		try {
 			const { filterPlant, filterLocation, commonDate, filterDate } =
@@ -46,7 +92,7 @@ class PlantScheduleController {
 				commonDate !== "" &&
 				typeof commonDate !== "undefined"
 			) {
-				console.log('masuk ke if 3 perbandingan');
+				console.log("masuk ke if 3 perbandingan");
 				const query = filterPlant.split(",").map((item) => ({
 					[Op.eq]: item,
 				}));
@@ -55,7 +101,9 @@ class PlantScheduleController {
 				}));
 
 				if (commonDate.length > 1) {
-					console.log('masuk ke if 3 perbandingan dengan commonDate.length > 1');
+					console.log(
+						"masuk ke if 3 perbandingan dengan commonDate.length > 1"
+					);
 					opt.where = {
 						"$PlantSheet.plant.name$": {
 							[Op.or]: query,
@@ -77,7 +125,9 @@ class PlantScheduleController {
 						],
 					};
 				} else {
-					console.log('masuk ke if 3 perbandingan dengan commonDate.length < 2')
+					console.log(
+						"masuk ke if 3 perbandingan dengan commonDate.length < 2"
+					);
 					opt.where = {
 						"$PlantSheet.plant.name$": {
 							[Op.or]: query,
@@ -92,20 +142,23 @@ class PlantScheduleController {
 						),
 					};
 				}
-				
 			} else if (
 				filterPlant !== "" &&
 				typeof filterPlant !== "undefined" &&
 				commonDate !== "" &&
 				typeof commonDate !== "undefined"
 			) {
-				console.log('masuk ke if 2 perbandingan antara filterPlant dan commonDate')
+				console.log(
+					"masuk ke if 2 perbandingan antara filterPlant dan commonDate"
+				);
 				const query = filterPlant.split(",").map((item) => ({
 					[Op.eq]: item,
 				}));
 
 				if (commonDate.length > 1) {
-					console.log('masuk ke if 2 perbandingan antara filterPlant dan commonDate dengan commonDate.length > 1');
+					console.log(
+						"masuk ke if 2 perbandingan antara filterPlant dan commonDate dengan commonDate.length > 1"
+					);
 					opt.where = {
 						"$PlantSheet.plant.name$": {
 							[Op.or]: query,
@@ -124,7 +177,9 @@ class PlantScheduleController {
 						],
 					};
 				} else {
-					console.log('masuk ke if 2 perbandingan antara filterLocation dan commonDate dengan commonDate.length < 2')
+					console.log(
+						"masuk ke if 2 perbandingan antara filterLocation dan commonDate dengan commonDate.length < 2"
+					);
 					opt.where = {
 						"$PlantSheet.plant.name$": {
 							[Op.or]: query,
@@ -136,22 +191,24 @@ class PlantScheduleController {
 						),
 					};
 				}
-				
 			} else if (
 				filterLocation !== "" &&
 				typeof filterLocation !== "undefined" &&
 				commonDate !== "" &&
 				typeof commonDate !== "undefined"
 			) {
-				
-				console.log('masuk ke if 2 perbandingan antara filterLocation dan commonDate')
+				console.log(
+					"masuk ke if 2 perbandingan antara filterLocation dan commonDate"
+				);
 				const queryLocation = filterLocation.split(",").map((item) => ({
 					[Op.eq]: item,
 				}));
 
 				if (commonDate.length > 1) {
-					console.log('masuk ke if 2 perbandingan dengan commonDate.length > 1');
-				
+					console.log(
+						"masuk ke if 2 perbandingan dengan commonDate.length > 1"
+					);
+
 					opt.where = {
 						"$CropArea.name$": {
 							[Op.or]: queryLocation,
@@ -170,7 +227,9 @@ class PlantScheduleController {
 						],
 					};
 				} else {
-					console.log('masuk ke if 2 perbandingan dengan commonDate.length < 2')
+					console.log(
+						"masuk ke if 2 perbandingan dengan commonDate.length < 2"
+					);
 					opt.where = {
 						"$CropArea.name$": {
 							[Op.or]: queryLocation,
@@ -182,14 +241,15 @@ class PlantScheduleController {
 						),
 					};
 				}
-				
 			} else if (
 				filterPlant !== "" &&
 				typeof filterPlant !== "undefined" &&
 				filterLocation !== "" &&
 				typeof filterLocation !== "undefined"
 			) {
-				console.log('masuk ke if 2 perbandingan antara filterLocation dan filterPlant')
+				console.log(
+					"masuk ke if 2 perbandingan antara filterLocation dan filterPlant"
+				);
 				const query = filterPlant.split(",").map((item) => ({
 					[Op.eq]: item,
 				}));
@@ -209,7 +269,7 @@ class PlantScheduleController {
 				filterLocation !== "" &&
 				typeof filterLocation !== "undefined"
 			) {
-				console.log('masuk ke perbandingan hanya location');
+				console.log("masuk ke perbandingan hanya location");
 				const query = filterLocation.split(",").map((item) => ({
 					[Op.eq]: item,
 				}));
@@ -219,7 +279,7 @@ class PlantScheduleController {
 					},
 				};
 			} else if (filterPlant !== "" && typeof filterPlant !== "undefined") {
-				console.log('masuk ke perbandingan hanya filterPlant');
+				console.log("masuk ke perbandingan hanya filterPlant");
 				const query = filterPlant.split(",").map((item) => ({
 					[Op.eq]: item,
 				}));
@@ -238,7 +298,7 @@ class PlantScheduleController {
 				// 	[Op.eq]: item,
 				// }));
 				// console.log(query, "<<< INI QUERY");
-				console.log('masuk ke perbandingan hanya tanggal');
+				console.log("masuk ke perbandingan hanya tanggal");
 				console.log(commonDate.length, "<<< INI commonDate.length");
 				console.log(commonDate, "<<< INI commonDate original");
 				console.log(
@@ -285,6 +345,146 @@ class PlantScheduleController {
 					name: "NotFound",
 				};
 			}
+
+			res.status(200).json(data);
+		} catch (error) {
+			console.log(error);
+			next(error);
+		}
+	}
+
+	static async postSchedule(req, res, next) {
+		try {
+			console.log(req.body, "<< ini req.body");
+			const {
+				seedlingDate,
+				plantingDate,
+				harvestDate,
+				unloadDate,
+				PlantsheetId,
+				CropAreaId,
+				totalPopulation,
+			} = req.body;
+
+			await PlantSchedule.create({
+				seedlingDate,
+				plantingDate,
+				harvestDate,
+				unloadDate,
+				PlantsheetId,
+				CropAreaId,
+				totalPopulation,
+			});
+			res.status(201).json("New Plant Schedule successfully added");
+		} catch (error) {
+			console.log(error);
+			next(error);
+		}
+	}
+
+	static async getScheduleById(req, res, next) {
+		try {
+			const { id } = req.params;
+			const opt = {
+				include: [
+					{
+						model: PlantSheet,
+						include: [
+							{
+								model: Item,
+								as: "plant",
+								attributes: ["name", "code"],
+							},
+							{
+								model: PlantType,
+								attributes: ["name"],
+							},
+							{
+								model: SeedConjunction,
+								attributes: ["id", "seedid", "plantsheetid"],
+								include: {
+									model: Item,
+									attributes: ["name", "description", "standardqty"],
+								},
+							},
+							{
+								model: fertilizerConjunction,
+								attributes: [
+									"id",
+									"dose",
+									"fertilizerid",
+									"plantsheetid",
+								],
+								include: {
+									model: Item,
+									attributes: ["name", "standardqty", "description"],
+									include: [
+										{
+											model: Uom,
+											attributes: ["name"],
+										},
+									],
+								},
+							},
+							{
+								model: PesticideConjunction,
+								attributes: [
+									"id",
+									"dose",
+									"pesticideid",
+									"plantsheetid",
+								],
+								include: {
+									model: Item,
+									attributes: ["name", "standardqty", "description"],
+									include: [
+										{
+											model: Uom,
+											attributes: ["name"],
+										},
+										{
+											model: Category,
+											attributes: ["name"],
+										},
+									],
+								},
+							},
+							{
+								model: materialConjunction,
+								attributes: [
+									"id",
+									"dose",
+									"materialid",
+									"plantsheetid",
+								],
+								include: {
+									model: Item,
+									attributes: ["name", "standardqty", "description"],
+									include: [
+										{
+											model: Uom,
+											attributes: ["name"],
+										},
+									],
+								},
+							},
+						],
+						attributes: {
+							exclude: ["createdAt", "updatedAt"],
+						},
+					},
+					{
+						model: HarvestOutcome,
+						attributes: {
+							exclude: ["createdAt", "updatedAt"],
+						},
+					},
+				],
+				attributes: {
+					exclude: ["createdAt", "updatedAt"],
+				},
+			};
+			const data = await PlantSchedule.findByPk(id, opt);
 
 			res.status(200).json(data);
 		} catch (error) {
