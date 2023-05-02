@@ -10,10 +10,22 @@ export const useUomStore = defineStore('uom', {
             editFlag: false,
             query: {
                 filter: ''
-            }
+            },
+			sidebarFlag: false
         }
     },
     actions: {
+		async handleSidebarFlag() {
+			console.log("masuk ke useUomStore");
+			console.log("masuk ke handleFalsesidebarFlag");
+			this.sidebarFlag = true;
+			console.log(this.sidebarFlag,"ini this.sidebarFlag");
+		},async handleSidebarFlagFalse() {
+			console.log("masuk ke useUomStore");
+			console.log("masuk ke handleSidebarFlagFalse");
+			this.sidebarFlag = false;
+			console.log(this.sidebarFlag,"ini this.sidebarFlag");
+		},
         async patchUom(val) {
 			try {
 				console.log(val, "ini data patch");

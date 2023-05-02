@@ -58,6 +58,7 @@ export default {
 </script>
 
 <template>
+	<pre>{{ editFlag }}</pre>
 	<!-- <pre>{{ this.$route.query.id }}</pre> -->
 	<!-- <pre>{{ typeof this.$route.query.harvestExpectation }}</pre> -->
 	<section class="w-full">

@@ -1,6 +1,7 @@
 <script>
 import { mapActions, mapState } from "pinia";
-import { useCropStore } from "../stores/crop";
+import VueDatePicker from "@vuepic/vue-datepicker";
+import "@vuepic/vue-datepicker/dist/main.css";
 import RedButton from "../components/Buttons/RedButton.vue";
 import BlueButton from "../components/Buttons/BlueButton.vue";
 import TableRow4Colum from "../components/TableRow/TableRow4Colum.vue";
@@ -16,13 +17,91 @@ export default {
 				id: 0,
 				arcStatus: "",
 			},
+			markers: [],
 		};
 	},
 	methods: {
+		calendarData() {
+			if (this.plantSchedulesDetail.seedlingDate) {
+				const seedlingDate = new Date(
+					this.plantSchedulesDetail.seedlingDate
+				);
+				const plantingDate = new Date(
+					this.plantSchedulesDetail.plantingDate
+				);
+				const plantingDateMinusOneDay = plantingDate.setDate(
+					plantingDate.getDate() - 1
+				);
+				for (
+					let d = seedlingDate;
+					d <= plantingDateMinusOneDay;
+					d.setDate(d.getDate() + 1)
+				) {
+					let seedlingDateObj = {
+						date: new Date(d),
+						type: "line",
+						tooltip: [
+							{ text: "Seedling Date to Planting Date", color: "blue" },
+						],
+						color: "blue",
+					};
+					this.markers.push(seedlingDateObj);
+				}
+
+				const harvestDate = new Date(this.plantSchedulesDetail.harvestDate);
+				const harvestDateMinusOneDay = harvestDate.setDate(
+					harvestDate.getDate() - 1
+				);
+				for (
+					let d = plantingDate;
+					d <= harvestDateMinusOneDay;
+					d.setDate(d.getDate() + 1)
+				) {
+					let harvestDateObj = {
+						date: new Date(d),
+						type: "line",
+						tooltip: [
+							{ text: "Planting Date to Harvest Date", color: "red" },
+						],
+						color: "red",
+					};
+					this.markers.push(harvestDateObj);
+				}
+				const unloadDate = new Date(this.plantSchedulesDetail.unloadDate);
+				const unloadDateMinusOneDay = unloadDate.setDate(
+					unloadDate.getDate() - 1
+				);
+				for (
+					let d = harvestDate;
+					d <= unloadDateMinusOneDay;
+					d.setDate(d.getDate() + 1)
+				) {
+					let unloadDateObj = {
+						date: new Date(d),
+						type: "line",
+						tooltip: [
+							{ text: "Harvest Date to Unload Date", color: "yellow" },
+						],
+						color: "yellow",
+					};
+					this.markers.push(unloadDateObj);
+				}
+				this.markers.push({
+					date: this.plantSchedulesDetail.unloadDate,
+					type: "line",
+					tooltip: [{ text: "Unload Date", color: "green" }],
+					color: "green",
+				});
+			} else if (!this.plantSchedulesDetail.seedlingDate) {
+				console.log(
+					"masuk ke calendarData function dan seedling date belum ada"
+				);
+			}
+		},
 		...mapActions(usePlantScheduleStore, [
 			"fetchPlantSchedulesById",
 			"fetchHarvestRealization",
-			'fetchPlantSchedulesByIdForEdit'
+			"fetchPlantSchedulesByIdForEdit",
 		]),
 		buttonSelector(value) {
 			this.activeTab = value;
@@ -42,6 +121,7 @@ export default {
 		...mapState(usePlantScheduleStore, [
 			"plantSchedulesDetail",
 			"harvestRealization",
+			"editFlag",
 		]),
 		archive() {
 			if (this.cropDetail.arcStatus === "archived") {
@@ -82,13 +162,25 @@ export default {
 		this.fetchPlantSchedulesById(this.$route.params.id);
 		this.fetchHarvestRealization(this.$route.params.id);
 	},
+	watch: {
+		plantSchedulesDetail(newVal, oldVal) {
+			if (newVal.seedlingDate) {
+				this.calendarData();
+			}
+		},
+	},
 	components: { RedButton, BlueButton, TableRow4Colum },
 };
 </script>
 
 <template>
-	<!-- <pre>{{ harvestTotalExpectation }}</pre>
-	<pre>{{ harvestPerDayExpectation }}</pre> -->
+	<!-- <pre>{{ editFlag }}</pre> -->
+	<!-- <pre>{{ plantSchedulesDetail }}</pre> -->
+	<!-- <pre>{{ plantSchedulesDetail.seedlingDate }}</pre>
+	<pre>{{ plantSchedulesDetail.plantingDate }}</pre>
+	<pre>{{ plantSchedulesDetail.harvestDate }}</pre>
+	<pre>{{ plantSchedulesDetail.unloadDate }}</pre> -->
+	<!-- <pre>{{ markers }}</pre>  -->
 	<section class="w-full">
 		<div class="flex flex-col px-10 bg-slate-100">
 			<!-- <div class="w-full flex justify-end items-end pt-4">
@@ -119,14 +211,16 @@ export default {
 						<BlueButton :type="'button'" :text="'EDIT'" />
 					</div> -->
 					<div
-						@click="fetchPlantSchedulesByIdForEdit(plantSchedulesDetail.id)"
+						@click="
+							fetchPlantSchedulesByIdForEdit(plantSchedulesDetail.id)
+						"
 					>
 						<BlueButton :type="'button'" :text="'VALIDATION'" />
 					</div>
 				</div>
 			</div>
 			<div
-				class="h-[443px] flex flex-col-reverse border-2 border-black bg-slate-300"
+				class="h-[443px] flex flex-col-reverse border-2 border-black bg-slate-300 rounded-md"
 			>
 				<div class="flex flex-row justify-center items-center mb-2">
 					<div
@@ -287,6 +381,53 @@ export default {
 					</div>
 				</div>
 			</div>
+			<section
+				id="calendar-section"
+				class="h-[410px] border-2 rounded-md border-black bg-slate-300 mt-3 flex flex-col justify-center gap-3 items-center"
+			>
+				<div class="text-5xl font-semibold" >
+					<h2>Detail Schedule</h2>
+				</div>
+				<div>
+					<VueDatePicker
+						inline
+						auto-apply
+						range
+						multi-calendars
+						:enable-time-picker="false"
+						:markers="markers"
+					>
+						<template #left-sidebar class="w-5">
+							<ul class="p-2">
+								<li class="h-14 w-60">
+									- <span class="text-blue-400">Blue Line </span>
+									<p class="w-full pl-3 ">
+										Seedling Date to Planting Date
+									</p>
+								</li>
+								<li class="h-14 w-60">
+									- <span class="text-red-400">Red Line </span>
+									<p class="w-full pl-3 ">
+										Planting Date to Harvest Date
+									</p>
+								</li>
+								<li class="h-14 w-60">
+									- <span class="text-yellow-400">Yellow Line </span>
+									<p class="w-full pl-3 ">
+										Harvest Date to Unload Date
+									</p>
+								</li>
+								<li class="h-14 w-60">
+									- <span class="text-green-400">Green Line </span>
+									<p class="w-full pl-3 ">
+										Unload Date
+									</p>
+								</li>
+							</ul>
+						</template>
+					</VueDatePicker>
+				</div>
+			</section>
 			<div
 				class="flex flex-col mt-3 relative bg-slate-300 mb-4 h-[300px] p-2 border-2 border-black rounded overflow-auto"
 			>
@@ -340,29 +481,33 @@ export default {
 						class="bg-slate-400 bg-opacity-50 w-[100%] h-[220px] rounded-md mt-2 flex flex-row justify-center items-center gap-3"
 					>
 						<div
-							class="bg-yellow-300 h-[120px] border-black border-[3px] w-[18%] rounded-lg  flex flex-col justify-center items-center gap-2"
+							class="bg-yellow-300 h-[120px] border-black border-[3px] w-[18%] rounded-lg flex flex-col justify-center items-center gap-2"
 						>
 							<div
 								class="flex flex-col border-2 bg-yellow-500 border-black px-3 rounded-lg w-[85%]"
 							>
-								<div class="text-xl font-bold pl-[5px] text-center">Total Harvest Estimation</div>
+								<div class="text-xl font-bold pl-[5px] text-center">
+									Total Harvest Estimation
+								</div>
 								<div class="text-lg font-semibold text-center">
 									{{ harvestTotalExpectation }} Kg
 								</div>
 							</div>
 						</div>
 						<div
-						class="bg-yellow-300 h-[120px] border-black border-[3px] w-[18%] rounded-lg  flex flex-col justify-center items-center gap-2"
-					>
-						<div
-							class="flex flex-col border-2 bg-yellow-500 border-black px-3 rounded-lg w-[85%]"
+							class="bg-yellow-300 h-[120px] border-black border-[3px] w-[18%] rounded-lg flex flex-col justify-center items-center gap-2"
 						>
-							<div class="text-xl font-bold pl-[5px] text-center">Harvest per Day Estimation</div>
-							<div class="text-lg font-semibold text-center">
-								{{ harvestPerDayExpectation }} Kg
+							<div
+								class="flex flex-col border-2 bg-yellow-500 border-black px-3 rounded-lg w-[85%]"
+							>
+								<div class="text-xl font-bold pl-[5px] text-center">
+									Harvest per Day Estimation
+								</div>
+								<div class="text-lg font-semibold text-center">
+									{{ harvestPerDayExpectation }} Kg
+								</div>
 							</div>
 						</div>
-					</div>
 					</div>
 					<div
 						v-if="activeTab === 'realization'"

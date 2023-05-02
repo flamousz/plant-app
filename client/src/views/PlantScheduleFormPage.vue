@@ -29,45 +29,55 @@ export default {
 		};
 	},
 	methods: {
-		...mapActions(usePlantScheduleStore, ["postPlantSchedules"]),
+		formattedDate(date) {
+			return usePlantScheduleStore().formatDate(date);
+		},
+		...mapActions(usePlantScheduleStore, [
+			"postPlantSchedules",
+			"putPlantSchedules",
+			"handleFalseEditFlag",
+		]),
 		...mapActions(useCropAreaStore, ["fetchAllCropArea"]),
 		...mapActions(useCropStore, ["fetchCropPlain", "getCropById"]),
 		handlePutorPost() {
 			if (this.editFlag === true) {
-				this.putItem(this.cropData);
+				this.putPlantSchedules(this.cropData);
 			} else if (this.editFlag === false) {
 				this.postPlantSchedules(this.cropData);
 			}
 		},
-		fetchSelectedPlantsheet(value) {
-			this.getCropById(value);
+		fetchSelectedPlantsheet(PlantSheetId) {
+			this.getCropById(PlantSheetId);
 		},
 		seedOrPlant() {
 			console.log("masuk ke seedOrPlant");
-			if (this.cropData.seedlingDate) {
-				const startingDate = new Date(this.cropData.seedlingDate);
-				const resultDate = new Date(startingDate);
-				if (!this.cropDetail.seedlingAge) {
-					return null;
+			if (!this.editFlag) {
+				console.log("masuk ke this.editFlag === false, seedOrPlant");
+				if (this.cropData.seedlingDate) {
+					const startingDate = new Date(this.cropData.seedlingDate);
+					const resultDate = new Date(startingDate);
+					if (!this.cropDetail.seedlingAge) {
+						return null;
+					}
+					resultDate.setDate(
+						startingDate.getDate() + this.cropDetail.seedlingAge
+					);
+					const formattedDate = resultDate.toISOString().slice(0, 10);
+					this.cropData.plantingDate = formattedDate;
+					this.isDateDisabled.plantingDate = true;
+				} else if (this.cropData.plantingDate) {
+					const startingDate = new Date(this.cropData.plantingDate);
+					const resultDate = new Date(startingDate);
+					if (!this.cropDetail.seedlingAge) {
+						return null;
+					}
+					resultDate.setDate(
+						startingDate.getDate() - this.cropDetail.seedlingAge
+					);
+					const formattedDate = resultDate.toISOString().slice(0, 10);
+					this.cropData.seedlingDate = formattedDate;
+					this.isDateDisabled.seedlingDate = true;
 				}
-				resultDate.setDate(
-					startingDate.getDate() + this.cropDetail.seedlingAge
-				);
-				const formattedDate = resultDate.toISOString().slice(0, 10);
-				this.cropData.plantingDate = formattedDate;
-				this.isDateDisabled.plantingDate = true;
-			} else if (this.cropData.plantingDate) {
-				const startingDate = new Date(this.cropData.plantingDate);
-				const resultDate = new Date(startingDate);
-				if (!this.cropDetail.seedlingAge) {
-					return null;
-				}
-				resultDate.setDate(
-					startingDate.getDate() - this.cropDetail.seedlingAge
-				);
-				const formattedDate = resultDate.toISOString().slice(0, 10);
-				this.cropData.seedlingDate = formattedDate;
-				this.isDateDisabled.seedlingDate = true;
 			}
 		},
 	},
@@ -83,28 +93,37 @@ export default {
 			}
 		},
 		harvestDateCalculation() {
-			console.log('masuk ke harvestDateCalculation');
-			console.log(this.cropData.plantingDate,'<< ini this.cropData.plantingDate');
+			console.log("masuk ke harvestDateCalculation");
+			console.log(
+				this.cropData.plantingDate,
+				"<< ini this.cropData.plantingDate"
+			);
 			if (!this.cropData.plantingDate) {
 				return null;
 			}
-			console.log('masuk ke harvestDateCalculation setelah if pertama');
+			console.log("masuk ke harvestDateCalculation setelah if pertama");
 			const startingDate = new Date(this.cropData.plantingDate);
 			const resultDate = new Date(startingDate);
+			console.log(this.cropDetail, "<<<< ini this.cropDetail");
+			console.log(
+				this.cropDetail.harvestAge,
+				"<<<< ini this.cropDetail.harvestAge"
+			);
 			if (!this.cropDetail.harvestAge) {
 				return null;
 			}
+			console.log("masuk ke harvestDateCalculation setelah if kedua");
 			resultDate.setDate(
 				startingDate.getDate() + this.cropDetail.harvestAge
 			);
 
 			const formattedDate = resultDate.toISOString().slice(0, 10);
 			this.cropData.harvestDate = formattedDate;
-			console.log('masuk ke harvestDateCalculation sebelum formattedDate')
+			console.log("masuk ke harvestDateCalculation sebelum formattedDate");
 			return formattedDate;
 		},
 		unloadDateCalculation() {
-			console.log('masuk ke unloadDateCalculation');
+			console.log("masuk ke unloadDateCalculation");
 			if (!this.cropData.harvestDate) {
 				return null;
 			}
@@ -126,6 +145,7 @@ export default {
 		this.fetchAllCropArea();
 		this.fetchCropPlain();
 		if (this.editFlag === true) {
+			this.fetchSelectedPlantsheet(this.plantSchedulesDetail.PlantsheetId);
 			this.cropData.id = this.plantSchedulesDetail.id;
 
 			this.cropData.seedlingDate =
@@ -144,7 +164,10 @@ export default {
 };
 </script>
 
-<template>
+<template class="flex flex-col">
+	<!-- <pre>{{ plantSchedulesDetail.PlantsheetId }}</pre> -->
+	<!-- <pre>{{ cropDetail}}</pre> -->
+	<pre>{{ editFlag }}</pre>
 	<section class="w-full">
 		<form @submit.prevent="handlePutorPost">
 			<div class="flex flex-col px-10">
@@ -159,13 +182,13 @@ export default {
 							<div
 								class="w-[60%] flex flex-row justify-end items-end gap-3"
 							>
-								<div @click="handleStatus('confirm')">
+								<!-- <div @click="handleStatus('confirm')">
 									<BlueButton
 										:type="'submit'"
 										:text="'Confirm'"
 										v-if="role !== 'super' && editFlag === true"
 									/>
-								</div>
+								</div> -->
 								<!-- <div @click="handleStatus('draft')">
 									<GreenButton
 										:type="'submit'"
@@ -173,18 +196,20 @@ export default {
 										v-if="role !== 'super' && editFlag === true"
 									/>
 								</div> -->
-								<GreenButton
+								<GreenButton :type="'submit'" :text="'Submit'" />
+								<!-- <GreenButton
 									:type="'submit'"
 									:text="'Submit'"
 									v-if="role === 'super' || editFlag === false"
-								/>
+								/> -->
 
 								<button
 									class="bg-red-500 rounded flex hover:bg-red-900 justify-center items-center font-semibold text-[11px] text-slate-100 lg:h-[30px] w-[90px]"
 									@click.prevent="
+										handleFalseEditFlag();
 										this.$router.push(
 											`/plantschedule/${plantSchedulesDetail.id}`
-										)
+										);
 									"
 									v-if="editFlag === true"
 								>
@@ -212,14 +237,16 @@ export default {
 						<select
 							v-model="cropData.PlantsheetId"
 							@change="fetchSelectedPlantsheet(cropData.PlantsheetId)"
+
 						>
-							<option value="" disabled selected>
+							<option value="" disabled :selected="!editFlag">
 								---Select Plant---
 							</option>
 							<option
 								v-for="item in crop"
 								:key="item.id"
 								:value="item.id"
+								:disabled="editFlag"
 							>
 								{{ item.plant.name }} {{ item.id }}
 							</option>
@@ -245,7 +272,7 @@ export default {
 							Seedling Date :
 						</div>
 						<p>
-							{{ cropData.seedlingDate }}
+							{{ formattedDate(cropData.seedlingDate) }}
 						</p>
 					</div>
 					<div class="flex flex-row gap-2">
@@ -274,7 +301,7 @@ export default {
 								<option value="" disabled selected>
 									--Select Location--
 								</option>
-								<option v-for="item in cropArea" :value="item.id">
+								<option v-for="item in cropArea" :value="item.id" :disabled="editFlag" >
 									{{ item.name }}
 								</option>
 							</select>
@@ -285,25 +312,25 @@ export default {
 							Population :
 						</div>
 						<div>
-							<input type="number" v-model="cropData.totalPopulation" />
+							<input :disabled="editFlag " type="number" v-model="cropData.totalPopulation" />
 						</div>
 					</div>
 					<div class="flex flex-row gap-2">
-							<div class="flex justify-start items-center w-[13.5%]">
-								Harvest Date :
-							</div>
-							<div>
-								{{ harvestDateCalculation }}
-							</div>
+						<div class="flex justify-start items-center w-[13.5%]">
+							Harvest Date :
 						</div>
-						<div class="flex flex-row gap-2">
-							<div class="flex justify-start items-center w-[13.5%]">
-								Unload Date :
-							</div>
-							<div>
-								{{ unloadDateCalculation }}
-							</div>
+						<div>
+							{{ formattedDate(harvestDateCalculation) }}
 						</div>
+					</div>
+					<div class="flex flex-row gap-2">
+						<div class="flex justify-start items-center w-[13.5%]">
+							Unload Date :
+						</div>
+						<div>
+							{{ formattedDate(unloadDateCalculation) }}
+						</div>
+					</div>
 				</div>
 			</div>
 		</form>

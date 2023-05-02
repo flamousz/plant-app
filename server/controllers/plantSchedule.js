@@ -18,7 +18,7 @@ const {
 class PlantScheduleController {
 	static async putSchedule(req, res, next) {
 		try {
-			console.log(req.body, '<<<<<<< ini req.body');
+			console.log(req.body, '<<<<<<< ini req.body dari putSchedule');
 			const {
 				seedlingDate,
 				plantingDate,

@@ -28,7 +28,7 @@ export default {
 
 <template>
 	<!-- <pre>{{ crop }}</pre> -->
-	<div class="z-40 fixed flex">
+	<div class="z-40 fixed bottom-4 opacity-50 hover:opacity-90 right-6 flex">
 		<RouterLink to="/formplantsheet"
 			><BlueButton :type="'button'" :text="'NEW CROP'"
 		/></RouterLink>
