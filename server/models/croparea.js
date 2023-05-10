@@ -20,7 +20,12 @@ module.exports = (sequelize, DataTypes) => {
 			area: DataTypes.INTEGER,
 			type: DataTypes.STRING,
 			detailplace: DataTypes.STRING,
-			map: DataTypes.STRING,
+			map: {
+				type: DataTypes.TEXT,
+				unique: {
+					msg: "Code has been exists",
+				},
+			},
 			status: DataTypes.STRING,
 			arcStatus: DataTypes.STRING,
 		},

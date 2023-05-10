@@ -27,7 +27,9 @@ module.exports = (sequelize, DataTypes) => {
     unloadDate: DataTypes.DATE,
     PlantsheetId: DataTypes.INTEGER,
     CropAreaId: DataTypes.INTEGER,
-    totalPopulation: DataTypes.STRING
+    totalPopulation: DataTypes.STRING,
+    code: DataTypes.STRING,
+    status: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'PlantSchedule',

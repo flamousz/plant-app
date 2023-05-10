@@ -16,9 +16,36 @@ const {
 } = require("../models/index");
 
 class PlantScheduleController {
+	static async putCodeSchedule(req, res, next) {
+		try {
+			const allPlantSchedule = await PlantSchedule.findAll();
+
+			for (const plantSchedule of allPlantSchedule) {
+				const uniqueNumber = Math.floor(1000 + Math.random() * 9000);
+				const newValue = `non-mush${uniqueNumber}`;
+
+				await PlantSchedule.update(
+					{
+						code: newValue,
+					},
+					{
+						where: {
+							id: plantSchedule.id,
+						},
+					}
+				);
+			}
+
+			res.status(200).json("successfully update code column");
+		} catch (error) {
+			console.log(error);
+			next(error)
+		}
+	}
+
 	static async putSchedule(req, res, next) {
 		try {
-			console.log(req.body, '<<<<<<< ini req.body dari putSchedule');
+			console.log(req.body, "<<<<<<< ini req.body dari putSchedule");
 			const {
 				seedlingDate,
 				plantingDate,
@@ -35,19 +62,22 @@ class PlantScheduleController {
 					name: "NotFound",
 				};
 			}
-			await PlantSchedule.update({
-				seedlingDate,
-				plantingDate,
-				harvestDate,
-				unloadDate,
-				PlantsheetId,
-				CropAreaId,
-				totalPopulation,
-			}, {
-				where: {id},
-				returning: true
-			})
-			res.status(200).json(`Schedule has been validated`)
+			await PlantSchedule.update(
+				{
+					seedlingDate,
+					plantingDate,
+					harvestDate,
+					unloadDate,
+					PlantsheetId,
+					CropAreaId,
+					totalPopulation,
+				},
+				{
+					where: { id },
+					returning: true,
+				}
+			);
+			res.status(200).json(`Schedule has been validated`);
 		} catch (error) {
 			console.log();
 			next(error);
@@ -66,7 +96,7 @@ class PlantScheduleController {
 				include: [
 					{
 						model: CropArea,
-						attributes: ["name"],
+						attributes: ["name", "area"],
 					},
 					{
 						model: PlantSheet,
@@ -479,6 +509,12 @@ class PlantScheduleController {
 							exclude: ["createdAt", "updatedAt"],
 						},
 					},
+					{
+						model: CropArea,
+						attributes: {
+							exclude: ['createdAt', 'updatedAt']
+						}
+					}
 				],
 				attributes: {
 					exclude: ["createdAt", "updatedAt"],
