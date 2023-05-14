@@ -18,6 +18,7 @@ module.exports = (sequelize, DataTypes) => {
 				foreignKey: 'CropAreaId'
 			})
       PlantSchedule.hasMany(models.HarvestOutcome)
+      PlantSchedule.hasMany(models.SeedNursery)
     }
   }
   PlantSchedule.init({
@@ -29,7 +30,8 @@ module.exports = (sequelize, DataTypes) => {
     CropAreaId: DataTypes.INTEGER,
     totalPopulation: DataTypes.STRING,
     code: DataTypes.STRING,
-    status: DataTypes.STRING
+    status: DataTypes.STRING,
+    seedNursery: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'PlantSchedule',

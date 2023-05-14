@@ -13,6 +13,7 @@ const {
 	materialConjunction,
 	Uom,
 	Category,
+	SeedNursery,
 } = require("../models/index");
 
 class PlantScheduleController {
@@ -39,7 +40,7 @@ class PlantScheduleController {
 			res.status(200).json("successfully update code column");
 		} catch (error) {
 			console.log(error);
-			next(error)
+			next(error);
 		}
 	}
 
@@ -55,6 +56,7 @@ class PlantScheduleController {
 				CropAreaId,
 				totalPopulation,
 				id,
+				seedNursery,
 			} = req.body;
 			const findData = await PlantSchedule.findByPk(id);
 			if (!findData) {
@@ -71,6 +73,7 @@ class PlantScheduleController {
 					PlantsheetId,
 					CropAreaId,
 					totalPopulation,
+					seedNursery,
 				},
 				{
 					where: { id },
@@ -386,7 +389,7 @@ class PlantScheduleController {
 	static async postSchedule(req, res, next) {
 		try {
 			console.log(req.body, "<< ini req.body");
-			const {
+			let {
 				seedlingDate,
 				plantingDate,
 				harvestDate,
@@ -394,9 +397,16 @@ class PlantScheduleController {
 				PlantsheetId,
 				CropAreaId,
 				totalPopulation,
+				seedNursery,
 			} = req.body;
+			const min = 1121;
+			const max = 9999;
+			const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
+			const code = `nonmush-${randomNumber}`;
 
-			await PlantSchedule.create({
+			seedNursery = Math.ceil(seedNursery);
+			console.log(seedNursery, "<<< seedNursery setelah dibulatkan");
+			const data = await PlantSchedule.create({
 				seedlingDate,
 				plantingDate,
 				harvestDate,
@@ -404,7 +414,14 @@ class PlantScheduleController {
 				PlantsheetId,
 				CropAreaId,
 				totalPopulation,
+				code,
+				seedNursery,
 			});
+
+			await SeedNursery.create({
+				PlantScheduleId: data.id,
+			});
+
 			res.status(201).json("New Plant Schedule successfully added");
 		} catch (error) {
 			console.log(error);
@@ -512,9 +529,9 @@ class PlantScheduleController {
 					{
 						model: CropArea,
 						attributes: {
-							exclude: ['createdAt', 'updatedAt']
-						}
-					}
+							exclude: ["createdAt", "updatedAt"],
+						},
+					},
 				],
 				attributes: {
 					exclude: ["createdAt", "updatedAt"],

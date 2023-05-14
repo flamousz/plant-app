@@ -34,6 +34,9 @@ module.exports = (sequelize, DataTypes) => {
 				foreignKey: "plantid",
 				as: "plant",
 			});
+			Item.hasMany(models.SeedNursery, {
+				foreignKey: 'SeedId'
+			})
 			
 		}
 	}
