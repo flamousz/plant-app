@@ -48,14 +48,14 @@ export default {
 					>
 					<RouterLink
 						class="hover:text-blue-400"
-						:class="{ 'text-blue-700': this.$route.name === 'maparea' }"
-						to="/maparea"
+						:class="{ 'text-blue-700': this.$route.name === 'mapbasic' }"
+						to="/mapbasic"
 						>Plantation Map</RouterLink
 					>
 					<RouterLink
 						class="hover:text-blue-400"
 						:class="{ 'text-blue-700': this.$route.name === 'task' }"
-						to="/task"
+						to="/crop"
 						>Task Sheet</RouterLink
 					>
 				</ul>
@@ -64,7 +64,7 @@ export default {
 				id="master-data-group"
 				:style="{
 					position: 'absolute',
-					top: '430px',
+					top: '428px',
 					transition: 'top 400ms',
 				}"
 			>
@@ -137,6 +137,7 @@ export default {
 						to="/employee"
 						>Employee</RouterLink
 					>
+					
 				</ul>
 			</div>
 		</div>

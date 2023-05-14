@@ -23,10 +23,23 @@ import PlantSchedulePage from '../views/PlantSchedulePage.vue'
 import PlantScheduleFormPage from '../views/PlantScheduleFormPage.vue'
 import DetailPlantSchedule from '../views/DetailPlantSchedule.vue'
 import HarvestOutcomeFormPage from '../views/HarvestOutcomeFormPage.vue'
+import MapPlainPage from '../views/MapPlainPage.vue'
+import SeedNurseryPage from '../views/SeedNurseryPage.vue'
+import SeedNurseryDetailPage from '../views/SeedNurseryDetailPage.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    {
+      path: '/seednursery',
+      name: 'seednursery',
+      component: SeedNurseryPage
+    },
+    {
+      path: '/seednursery/:id',
+      name: 'detailseednursery',
+      component: SeedNurseryDetailPage
+    },
     {
       path: '/harvestoutcome/form',
       name: 'harvestoutcomeform',
@@ -146,6 +159,11 @@ const router = createRouter({
       path:'/login',
       name: 'login',
       component: LoginPage
+    },
+    {
+      path: '/mapbasic',
+      name: 'mapbasic',
+      component: MapPlainPage
     }
   ]
 })

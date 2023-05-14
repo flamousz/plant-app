@@ -21,6 +21,7 @@ export default {
 				PlantsheetId: 0,
 				CropAreaId: 0,
 				totalPopulation: null,
+				seedNursery: null
 			},
 			isDateDisabled: {
 				seedlingDate: false,
@@ -37,7 +38,7 @@ export default {
 			"putPlantSchedules",
 			"handleFalseEditFlag",
 		]),
-		...mapActions(useCropAreaStore, ["fetchAllCropArea"]),
+		...mapActions(useCropAreaStore, ["fetchAllCropArea", 'getCropAreaById']),
 		...mapActions(useCropStore, ["fetchCropPlain", "getCropById"]),
 		handlePutorPost() {
 			if (this.editFlag === true) {
@@ -48,6 +49,10 @@ export default {
 		},
 		fetchSelectedPlantsheet(PlantSheetId) {
 			this.getCropById(PlantSheetId);
+		},
+		fetchCropArea(id){
+			console.log('<<< masuk ke fetchCropArea(id)');
+			this.getCropAreaById(id)
 		},
 		seedOrPlant() {
 			console.log("masuk ke seedOrPlant");
@@ -83,7 +88,7 @@ export default {
 	},
 	computed: {
 		...mapState(useCropStore, ["crop", "cropDetail"]),
-		...mapState(useCropAreaStore, ["cropArea"]),
+		...mapState(useCropAreaStore, ["cropArea", 'cropAreaDetail']),
 		...mapState(usePlantScheduleStore, ["editFlag", "plantSchedulesDetail"]),
 		heading() {
 			if (this.editFlag === true) {
@@ -91,6 +96,24 @@ export default {
 			} else if (this.editFlag === false) {
 				return "New";
 			}
+		},
+		seedNurseryCalculation(){
+			if (!this.cropData.totalPopulation) {
+				return null
+			}
+			
+			return this.cropData.seedNursery = this.cropData.totalPopulation + (this.cropData.totalPopulation*this.cropDetail.fallacyNursery) 
+		},
+		populationCalculation(){
+			if (!this.cropDetail.plantPerMetre) {
+				return null
+			}
+			if (!this.cropAreaDetail.area) {
+				return null
+			}
+			console.log(this.cropDetail.plantPerMetre, '<<< this.cropDetail.plantPerMetre');
+			console.log(this.cropAreaDetail.area, '<<< this.cropAreaDetail.area');
+			return this.cropData.totalPopulation = this.cropAreaDetail.area*this.cropDetail.plantPerMetre
 		},
 		harvestDateCalculation() {
 			console.log("masuk ke harvestDateCalculation");
@@ -167,7 +190,8 @@ export default {
 <template class="flex flex-col">
 	<!-- <pre>{{ plantSchedulesDetail.PlantsheetId }}</pre> -->
 	<!-- <pre>{{ cropDetail}}</pre> -->
-	<pre>{{ editFlag }}</pre>
+	<!-- <pre>{{ cropAreaDetail }}</pre> -->
+	<!-- <pre>{{ editFlag }}</pre> -->
 	<section class="w-full">
 		<form @submit.prevent="handlePutorPost">
 			<div class="flex flex-col px-10">
@@ -252,21 +276,6 @@ export default {
 							</option>
 						</select>
 					</div>
-
-					<div class="flex flex-row gap-2" v-if="!editFlag">
-						<div class="flex justify-start items-center w-[13%]">
-							Seedling Date :
-						</div>
-						<input
-							id="seedlingDate"
-							class="p-[6px] border border-gray-300 rounded-md bg-green-100"
-							name="seedlingDate"
-							type="date"
-							:disabled="isDateDisabled.seedlingDate"
-							v-model="cropData.seedlingDate"
-							@change="seedOrPlant"
-						/>
-					</div>
 					<div class="flex flex-row gap-2" v-if="editFlag">
 						<div class="flex justify-start items-center w-[13%]">
 							Seedling Date :
@@ -297,7 +306,7 @@ export default {
 							Location :
 						</div>
 						<div>
-							<select v-model="cropData.CropAreaId">
+							<select v-model="cropData.CropAreaId" @change="fetchCropArea(cropData.CropAreaId)" >
 								<option value="" disabled selected>
 									--Select Location--
 								</option>
@@ -311,9 +320,7 @@ export default {
 						<div class="flex justify-start items-center w-[13.5%]">
 							Population :
 						</div>
-						<div>
-							<input :disabled="editFlag " type="number" v-model="cropData.totalPopulation" />
-						</div>
+						<p>{{ populationCalculation }} <span class="text-slate-100" >{{ seedNurseryCalculation }}</span> </p>
 					</div>
 					<div class="flex flex-row gap-2">
 						<div class="flex justify-start items-center w-[13.5%]">

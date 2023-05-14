@@ -13,6 +13,6 @@ export default {
 </script>
 
 <template>
-	<Navbar v-if="!isLoginPage" />
+	<Navbar v-if="!isLoginPage"  />
 	<RouterView />
 </template>
