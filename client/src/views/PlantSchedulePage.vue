@@ -6,6 +6,7 @@ import { useCropAreaStore } from "../stores/cropArea";
 import BlueButton from "../components/Buttons/BlueButton.vue";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
+import SideBar from "../components/SideBar.vue";
 
 export default {
 	name: "PlantSchedulePage",
@@ -73,12 +74,13 @@ export default {
 		this.fetchPlantSchedules();
 		// console.log(typeof this.plantSchedules[0].seedlingDate, '<<< seedlingDate');
 	},
-	components: { BlueButton },
+	components: { BlueButton, SideBar },
 };
 </script>
 
 <template>
 	<pre>{{ itemsData.filterDate }}</pre>
+	<!-- <SideBar/> -->
 	<div class="bg-blue-100 p-4 w-full h-screen flex flex-col static">
 		<div class="z-40 fixed bottom-6 right-7 flex opacity-50 hover:opacity-90">
 			<RouterLink to="/plantschedule/form"
@@ -120,6 +122,7 @@ export default {
 					</div>
 					<VueDatePicker
 						v-model="itemsData.commonDate"
+						close-on-scroll
 						range
 						:enable-time-picker="false"
 						@update:model-value="

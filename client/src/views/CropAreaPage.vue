@@ -81,7 +81,7 @@ export default {
 <template>
 	<!-- <pre>{{ cropArea }}</pre> -->
 	<div class="bg-blue-100 p-4 w-full flex flex-col">
-		<div class="z-40 fixed flex">
+		<div class="z-40 fixed flex bottom-3 right-8">
 			<RouterLink to="/cropareaform"
 				><BlueButton :type="'button'" :text="'NEW AREA'"
 			/></RouterLink>

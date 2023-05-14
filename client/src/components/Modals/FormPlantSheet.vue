@@ -12,7 +12,7 @@ export default {
 	name: "FormPlantSheet",
 	data() {
 		return {
-			activeTab: "",
+			activeTab: "pesticidesNursery",
 			cropData: {
 				plantid: "",
 				seedlingAge: "",
@@ -29,7 +29,19 @@ export default {
 						dose: null,
 					},
 				],
+				materialConjunctionsNursery: [
+					{
+						materialid: 0,
+						dose: null,
+					},
+				],
 				fertilizerConjunctions: [
+					{
+						fertilizerid: 0,
+						dose: null,
+					},
+				],
+				fertilizerConjunctionsNursery: [
 					{
 						fertilizerid: 0,
 						dose: null,
@@ -41,9 +53,10 @@ export default {
 						dose: null,
 					},
 				],
-				SeedConjunctions: [
+				PesticideConjunctionsNursery: [
 					{
-						seedid: 0,
+						pesticideid: 0,
+						dose: null,
 					},
 				],
 			},
@@ -56,16 +69,15 @@ export default {
 			"fetchPlantType",
 			"fetchMaterial",
 			"fetchFertilizer",
-			"fetchSeed",
 			"fetchPesticide",
 		]),
-		handleDeletedConjunctions(key, index) {
-			this.cropData[`${key}Conjunctions`].splice(index, 1);
+		handleDeletedConjunctions(key, index, suffix = "") {
+			this.cropData[`${key}Conjunctions${suffix}`].splice(index, 1);
 		},
 		handlePutorPost() {
-			if (this.editFlag === true) {
+			if (this.editFlag) {
 				this.putCrop(this.cropData);
-			} else if (this.editFlag === false) {
+			} else if (!this.editFlag) {
 				this.postCrop(this.cropData);
 			}
 		},
@@ -75,41 +87,9 @@ export default {
 		buttonSelector(value) {
 			this.activeTab = value;
 		},
-		materialInputHandler(e, i, field) {
-			this.cropData.materialConjunctions[i][field] = e;
-		},
-		fertilizerInputHandler(e, i, field) {
-			this.cropData.fertilizerConjunctions[i][field] = e;
-		},
-		pesticideDoseInputHandler(e, i) {
-			this.cropData.PesticideConjunctions[i].dose = e;
-		},
-		pesticideInputHandler(e, i) {
-			this.cropData.PesticideConjunctions[i].pesticideid = e;
-		},
-		seedInputHandler(e, i) {
-			this.cropData.SeedConjunctions[i].seedid = e;
-		},
-		addSeedColumn() {
-			this.cropData.SeedConjunctions.push({
-				seedid: 0,
-			});
-		},
-		addPesticideColumn() {
-			this.cropData.PesticideConjunctions.push({
-				pesticideid: 0,
-				dose: null,
-			});
-		},
-		addMaterialColumn() {
-			this.cropData.materialConjunctions.push({
-				materialid: 0,
-				dose: null,
-			});
-		},
-		addFertilizerColumn() {
-			this.cropData.fertilizerConjunctions.push({
-				fertilizerid: 0,
+		addColumn(array, propName) {
+			array.push({
+				[propName]: 0,
 				dose: null,
 			});
 		},
@@ -121,13 +101,11 @@ export default {
 			"plantTypes",
 			"materials",
 			"fertilizers",
-			"seeds",
 			"pesticides",
 		]),
-		...mapState(useUserStore, ["role", "access_token"]),
+		...mapState(useUserStore, ["role"]),
 	},
 	created() {
-		this.fetchSeed();
 		this.fetchFertilizer();
 		this.fetchMaterial();
 		this.fetchPlant();
@@ -149,7 +127,6 @@ export default {
 				this.cropDetail.fertilizerConjunctions;
 			this.cropData.PesticideConjunctions =
 				this.cropDetail.PesticideConjunctions;
-			this.cropData.SeedConjunctions = this.cropDetail.SeedConjunctions;
 			this.cropData.status = this.cropDetail.status;
 		}
 	},
@@ -161,11 +138,13 @@ export default {
 	<!-- <pre>{{ cropDetail }}</pre>
 	<pre>{{ role }}</pre> -->
 	<!-- <pre>{{ editFlag }}</pre> -->
-
 	<section class="w-full bg-slate-100">
 		<form @submit.prevent="handlePutorPost">
 			<div class="flex flex-col px-10">
-				<div class="w-full flex justify-end items-end pt-4" v-if="editFlag === true">
+				<div
+					class="w-full flex justify-end items-end pt-4"
+					v-if="editFlag === true"
+				>
 					<div class="text-2xl font-bold w-[8%]">STATUS:</div>
 					<div
 						class="w-[6%] border-[3px] rounded-md border-slate-800 bg-yellow-300 font-semibold text-center tracking-wide"
@@ -221,13 +200,18 @@ export default {
 						/>
 
 						<button
-							class=" bg-red-500 rounded flex hover:bg-red-900 justify-center items-center font-semibold text-[11px] text-slate-100 lg:h-[30px] w-[90px]" @click.prevent="this.$router.push(`/detailplant/${cropDetail.id}`)" v-if="editFlag === true"
+							class="bg-red-500 rounded flex hover:bg-red-900 justify-center items-center font-semibold text-[11px] text-slate-100 lg:h-[30px] w-[90px]"
+							@click.prevent="
+								this.$router.push(`/detailplant/${cropDetail.id}`)
+							"
+							v-if="editFlag === true"
 						>
 							Cancel
 						</button>
 						<RouterLink to="/crop">
 							<button
-								class=" bg-red-500 rounded flex hover:bg-red-900 justify-center items-center font-semibold text-[11px] text-slate-100 lg:h-[30px] w-[90px]" v-if="editFlag === false"
+								class="bg-red-500 rounded flex hover:bg-red-900 justify-center items-center font-semibold text-[11px] text-slate-100 lg:h-[30px] w-[90px]"
+								v-if="editFlag === false"
 							>
 								Cancel
 							</button>
@@ -349,345 +333,638 @@ export default {
 						</div>
 					</div>
 				</div>
-				<div class="flex flex-col mt-3">
-					<div class="flex flex-row w-full gap-2">
-						<button
-							@click.prevent="buttonSelector('pesticides')"
-							type="button"
-							class="border active:bg-red-300 hover:bg-red-400 focus:bg-red-500 border-black p-1 w-[7%] text-center rounded-md focus:text-red-100"
-						>
-							Pesticides
-						</button>
-						<button
-							@click.prevent="buttonSelector('fertilizers')"
-							type="button"
-							class="border border-black p-1 w-[7%] text-center rounded-md active:bg-red-300 hover:bg-red-400 focus:bg-red-500 focus:text-red-100"
-						>
-							Fertilizers
-						</button>
-						<button
-							@click.prevent="buttonSelector('materials')"
-							type="button"
-							class="border border-black p-1 w-[7%] text-center rounded-md active:bg-red-300 hover:bg-red-400 focus:bg-red-500 focus:text-red-100"
-						>
-							Materials
-						</button>
-						<button
-							@click.prevent="buttonSelector('seeds')"
-							type="button"
-							class="border border-black p-1 w-[7%] text-center rounded-md active:bg-red-300 hover:bg-red-400 focus:bg-red-500 focus:text-red-100"
-						>
-							Seeds
-						</button>
-					</div>
-					<div class="pt-2">
+				<section
+					id="conjunction-tables"
+					class="flex flex-row mt-3 justify-between items-end h-[300px]"
+				>
+					<div
+						id="nursery-conjunction "
+						class="flex flex-col w-[50%] h-full overflow-auto border-2 rounded-tl-md border-black"
+					>
 						<div
-							v-if="activeTab === 'fertilizers'"
-							class="w-[90%] flex flex-col gap-2"
+							class="flex justify-center items-center border-b-2 border-black p-1"
 						>
-							<div>
-								<div class="flex flex-row w-full">
-									<div class="w-[13%] text-center border-black border">
-										Name
-									</div>
-									<div class="w-[12%] border border-black text-center">
-										Dose
-									</div>
-									<div class="w-[12%] border border-black text-center">
-										Action
-									</div>
-								</div>
-								<div
-									v-for="(
-										el, index
-									) in cropData.fertilizerConjunctions"
-									class="w-full flex flex-row"
-								>
-									<div class="w-[13%] border border-black">
-										<select
-											v-model="el.fertilizerid"
-											@change="
-												fertilizerInputHandler(
-													el.fertilizerid,
-													index,
-													'fertilizerid'
-												)
-											"
-											class="bg-yellow-200 hover:bg-yellow-300 rounded-md h-full flex flex-col"
-										>
-											<option value="" disabled selected>
-												Enter Material here
-											</option>
-											<option
-												class="text-center"
-												v-for="item in fertilizers"
-												:key="item.id"
-												:value="item.id"
-											>
-												{{ item.name }}
-											</option>
-										</select>
-									</div>
-									<div class="w-[12%]">
-										<input
-											id="dose"
-											type="number"
-											step="0.01"
-											v-model="el.dose"
-											@change="
-												fertilizerInputHandler(
-													el.dose,
-													index,
-													'dose'
-												)
-											"
-											placeholder="Input Dose here ..."
-											class="text-sm text-center h-full w-full bg-yellow-200 border border-black hover:bg-yellow-300"
-										/>
-									</div>
-									<div
-										class="w-[12%] border border-black flex flex-col justify-center items-center bg-yellow-200"
-									>
-										<button
-											class="bg-red-500 w-[50%] rounded text-slate-200 tracking-wide font-semibold text-center text-sm hover:bg-red-800"
-											@click.prevent="
-												handleDeletedConjunctions(
-													'fertilizer',
-													index
-												)
-											"
-										>
-											DELETE
-										</button>
-									</div>
-								</div>
-							</div>
-							<button
-								class="bg-red-500 w-[10%] h-full rounded tracking-wide text-slate-200 text-sm hover:bg-red-800"
-								@click.prevent="addFertilizerColumn"
-							>
-								<span class="text-2xl font-extrabold">+</span>
-								Fertilizer
-							</button>
+							<h3 class="text-2xl font-semibold">Nursery</h3>
 						</div>
-						<div
-							v-if="activeTab === 'pesticides'"
-							class="w-[90%] flex flex-col gap-2"
-						>
-							<div>
-								<div class="flex flex-row w-full">
-									<div class="w-[13%] text-center border-black border">
-										Name
+						<div class="p-1">
+							<section
+								id="breadcrumbs"
+								class="flex flex-row w-full gap-2"
+							>
+								<button
+									@click.prevent="buttonSelector('pesticidesNursery')"
+									type="button"
+									:class="{
+										'bg-red-500': activeTab === 'pesticidesNursery',
+										'text-red-100': activeTab === 'pesticidesNursery',
+									}"
+									class="border active:bg-red-300 hover:bg-red-400 border-black p-1 w-[13%] text-center rounded-md"
+								>
+									Pesticides
+								</button>
+								<button
+									@click.prevent="buttonSelector('fertilizersNursery')"
+									type="button"
+									:class="{
+										'bg-red-500': activeTab === 'fertilizersNursery',
+										'text-red-100':
+											activeTab === 'fertilizersNursery',
+									}"
+									class="border border-black p-1 w-[13%] text-center rounded-md active:bg-red-300 hover:bg-red-400"
+								>
+									Fertilizers
+								</button>
+								<button
+									@click.prevent="buttonSelector('materialsNursery')"
+									type="button"
+									:class="{
+										'bg-red-500': activeTab === 'materialsNursery',
+										'text-red-100': activeTab === 'materialsNursery',
+									}"
+									class="border border-black p-1 w-[13%] text-center rounded-md active:bg-red-300 hover:bg-red-400"
+								>
+									Materials
+								</button>
+							</section>
+							<section id="table-form" class="pt-2">
+								<div
+									v-if="activeTab === 'fertilizersNursery'"
+									class="w-[90%] flex flex-col gap-2"
+								>
+									<div>
+										<div class="flex flex-row w-full">
+											<div
+												class="w-[41.5%] text-center border-black border"
+											>
+												Name
+											</div>
+											<div
+												class="w-[14%] border border-black text-center"
+											>
+												Dose
+											</div>
+											<div
+												class="w-[12%] border border-black text-center"
+											>
+												Action
+											</div>
+										</div>
+										<div
+											v-for="(
+												el, index
+											) in cropData.fertilizerConjunctionsNursery"
+											class="w-full flex flex-row"
+										>
+											<div class="w-[41.5%] border border-black">
+												<select
+													v-model="el.fertilizerid"
+													class="bg-yellow-200 hover:bg-yellow-300 rounded-md h-full flex flex-col"
+												>
+													<option value="" disabled>
+														Enter here ..
+													</option>
+													<option
+														class="text-center"
+														v-for="item in fertilizers"
+														:key="item.id"
+														:value="item.id"
+													>
+														{{ item.name }}
+													</option>
+												</select>
+											</div>
+											<div class="w-[14%]">
+												<input
+													id="dose"
+													type="number"
+													step="0.01"
+													v-model="el.dose"
+													placeholder="Input Dose here ..."
+													class="text-sm text-center h-full w-full bg-yellow-200 border border-black hover:bg-yellow-300"
+												/>
+											</div>
+											<div
+												class="w-[12%] border border-black flex flex-col justify-center items-center bg-yellow-200"
+											>
+												<button
+													class="bg-red-500 w-[85%] rounded text-slate-200 tracking-wide font-semibold text-center text-sm hover:bg-red-800"
+													@click.prevent="
+														handleDeletedConjunctions(
+															'fertilizer',
+															index,
+															'Nursery'
+														)
+													"
+												>
+													DELETE
+												</button>
+											</div>
+										</div>
 									</div>
-									<div class="w-[12%] border border-black text-center">
-										Dose
-									</div>
-									<div class="w-[12%] border border-black text-center">
-										Action
-									</div>
+									<button
+										class="bg-red-500 w-[15%] h-full rounded text-slate-200 text-sm hover:bg-red-800"
+										@click.prevent="
+											addColumn(
+												this.cropData.fertilizerConjunctionsNursery,
+												'fertilizerid'
+											)
+										"
+									>
+										<span class="text-2xl font-extrabold">+</span>
+										Fertilizer
+									</button>
 								</div>
 								<div
-									v-for="(el, index) in cropData.PesticideConjunctions"
-									class="w-full flex flex-row"
+									v-if="activeTab === 'pesticidesNursery'"
+									class="w-[90%] flex flex-col gap-2"
 								>
-									<div class="w-[13%] border border-black">
-										<select
-											v-model="el.pesticideid"
-											@change="
-												pesticideInputHandler(el.pesticideid, index)
-											"
-											class="bg-yellow-200 hover:bg-yellow-300 rounded-md h-full flex flex-col"
-										>
-											<option value="" disabled selected>
-												Enter Insectide Pesticide here
-											</option>
-											<option
-												class="text-center"
-												v-for="item in pesticides"
-												:key="item.id"
-												:value="item.id"
+									<div>
+										<div class="flex flex-row w-full">
+											<div
+												class="w-[19%] text-center border-black border"
 											>
-												{{ item.name }}
-											</option>
-										</select>
-									</div>
-									<div class="w-[12%]">
-										<input
-											id="dose"
-											type="number"
-											step="0.01"
-											v-model="el.dose"
-											@change="
-												pesticideDoseInputHandler(el.dose, index)
-											"
-											placeholder="Input Dose here ..."
-											class="text-sm text-center h-full w-full bg-yellow-200 border border-black hover:bg-yellow-300"
-										/>
-									</div>
-									<div
-										class="w-[12%] border border-black flex flex-col justify-center items-center bg-yellow-200"
-									>
-										<button
-											class="bg-red-500 w-[50%] rounded text-slate-200 tracking-wide font-semibold text-center text-sm hover:bg-red-800"
-											@click.prevent="
-												handleDeletedConjunctions(
-													'Pesticide',
-													index
-												)
-											"
+												Name
+											</div>
+											<div
+												class="w-[14%] border border-black text-center"
+											>
+												Dose
+											</div>
+											<div
+												class="w-[12%] border border-black text-center"
+											>
+												Action
+											</div>
+										</div>
+										<div
+											v-for="(
+												el, index
+											) in cropData.PesticideConjunctionsNursery"
+											class="w-full flex flex-row"
 										>
-											DELETE
-										</button>
+											<div class="w-[19%] border border-black">
+												<select
+													v-model="el.pesticideid"
+													class="bg-yellow-200 hover:bg-yellow-300 rounded-md h-full w-[100%] flex flex-col"
+												>
+													<option value="" disabled selected>
+														Enter here
+													</option>
+													<option
+														class="text-center"
+														v-for="item in pesticides"
+														:key="item.id"
+														:value="item.id"
+													>
+														{{ item.name }}
+													</option>
+												</select>
+											</div>
+											<div class="w-[14%]">
+												<input
+													id="dose"
+													type="number"
+													step="0.01"
+													v-model="el.dose"
+													placeholder="Input Dose here ..."
+													class="text-sm text-center h-full w-full bg-yellow-200 border border-black hover:bg-yellow-300"
+												/>
+											</div>
+											<div
+												class="w-[12%] border border-black flex flex-col justify-center items-center bg-yellow-200"
+											>
+												<button
+													class="bg-red-500 w-[85%] rounded text-slate-200 tracking-wide font-semibold text-center text-sm hover:bg-red-800"
+													@click.prevent="
+														handleDeletedConjunctions(
+															'Pesticide',
+															index,
+															'Nursery'
+														)
+													"
+												>
+													DELETE
+												</button>
+											</div>
+										</div>
 									</div>
-								</div>
-							</div>
-							<button
-								class="bg-red-500 w-[10%] h-full rounded tracking-wide text-slate-200 text-sm hover:bg-red-800"
-								@click.prevent="addPesticideColumn"
-							>
-								<span class="text-2xl font-extrabold">+</span> Pesticide
-							</button>
-						</div>
-						<div
-							v-if="activeTab === 'materials'"
-							class="w-[90%] flex flex-col gap-2"
-						>
-							<div>
-								<div class="flex flex-row w-full">
-									<div class="w-[13%] text-center border-black border">
-										Name
-									</div>
-									<div class="w-[12%] border border-black text-center">
-										Dose
-									</div>
-									<div class="w-[12%] border border-black text-center">
-										Action
-									</div>
+									<button
+										class="bg-red-500 w-[15%] h-full rounded text-slate-200 text-sm hover:bg-red-800"
+										@click.prevent="
+											addColumn(
+												this.cropData.PesticideConjunctionsNursery,
+												'pesticideid'
+											)
+										"
+									>
+										<span class="text-2xl font-extrabold">+</span>
+										Pesticide
+									</button>
 								</div>
 								<div
-									v-for="(el, index) in cropData.materialConjunctions"
-									class="w-full flex flex-row"
+									v-if="activeTab === 'materialsNursery'"
+									class="w-[90%] flex flex-col gap-2"
 								>
-									<div class="w-[13%] border border-black">
-										<select
-											v-model="el.materialid"
-											@change="
-												materialInputHandler(
-													el.materialid,
-													index,
-													'materialid'
-												)
-											"
-											class="bg-yellow-200 hover:bg-yellow-300 rounded-md h-full flex flex-col"
-										>
-											<option value="" disabled selected>
-												Enter Material here
-											</option>
-											<option
-												class="text-center"
-												v-for="item in materials"
-												:key="item.id"
-												:value="item.id"
+									<div>
+										<div class="flex flex-row w-full">
+											<div
+												class="w-[18%] text-center border-black border"
 											>
-												{{ item.name }}
-											</option>
-										</select>
-									</div>
-									<div class="w-[12%]">
-										<input
-											id="dose"
-											type="number"
-											step="0.01"
-											v-model="el.dose"
-											@change="
-												materialInputHandler(el.dose, index, 'dose')
-											"
-											placeholder="Input Dose here ..."
-											class="text-sm text-center h-full w-full bg-yellow-200 border border-black hover:bg-yellow-300"
-										/>
-									</div>
-									<div
-										class="w-[12%] border border-black flex flex-col justify-center items-center bg-yellow-200"
-									>
-										<button
-											class="bg-red-500 w-[50%] rounded text-slate-200 tracking-wide font-semibold text-center text-sm hover:bg-red-800"
-											@click.prevent="
-												handleDeletedConjunctions('material', index)
-											"
-										>
-											DELETE
-										</button>
-									</div>
-								</div>
-							</div>
-							<button
-								class="bg-red-500 w-[10%] h-full rounded tracking-wide text-slate-200 text-sm hover:bg-red-800"
-								@click.prevent="addMaterialColumn"
-							>
-								<span class="text-2xl font-extrabold">+</span> Material
-							</button>
-						</div>
-						<div
-							v-if="activeTab === 'seeds'"
-							class="w-[90%] flex flex-col gap-2"
-						>
-							<div>
-								<div class="flex flex-row w-full">
-									<div class="w-[13%] text-center border-black border">
-										Name
-									</div>
-									<div class="w-[12%] border border-black text-center">
-										Action
-									</div>
-								</div>
-								<div
-									v-for="(el, index) in cropData.SeedConjunctions"
-									class="w-full flex flex-row"
-								>
-									<div class="w-[13%] border border-black">
-										<select
-											v-model="el.seedid"
-											@change="seedInputHandler(el.seedid, index)"
-											class="bg-yellow-200 hover:bg-yellow-300 rounded-md h-full flex flex-col w-full"
-										>
-											<option value="" disabled selected>
-												Enter Seed here
-											</option>
-											<option
-												class="text-center"
-												v-for="item in seeds"
-												:key="item.id"
-												:value="item.id"
+												Name
+											</div>
+											<div
+												class="w-[14%] border border-black text-center"
 											>
-												{{ item.name }}
-											</option>
-										</select>
-									</div>
-									<div
-										class="w-[12%] border border-black flex flex-col justify-center items-center bg-yellow-200"
-									>
-										<button
-											class="bg-red-500 w-[50%] rounded text-slate-200 tracking-wide font-semibold text-center text-sm hover:bg-red-800"
-											@click.prevent="
-												handleDeletedConjunctions('Seed', index)
-											"
+												Dose
+											</div>
+											<div
+												class="w-[12%] border border-black text-center"
+											>
+												Action
+											</div>
+										</div>
+										<div
+											v-for="(
+												el, index
+											) in cropData.materialConjunctionsNursery"
+											class="w-full flex flex-row"
 										>
-											DELETE
-										</button>
+											<div class="w-[18%] border border-black">
+												<select
+													v-model="el.materialid"
+													class="bg-yellow-200 hover:bg-yellow-300 w-full rounded-md h-full flex flex-col"
+												>
+													<option value="" disabled selected>
+														Enter Material here
+													</option>
+													<option
+														class="text-center"
+														v-for="item in materials"
+														:key="item.id"
+														:value="item.id"
+													>
+														{{ item.name }}
+													</option>
+												</select>
+											</div>
+											<div class="w-[14%]">
+												<input
+													id="dose"
+													type="number"
+													step="0.01"
+													v-model="el.dose"
+													placeholder="Input Dose here ..."
+													class="text-sm text-center h-full w-full bg-yellow-200 border border-black hover:bg-yellow-300"
+												/>
+											</div>
+											<div
+												class="w-[12%] border border-black flex flex-col justify-center items-center bg-yellow-200"
+											>
+												<button
+													class="bg-red-500 w-[85%] rounded text-slate-200 tracking-wide font-semibold text-center text-sm hover:bg-red-800"
+													@click.prevent="
+														handleDeletedConjunctions(
+															'material',
+															index,
+															'Nursery'
+														)
+													"
+												>
+													DELETE
+												</button>
+											</div>
+										</div>
 									</div>
+									<button
+										class="bg-red-500 w-[15%] h-full rounded text-slate-200 text-sm hover:bg-red-800"
+										@click.prevent="
+											addColumn(
+												this.cropData.materialConjunctionsNursery,
+												'materialid'
+											)
+										"
+									>
+										<span class="text-2xl font-extrabold">+</span>
+										Material
+									</button>
 								</div>
-							</div>
-							<button
-								class="bg-red-500 w-[10%] h-full rounded tracking-wide text-slate-200 text-sm hover:bg-red-800"
-								@click.prevent="addSeedColumn"
-							>
-								<span class="text-2xl font-extrabold">+</span> Seed
-							</button>
+							</section>
 						</div>
 					</div>
-				</div>
+					<div
+						id="planting-conjunction"
+						class="flex w-[50%] flex-col h-full border-t-2 border-r-2 border-b-2 border-black"
+					>
+						<div
+							class="flex justify-center items-center border-b-2 border-black p-1"
+						>
+							<h3 class="text-2xl font-semibold">Plant</h3>
+						</div>
+						<div class="p-1">
+							<section
+								id="breadcrumbs"
+								class="flex flex-row w-full gap-2"
+							>
+								<button
+									@click.prevent="buttonSelector('pesticides')"
+									type="button"
+									:class="{
+										'bg-red-500': activeTab === 'pesticides',
+										'text-red-100': activeTab === 'pesticides',
+									}"
+									class="border hover:bg-red-400 active:bg-red-300 border-black p-1 w-[13%] text-center rounded-md"
+								>
+									Pesticides
+								</button>
+								<button
+									@click.prevent="buttonSelector('fertilizers')"
+									type="button"
+									:class="{
+										'bg-red-500': activeTab === 'fertilizers',
+										'text-red-100': activeTab === 'fertilizers',
+									}"
+									class="border border-black p-1 w-[13%] text-center rounded-md active:bg-red-300 hover:bg-red-400"
+								>
+									Fertilizers
+								</button>
+								<button
+									@click.prevent="buttonSelector('materials')"
+									type="button"
+									:class="{
+										'bg-red-500': activeTab === 'materials',
+										'text-red-100': activeTab === 'materials',
+									}"
+									class="border border-black p-1 w-[13%] text-center rounded-md active:bg-red-300 hover:bg-red-400"
+								>
+									Materials
+								</button>
+							</section>
+							<section id="table-form" class="pt-2">
+								<div
+									v-if="activeTab === 'fertilizers'"
+									class="w-[90%] flex flex-col gap-2"
+								>
+									<div>
+										<div class="flex flex-row w-full">
+											<div
+												class="w-[41.5%] text-center border-black border"
+											>
+												Name
+											</div>
+											<div
+												class="w-[14%] border border-black text-center"
+											>
+												Dose
+											</div>
+											<div
+												class="w-[12%] border border-black text-center"
+											>
+												Action
+											</div>
+										</div>
+										<div
+											v-for="(
+												el, index
+											) in cropData.fertilizerConjunctions"
+											class="w-full flex flex-row"
+										>
+											<div class="w-[41.5%] border border-black">
+												<select
+													v-model="el.fertilizerid"
+													class="bg-yellow-200 hover:bg-yellow-300 rounded-md h-full flex flex-col"
+												>
+													<option value="" disabled selected>
+														Enter Material here
+													</option>
+													<option
+														class="text-center"
+														v-for="item in fertilizers"
+														:key="item.id"
+														:value="item.id"
+													>
+														{{ item.name }}
+													</option>
+												</select>
+											</div>
+											<div class="w-[14%]">
+												<input
+													id="dose"
+													type="number"
+													step="0.01"
+													v-model="el.dose"
+													placeholder="Input Dose here ..."
+													class="text-sm text-center h-full w-full bg-yellow-200 border border-black hover:bg-yellow-300"
+												/>
+											</div>
+											<div
+												class="w-[12%] border border-black flex flex-col justify-center items-center bg-yellow-200"
+											>
+												<button
+													class="bg-red-500 w-[85%] rounded text-slate-200 tracking-wide font-semibold text-center text-sm hover:bg-red-800"
+													@click.prevent="
+														handleDeletedConjunctions(
+															'fertilizer',
+															index
+														)
+													"
+												>
+													DELETE
+												</button>
+											</div>
+										</div>
+									</div>
+									<button
+										class="bg-red-500 w-[15%] h-full rounded text-slate-200 text-sm hover:bg-red-800"
+										@click.prevent="
+											addColumn(
+												this.cropData.fertilizerConjunctions,
+												'fertilizerid'
+											)
+										"
+									>
+										<span class="text-2xl font-extrabold">+</span>
+										Fertilizer
+									</button>
+								</div>
+								<div
+									v-if="activeTab === 'pesticides'"
+									class="w-[90%] flex flex-col gap-2"
+								>
+									<div>
+										<div class="flex flex-row w-full">
+											<div
+												class="w-[19%] text-center border-black border"
+											>
+												Name
+											</div>
+											<div
+												class="w-[14%] border border-black text-center"
+											>
+												Dose
+											</div>
+											<div
+												class="w-[12%] border border-black text-center"
+											>
+												Action
+											</div>
+										</div>
+										<div
+											v-for="(
+												el, index
+											) in cropData.PesticideConjunctions"
+											class="w-full flex flex-row"
+										>
+											<div class="w-[19%] border border-black">
+												<select
+													v-model="el.pesticideid"
+													class="bg-yellow-200 hover:bg-yellow-300 rounded-md h-full w-[100%] flex flex-col"
+												>
+													<option value="" disabled selected>
+														Enter here
+													</option>
+													<option
+														class="text-center"
+														v-for="item in pesticides"
+														:key="item.id"
+														:value="item.id"
+													>
+														{{ item.name }}
+													</option>
+												</select>
+											</div>
+											<div class="w-[14%]">
+												<input
+													id="dose"
+													type="number"
+													step="0.01"
+													v-model="el.dose"
+													placeholder="Input Dose here ..."
+													class="text-sm text-center h-full w-full bg-yellow-200 border border-black hover:bg-yellow-300"
+												/>
+											</div>
+											<div
+												class="w-[12%] border border-black flex flex-col justify-center items-center bg-yellow-200"
+											>
+												<button
+													class="bg-red-500 w-[85%] rounded text-slate-200 tracking-wide font-semibold text-center text-sm hover:bg-red-800"
+													@click.prevent="
+														handleDeletedConjunctions(
+															'Pesticide',
+															index
+														)
+													"
+												>
+													DELETE
+												</button>
+											</div>
+										</div>
+									</div>
+									<button
+										class="bg-red-500 w-[15%] h-full rounded text-slate-200 text-sm hover:bg-red-800"
+										@click.prevent="
+											addColumn(
+												this.cropData.PesticideConjunctions,
+												'pesticideid'
+											)
+										"
+									>
+										<span class="text-2xl font-extrabold">+</span>
+										Pesticide
+									</button>
+								</div>
+								<div
+									v-if="activeTab === 'materials'"
+									class="w-[90%] flex flex-col gap-2"
+								>
+									<div>
+										<div class="flex flex-row w-full">
+											<div
+												class="w-[18%] text-center border-black border"
+											>
+												Name
+											</div>
+											<div
+												class="w-[14%] border border-black text-center"
+											>
+												Dose
+											</div>
+											<div
+												class="w-[12%] border border-black text-center"
+											>
+												Action
+											</div>
+										</div>
+										<div
+											v-for="(
+												el, index
+											) in cropData.materialConjunctions"
+											class="w-full flex flex-row"
+										>
+											<div class="w-[18%] border border-black">
+												<select
+													v-model="el.materialid"
+													class="bg-yellow-200 hover:bg-yellow-300 w-full rounded-md h-full flex flex-col"
+												>
+													<option value="" disabled selected>
+														Enter Material here
+													</option>
+													<option
+														class="text-center"
+														v-for="item in materials"
+														:key="item.id"
+														:value="item.id"
+													>
+														{{ item.name }}
+													</option>
+												</select>
+											</div>
+											<div class="w-[14%]">
+												<input
+													id="dose"
+													type="number"
+													step="0.01"
+													v-model="el.dose"
+													placeholder="Input Dose here ..."
+													class="text-sm text-center h-full w-full bg-yellow-200 border border-black hover:bg-yellow-300"
+												/>
+											</div>
+											<div
+												class="w-[12%] border border-black flex flex-col justify-center items-center bg-yellow-200"
+											>
+												<button
+													class="bg-red-500 w-[85%] rounded text-slate-200 tracking-wide font-semibold text-center text-sm hover:bg-red-800"
+													@click.prevent="
+														handleDeletedConjunctions(
+															'material',
+															index
+														)
+													"
+												>
+													DELETE
+												</button>
+											</div>
+										</div>
+									</div>
+									<button
+										class="bg-red-500 w-[15%] h-full rounded text-slate-200 text-sm hover:bg-red-800"
+										@click.prevent="
+											addColumn(
+												this.cropData.materialConjunctions,
+												'materialid'
+											)
+										"
+									>
+										<span class="text-2xl font-extrabold">+</span>
+										Material
+									</button>
+								</div>
+							</section>
+						</div>
+					</div>
+				</section>
 			</div>
 		</form>
 		<!-- <pre>{{ cropData }}</pre> -->
 	</section>
+	<!-- <pre>{{ cropData }}</pre> -->
 </template>

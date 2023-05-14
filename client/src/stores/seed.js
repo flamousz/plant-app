@@ -12,7 +12,7 @@ export const useSeedStore = defineStore("seed", {
 		async fetchSeed() {
 			try {
 				const { data } = await axios({
-					url: `${baseUrl}/seeds`,
+					url: `${baseUrl}/items/seeds`,
 					method: "GET",
 				});
 				this.seed = data;

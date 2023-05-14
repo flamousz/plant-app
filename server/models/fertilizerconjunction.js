@@ -22,7 +22,8 @@ module.exports = (sequelize, DataTypes) => {
   fertilizerConjunction.init({
     plantsheetid: DataTypes.INTEGER,
     fertilizerid: DataTypes.INTEGER,
-    dose: DataTypes.FLOAT
+    dose: DataTypes.FLOAT,
+    type: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'fertilizerConjunction',

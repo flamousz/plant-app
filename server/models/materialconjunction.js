@@ -19,10 +19,12 @@ module.exports = (sequelize, DataTypes) => {
       })
     }
   }
+  
   materialConjunction.init({
     plantsheetid: DataTypes.INTEGER,
     materialid: DataTypes.INTEGER,
-    dose: DataTypes.FLOAT
+    dose: DataTypes.FLOAT,
+    type: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'materialConjunction',

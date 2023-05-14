@@ -44,6 +44,8 @@ module.exports = (sequelize, DataTypes) => {
 			plantid: DataTypes.INTEGER,
 			status: DataTypes.STRING,
 			arcStatus: DataTypes.STRING,
+			plantPerMetre: DataTypes.INTEGER,
+			fallacyNursery: DataTypes.FLOAT
 		},
 		{
 			sequelize,

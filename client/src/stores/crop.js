@@ -72,6 +72,7 @@ export const useCropStore = defineStore("crop", {
 			try {
 				const { id } = val;
 				console.log(id, "<<< ini id");
+				console.log("<<< masuk putCrop");
 				console.log(
 					val,
 					"<<< ini cropData yg diambil dari halaman edit dan sampe di crop store"
@@ -130,7 +131,7 @@ export const useCropStore = defineStore("crop", {
 		},
 		async postCrop(val) {
 			try {
-				console.log("masuk");
+				console.log("masuk postCrop");
 				console.log(val, "val dari crop store");
 				const { data } = await axios({
 					url: `${baseUrl}/plantsheet`,

@@ -88,7 +88,7 @@ export default {
 	<!-- <pre>{{ categories }}</pre> -->
 	<!-- <pre>{{ itemsData.category }}</pre> -->
 	<div class="bg-blue-100 p-4 w-full flex flex-col">
-		<div class="z-40 fixed flex">
+		<div class="z-40 fixed bottom-7 opacity-40 hover:opacity-90 right-8 flex">
 			<RouterLink to="/itemform"
 				><BlueButton :type="'button'" :text="'NEW ITEM'"
 			/></RouterLink>

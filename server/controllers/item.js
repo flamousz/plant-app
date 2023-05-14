@@ -133,8 +133,8 @@ class ItemController {
 		try {
 			const data = await Item.findAll({
 				where: { categoryid: 9 },
-				attributes: ["name", "id"],
-				order: [["createdAt", "DESC"]],
+				attributes: ["name", "id", 'description'],
+				order: [["createdAt", "ASC"]],
 			});
 			if (!data) {
 				throw {

@@ -60,10 +60,10 @@ class PlantSheetController {
 				},
 				order: [["createdAt", "DESC"]],
 				where: {
-					arcStatus: 'avail'
-				}
+					arcStatus: "avail",
+				},
 			};
-			
+
 			if (filter !== "" && typeof filter !== "undefined") {
 				const query = filter.split(",").map((item) => ({
 					[Op.eq]: item,
@@ -184,13 +184,16 @@ class PlantSheetController {
 				cropProdWeight,
 				planttypeid,
 				materialConjunctions,
+				materialConjunctionsNursery,
 				PesticideConjunctions,
+				PesticideConjunctionsNursery,
 				fertilizerConjunctions,
-				SeedConjunctions,
+				fertilizerConjunctionsNursery,
+				fallacyNursery,
 			} = req.body;
 
-			let status = 'draft'
-			let arcStatus = 'avail'
+			let status = "draft";
+			let arcStatus = "avail";
 
 			const plantsheet = await PlantSheet.create({
 				plantid,
@@ -201,37 +204,75 @@ class PlantSheetController {
 				cropProdWeight,
 				planttypeid,
 				status,
-				arcStatus
+				arcStatus,
+				fallacyNursery,
 			});
 
 			PesticideConjunctions.forEach((el) => {
+				el.type = "planting";
+				el.plantsheetid = plantsheet.id;
+			});
+			PesticideConjunctionsNursery.forEach((el) => {
+				el.type = "nursery";
 				el.plantsheetid = plantsheet.id;
 			});
 
 			materialConjunctions.forEach((el) => {
+				el.type = "planting";
+				el.plantsheetid = plantsheet.id;
+			});
+
+			materialConjunctionsNursery.forEach((el) => {
+				el.type = "nursery";
 				el.plantsheetid = plantsheet.id;
 			});
 
 			fertilizerConjunctions.forEach((el) => {
+				el.type = "planting";
+				el.plantsheetid = plantsheet.id;
+			});
+			fertilizerConjunctionsNursery.forEach((el) => {
+				el.type = "nursery";
 				el.plantsheetid = plantsheet.id;
 			});
 
-			SeedConjunctions.forEach((el) => {
-				el.plantsheetid = plantsheet.id;
-			});
+			// SeedConjunctions.forEach((el) => {
+			// 	el.plantsheetid = plantsheet.id;
+			// });
+			console.log(materialConjunctions, "<<< materialConjunctions");
+			console.log(
+				materialConjunctionsNursery,
+				"<<< materialConjunctionsNursery"
+			);
+			console.log(materialConjunctions, "<<< materialConjunctions");
+			console.log(
+				fertilizerConjunctionsNursery,
+				"<<< fertilizerConjunctionsNursery"
+			);
 
 			if (materialConjunctions[0].materialid !== 0) {
 				await materialConjunction.bulkCreate(materialConjunctions);
 			}
+			if (materialConjunctionsNursery[0].materialid !== 0) {
+				await materialConjunction.bulkCreate(materialConjunctionsNursery);
+			}
 			if (PesticideConjunctions[0].pesticideid !== 0) {
 				await PesticideConjunction.bulkCreate(PesticideConjunctions);
+			}
+			if (PesticideConjunctionsNursery[0].pesticideid !== 0) {
+				await PesticideConjunction.bulkCreate(PesticideConjunctionsNursery);
 			}
 			if (fertilizerConjunctions[0].fertilizerid !== 0) {
 				await fertilizerConjunction.bulkCreate(fertilizerConjunctions);
 			}
-			if (SeedConjunctions[0].seedid !== 0) {
-				await SeedConjunction.bulkCreate(SeedConjunctions);
+			if (fertilizerConjunctionsNursery[0].fertilizerid !== 0) {
+				await fertilizerConjunction.bulkCreate(
+					fertilizerConjunctionsNursery
+				);
 			}
+			// if (SeedConjunctions[0].seedid !== 0) {
+			// 	await SeedConjunction.bulkCreate(SeedConjunctions);
+			// }
 
 			res.status(200).json("new plantsheet has been added");
 		} catch (err) {

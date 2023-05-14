@@ -13,12 +13,40 @@ const {
 	materialConjunction,
 	Uom,
 	Category,
+	SeedNursery,
 } = require("../models/index");
 
 class PlantScheduleController {
+	static async putCodeSchedule(req, res, next) {
+		try {
+			const allPlantSchedule = await PlantSchedule.findAll();
+
+			for (const plantSchedule of allPlantSchedule) {
+				const uniqueNumber = Math.floor(1000 + Math.random() * 9000);
+				const newValue = `non-mush${uniqueNumber}`;
+
+				await PlantSchedule.update(
+					{
+						code: newValue,
+					},
+					{
+						where: {
+							id: plantSchedule.id,
+						},
+					}
+				);
+			}
+
+			res.status(200).json("successfully update code column");
+		} catch (error) {
+			console.log(error);
+			next(error);
+		}
+	}
+
 	static async putSchedule(req, res, next) {
 		try {
-			console.log(req.body, '<<<<<<< ini req.body');
+			console.log(req.body, "<<<<<<< ini req.body dari putSchedule");
 			const {
 				seedlingDate,
 				plantingDate,
@@ -28,6 +56,7 @@ class PlantScheduleController {
 				CropAreaId,
 				totalPopulation,
 				id,
+				seedNursery,
 			} = req.body;
 			const findData = await PlantSchedule.findByPk(id);
 			if (!findData) {
@@ -35,19 +64,23 @@ class PlantScheduleController {
 					name: "NotFound",
 				};
 			}
-			await PlantSchedule.update({
-				seedlingDate,
-				plantingDate,
-				harvestDate,
-				unloadDate,
-				PlantsheetId,
-				CropAreaId,
-				totalPopulation,
-			}, {
-				where: {id},
-				returning: true
-			})
-			res.status(200).json(`Schedule has been validated`)
+			await PlantSchedule.update(
+				{
+					seedlingDate,
+					plantingDate,
+					harvestDate,
+					unloadDate,
+					PlantsheetId,
+					CropAreaId,
+					totalPopulation,
+					seedNursery,
+				},
+				{
+					where: { id },
+					returning: true,
+				}
+			);
+			res.status(200).json(`Schedule has been validated`);
 		} catch (error) {
 			console.log();
 			next(error);
@@ -66,7 +99,7 @@ class PlantScheduleController {
 				include: [
 					{
 						model: CropArea,
-						attributes: ["name"],
+						attributes: ["name", "area"],
 					},
 					{
 						model: PlantSheet,
@@ -356,7 +389,7 @@ class PlantScheduleController {
 	static async postSchedule(req, res, next) {
 		try {
 			console.log(req.body, "<< ini req.body");
-			const {
+			let {
 				seedlingDate,
 				plantingDate,
 				harvestDate,
@@ -364,9 +397,16 @@ class PlantScheduleController {
 				PlantsheetId,
 				CropAreaId,
 				totalPopulation,
+				seedNursery,
 			} = req.body;
+			const min = 1121;
+			const max = 9999;
+			const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
+			const code = `nonmush-${randomNumber}`;
 
-			await PlantSchedule.create({
+			seedNursery = Math.ceil(seedNursery);
+			console.log(seedNursery, "<<< seedNursery setelah dibulatkan");
+			const data = await PlantSchedule.create({
 				seedlingDate,
 				plantingDate,
 				harvestDate,
@@ -374,7 +414,14 @@ class PlantScheduleController {
 				PlantsheetId,
 				CropAreaId,
 				totalPopulation,
+				code,
+				seedNursery,
 			});
+
+			await SeedNursery.create({
+				PlantScheduleId: data.id,
+			});
+
 			res.status(201).json("New Plant Schedule successfully added");
 		} catch (error) {
 			console.log(error);
@@ -475,6 +522,12 @@ class PlantScheduleController {
 					},
 					{
 						model: HarvestOutcome,
+						attributes: {
+							exclude: ["createdAt", "updatedAt"],
+						},
+					},
+					{
+						model: CropArea,
 						attributes: {
 							exclude: ["createdAt", "updatedAt"],
 						},

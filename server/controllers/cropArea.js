@@ -1,19 +1,44 @@
 const { Op } = require("sequelize");
-const { CropArea } = require("../models/index");
+const {
+	CropArea,
+	PlantSchedule,
+	PlantSheet,
+	Item,
+} = require("../models/index");
 
 class CropAreaController {
-	static async getAllCropArea(req, res, next){
+	static async getAllCropArea(req, res, next) {
 		try {
-			const data = await CropArea.findAll()
+			const opt = {
+				include: {
+					model: PlantSchedule,
+					include: {
+						model: PlantSheet,
+						include: {
+							model: Item,
+							as: "plant",
+							attributes: ["name"],
+						},
+						attributes: ["id"],
+					},
+					attributes: ["id", "code"],
+				},
+				where: {
+					map: {
+						[Op.ne]: null
+					}
+				},
+			};
+			const data = await CropArea.findAll(opt);
 			if (!data) {
-				throw{
-					name: 'NotFound'
-				}
+				throw {
+					name: "NotFound",
+				};
 			}
-			res.status(200).json(data)
+			res.status(200).json(data);
 		} catch (error) {
 			console.log(error);
-			next(error)
+			next(error);
 		}
 	}
 
@@ -120,7 +145,7 @@ class CropAreaController {
 					type,
 					detailPlace,
 					map,
-					status
+					status,
 				},
 				{
 					where: { id },
