@@ -141,12 +141,12 @@ export default {
 			</div>
 			<section
 				id="upper-block"
-				class="h-[276px] flex flex-col-reverse border-2 border-black bg-slate-300 rounded-md"
+				class="h-[300px] flex flex-col-reverse border-2 border-black bg-slate-300 rounded-md"
 			>
 				<div class="flex flex-row justify-between">
 					<section
 						id="yellow-box-information"
-						class="w-[30%] bg-slate-100 border-black border-[3px] rounded-lg p-2 m-2"
+						class="w-[30%] bg-slate-100 border-black border-[3px] rounded-lg p-2 m-2 pt-8"
 					>
 						<div class="flex flex-col">
 							<div class="flex flex-row w-full">
@@ -215,7 +215,7 @@ export default {
 					</section>
 					<section
 						id="graphic-information"
-						class="h-[255px] w-[50%] bg-slate-100 border-black border-[3px] rounded-lg m-2 flex flex-row gap-1 p-2"
+						class="h-[280px] w-[50%] bg-slate-100 border-black border-[3px] rounded-lg m-2 flex flex-row gap-1 p-2"
 					>
 						<div class="flex flex-col w-[33%] text-center mb-6">
 							<div class="font-bold">First Day Nursery</div>
@@ -278,7 +278,7 @@ export default {
 						type="button"
 						:class="{
 							'text-red-100': activeTab === 'pesticides',
-							'bg-red-700': activeTab === 'pesticides',
+							'bg-red-400': activeTab === 'pesticides',
 						}"
 						class="border bg-slate-300 active:bg-red-300 hover:bg-red-400 border-black p-1 w-[7%] text-center rounded-md"
 					>
@@ -289,7 +289,7 @@ export default {
 						type="button"
 						:class="{
 							'text-red-100': activeTab === 'fertilizers',
-							'bg-red-700': activeTab === 'fertilizers',
+							'bg-red-400': activeTab === 'fertilizers',
 						}"
 						class="border bg-slate-300 border-black p-1 w-[7%] text-center rounded-md active:bg-red-300 hover:bg-red-400"
 					>
@@ -300,7 +300,7 @@ export default {
 						type="button"
 						:class="{
 							'text-red-50': activeTab === 'materials',
-							'bg-red-700': activeTab === 'materials',
+							'bg-red-400': activeTab === 'materials',
 						}"
 						class="border bg-slate-300 border-black p-1 w-[7%] text-center rounded-md active:bg-red-300 hover:bg-red-400"
 					>
@@ -340,7 +340,7 @@ export default {
 						class=" w-[90%] flex flex-col"
 					>
 						<thead>
-							<tr class="flex flex-row w-full bg-slate-400">
+							<tr class="flex flex-row w-full ">
 								<th class="w-[22%] bg-slate-400 border-black border">
 									Name
 								</th>
@@ -350,7 +350,7 @@ export default {
 								<th class="w-[10%] bg-slate-400 border border-black">
 									UOM
 								</th>
-								<th class="w-[37%] border border-black">Description</th>
+								<th class="w-[37%] border border-black bg-slate-400">Description</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -382,8 +382,7 @@ export default {
 						</thead>
 						<tbody>
 							<TableRow4Colum
-								v-for="(materials, index) in plantSchedulesDetail
-									?.PlantSheet?.materialConjunctions"
+								v-for="(materials, index) in seednurseryDetail?.PlantSchedule?.PlantSheet?.materialConjunctions"
 								:key="materials.id"
 								:material="materials"
 								:index="index"
@@ -394,5 +393,5 @@ export default {
 			</div>
 		</div>
 	</section>
-	<pre>{{ seednurseryDetail }}</pre>
+	<!-- <pre>{{ seednurseryDetail }}</pre> -->
 </template>
