@@ -26,10 +26,37 @@ import HarvestOutcomeFormPage from '../views/HarvestOutcomeFormPage.vue'
 import MapPlainPage from '../views/MapPlainPage.vue'
 import SeedNurseryPage from '../views/SeedNurseryPage.vue'
 import SeedNurseryDetailPage from '../views/SeedNurseryDetailPage.vue'
+import TaskMasterFormPage from '../views/TaskMasterFormPage.vue'
+import TaskMasterPage from '../views/TaskMasterPage.vue'
+import TaskMasterDetailPage from '../views/TaskMasterDetailPage.vue'
+import TaskSheetPage from '../views/TaskSheetPage.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    {
+      path: '/tasksheet',
+      name: 'Task Sheet',
+      component: TaskSheetPage,
+      meta: {
+        tabLabel: 'Task Sheet', // Set the initial tab label
+      },
+    },
+    {
+      path: '/taskmaster/:id',
+      name: 'Detail Task Master',
+      component: TaskMasterDetailPage
+    },
+    {
+      path: '/taskmaster/form',
+      name: 'Task Master Form',
+      component: TaskMasterFormPage
+    },
+    {
+      path: '/taskmaster',
+      name: 'Task Master',
+      component: TaskMasterPage
+    },
     {
       path: '/seednursery',
       name: 'seednursery',

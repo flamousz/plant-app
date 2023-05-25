@@ -19,6 +19,9 @@ module.exports = (sequelize, DataTypes) => {
 			})
       PlantSchedule.hasMany(models.HarvestOutcome)
       PlantSchedule.hasMany(models.SeedNursery)
+      PlantSchedule.hasMany(models.PlantsheetTaskScheduleConjunction, {
+        foreignKey: 'PlantSchedulesId'
+      })
     }
   }
   PlantSchedule.init({

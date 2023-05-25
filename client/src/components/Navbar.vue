@@ -81,7 +81,7 @@ export default {
 						<div class="hidden sm:block sm:ml-12 sm:mt-1">
 							<div class="flex flex-row space-x-4">
 								<div class="text-md font-medium  text-slate-600 hover:text-slate-400 ">
-									{{ this.$route.name }} Page
+									{{ this.$route.name }}
 								</div>
 								<!-- <router-link
 									to="/crop"

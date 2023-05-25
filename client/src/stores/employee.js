@@ -14,6 +14,28 @@ export const useEmployeeStore = defineStore("employee", {
 		};
 	},
 	actions: {
+		async fetchEmployeeAtTaskSheet(val){
+			try {
+				console.log(val, 'ini val di fetchEmployeeAtTaskSheet, employee store');
+				const {data} = await axios({
+					url: `${baseUrl}/employees/task`,
+					method: 'GET',
+					data: val
+				})
+				console.log(data, "ini data dari store");
+				this.employees = data
+			} catch (err) {
+				console.log(err);
+				Toastify({
+					text: `${err.response.data.message}`,
+					style: {
+						background: "linear-gradient(to right, #611302, #a62103)",
+					},
+
+					duration: 2000,
+				}).showToast();
+			}
+		},
 		async patchEmployee(val) {
 			try {
 				console.log(val, "ini data patch");
@@ -63,7 +85,7 @@ export const useEmployeeStore = defineStore("employee", {
 				this.editFlag = true;
 				console.log(data, "ini data dari store");
 				this.employeeDetail = data;
-				this.router.push(`/employeeform`);
+				this.router.push(`/employee/form`);
 				// console.log(this.cropDetail, "< crop detail");
 			} catch (err) {
 				console.log(err);
@@ -83,7 +105,7 @@ export const useEmployeeStore = defineStore("employee", {
 					data: val,
 				});
 				this.editFlag = false;
-				this.router.push(`/employeedetail/${id}`);
+				this.router.push(`/employee/detail/${id}`);
 				Toastify({
 					text: data,
 					style: {

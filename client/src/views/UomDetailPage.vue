@@ -5,7 +5,7 @@ import RedButton from "../components/Buttons/RedButton.vue";
 import BlueButton from "../components/Buttons/BlueButton.vue";
 
 export default {
-	name: 'UomDetailPage',
+	name: "UomDetailPage",
 	data() {
 		return {
 			role: localStorage.getItem("role"),
@@ -17,10 +17,10 @@ export default {
 	},
 	methods: {
 		...mapActions(useUomStore, [
-			'getUomById',
-			'getUomByIdForEdit',
-			'patchUom',
-			'deleteUom'
+			"getUomById",
+			"getUomByIdForEdit",
+			"patchUom",
+			"deleteUom",
 		]),
 		patchLocal() {
 			this.cropData.id = this.uomDetail.id;
@@ -77,43 +77,34 @@ export default {
 								:text="archive"
 							/>
 						</div>
-						<div
-							@click="deleteUom(uomDetail.id)"
-							v-if="role === 'super'"
-						>
+						<div @click="deleteUom(uomDetail.id)" v-if="role === 'super'">
 							<RedButton :type="'button'" :text="'DELETE'" />
 						</div>
-                        <div
-								@click="getUomByIdForEdit(uomDetail.id)"
-								v-if="
-									role === 'super' || uomDetail.status === 'draft'
-								"
-							>
-								<BlueButton :type="'button'" :text="'EDIT'" />
-							</div>
+						<div
+							@click="getUomByIdForEdit(uomDetail.id)"
+							v-if="role === 'super' || uomDetail.status === 'draft'"
+						>
+							<BlueButton :type="'button'" :text="'EDIT'" />
+						</div>
 					</div>
 				</div>
 			</div>
-			<div class="flex flex-col p-4 bg-slate-100 mt-5 h-[130px] border-2 border-black rounded tracking-wide">
-                <div class="flex flex-row gap-2">
+			<div
+				class="flex flex-col p-4 bg-slate-100 mt-5 h-[130px] border-2 border-black rounded tracking-wide"
+			>
+				<div class="flex flex-row gap-2">
 					<div class="w-[11%]">Name</div>
-					<div>
-						: {{ uomDetail?.name }}
-					</div>
+					<div>: {{ uomDetail?.name }}</div>
 				</div>
 				<div class="flex flex-row gap-2">
 					<div class="w-[11%]">Code</div>
-					<div>
-						: {{ uomDetail?.code }} 
-					</div>
+					<div>: {{ uomDetail?.code }}</div>
 				</div>
 				<div class="flex flex-row gap-2">
 					<div class="w-[11%]">Description</div>
-					<div>
-						: {{ uomDetail?.description }}
-					</div>
+					<div>: {{ uomDetail?.description }}</div>
 				</div>
-            </div>
+			</div>
 		</div>
 	</section>
 </template>

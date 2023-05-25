@@ -37,6 +37,11 @@ module.exports = (sequelize, DataTypes) => {
 			Item.hasMany(models.SeedNursery, {
 				foreignKey: 'SeedId'
 			})
+			Item.hasMany(models.ToolConjunction, {
+				foreignKey: 'ToolId'
+			})
+			Item.hasMany(models.SeedConjunction)
+			Item.hasMany(models.PlantsheetTaskConjunction)
 			
 		}
 	}

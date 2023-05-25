@@ -26,10 +26,30 @@ export const useItemStore = defineStore("items", {
 				search: '',
 				filterStatus: ''
 			},
-			itemDetail: {}
+			itemDetail: {},
+			tools: []
 		};
 	},
 	actions: {
+		async fetchTool() {
+			try {
+				const {data} = await axios({
+					url: `${baseUrl}/items/tools`,
+					method: 'GET'
+				})
+				this.tools = data
+			} catch (err) {
+				console.log(err);
+				Toastify({
+					text: `${err.response.data.message}`,
+					style: {
+						background: "linear-gradient(to right, #611302, #a62103)",
+					},
+
+					duration: 2000,
+				}).showToast();
+			}
+		},
 		async fetchUom() {
 			try {
 				// this.editFlag = false;
@@ -56,7 +76,7 @@ export const useItemStore = defineStore("items", {
 					data: val,
 				});
 				this.editFlag = false;
-				this.router.push(`/itemdetail/${id}`);
+				this.router.push(`/item/detail/${id}`);
 				Toastify({
 					text: data,
 					style: {
@@ -165,7 +185,7 @@ export const useItemStore = defineStore("items", {
 				this.editFlag = true;
 				console.log(data, "ini data dari store");
 				this.itemDetail = data;
-				this.router.push(`/itemform`);
+				this.router.push(`/item/form`);
 				// console.log(this.cropDetail, "< crop detail");
 			} catch (err) {
 				console.log(err);

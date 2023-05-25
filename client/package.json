@@ -14,6 +14,7 @@
     "pinia": "^2.0.32",
     "toastify-js": "^1.12.0",
     "vue": "^3.2.47",
+    "vue-meta": "^2.4.0",
     "vue-router": "^4.1.6",
     "vue3-side-panel": "^1.2.0"
   },

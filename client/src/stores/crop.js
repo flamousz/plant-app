@@ -9,7 +9,7 @@ export const useCropStore = defineStore("crop", {
 			cropDetail: {},
 			editFlag: false,
 			query: {
-                filter: '',
+                filter: 'avail',
             }
 		};
 	},

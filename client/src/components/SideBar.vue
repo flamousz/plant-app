@@ -13,7 +13,6 @@ export default {
 </script>
 <template>
 	<div
-		
 		@mouseenter="isOpened = true"
 		class="fixed top-[80px] left-1 opacity-50"
 	>
@@ -24,11 +23,14 @@ export default {
 		/>
 	</div>
 	<!-- <button @mouseenter="isOpened = true">Open Sidebar</button> -->
-	<VueSidePanel v-model="isOpened" lock-scroll side="left" width="300px" >
-		<div class="flex flex-col h-[620px] bg-blue-100 pt-[180px] pl-[20px] "  @mouseleave="isOpened = false"  >
+	<VueSidePanel v-model="isOpened" lock-scroll side="left" width="300px">
+		<div
+			class="flex flex-col h-screen bg-blue-100 pt-[100px] pl-[20px]"
+			@mouseleave="isOpened = false"
+		>
 			<div id="transaction-data-group">
 				<button
-					@mouseenter="showTransaction = !showTransaction"
+					@click="showTransaction = !showTransaction"
 					:class="{ 'text-red-400': showTransaction }"
 					class="text-4xl font-semibold"
 				>
@@ -54,9 +56,19 @@ export default {
 					>
 					<RouterLink
 						class="hover:text-blue-400"
-						:class="{ 'text-blue-700': this.$route.name === 'task' }"
-						to="/crop"
+						:class="{
+							'text-blue-700': this.$route.name === 'Task Sheet',
+						}"
+						to="/tasksheet"
 						>Task Sheet</RouterLink
+					>
+					<RouterLink
+						class="hover:text-blue-400"
+						:class="{
+							'text-blue-700': this.$route.name === 'seednursery',
+						}"
+						to="/seednursery"
+						>Nursery</RouterLink
 					>
 				</ul>
 			</div>
@@ -69,7 +81,7 @@ export default {
 				}"
 			>
 				<button
-					@mouseenter="showMasterData = !showMasterData"
+					@click="showMasterData = !showMasterData"
 					:class="{ 'text-red-400': showMasterData }"
 					class="text-4xl font-semibold"
 				>
@@ -79,6 +91,12 @@ export default {
 					class="text-2xl transition-all duration-500 pl-4 transform translate-x-0 flex flex-col"
 					:class="{ 'translate-x-[-100%]  ': !showMasterData }"
 				>
+					<RouterLink
+						class="hover:text-blue-400"
+						:class="{ 'text-blue-700': this.$route.name === 'crop' }"
+						to="/crop"
+						>Plant Sheet</RouterLink
+					>
 					<RouterLink
 						to="/item"
 						class="hover:text-blue-400"
@@ -99,9 +117,9 @@ export default {
 					>
 					<RouterLink
 						class="hover:text-blue-400"
-						:class="{ 'text-blue-700': this.$route.name === 'crop' }"
-						to="/crop"
-						>Plant Sheet</RouterLink
+						:class="{ 'text-blue-700': this.$route.name === 'Task Master' }"
+						to="/taskmaster"
+						>Task Master</RouterLink
 					>
 				</ul>
 			</div>
@@ -114,7 +132,7 @@ export default {
 				}"
 			>
 				<button
-					@mouseenter="showResources = !showResources"
+					@click="showResources = !showResources"
 					:class="{ 'text-red-400': showResources }"
 					class="text-4xl font-semibold"
 				>
@@ -137,7 +155,6 @@ export default {
 						to="/employee"
 						>Employee</RouterLink
 					>
-					
 				</ul>
 			</div>
 		</div>

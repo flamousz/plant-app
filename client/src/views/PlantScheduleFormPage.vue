@@ -102,7 +102,7 @@ export default {
 				return null
 			}
 			
-			return this.cropData.seedNursery = this.cropData.totalPopulation + (this.cropData.totalPopulation*this.cropDetail.fallacyNursery) 
+			return this.cropData.seedNursery = Math.ceil(this.cropData.totalPopulation + (this.cropData.totalPopulation*(0.01*this.cropDetail.fallacyNursery)) )
 		},
 		populationCalculation(){
 			if (!this.cropDetail.plantPerMetre) {
@@ -296,7 +296,7 @@ export default {
 							:disabled="isDateDisabled.plantingDate"
 							class="p-[6px] border border-gray-300 rounded-md bg-green-100"
 							name="plantingDate"
-							type="date"
+							type="datetime-local"
 							v-model="cropData.plantingDate"
 							@change="seedOrPlant"
 						/>
@@ -320,7 +320,13 @@ export default {
 						<div class="flex justify-start items-center w-[13.5%]">
 							Population :
 						</div>
-						<p>{{ populationCalculation }} <span class="text-slate-100" >{{ seedNurseryCalculation }}</span> </p>
+						<p>{{ populationCalculation }} crop </p>
+					</div>
+					<div class="flex flex-row gap-2">
+						<div class="flex justify-start items-center w-[13.5%]">
+							Seed Nursery :
+						</div>
+						<p>{{seedNurseryCalculation}} seed</p>
 					</div>
 					<div class="flex flex-row gap-2">
 						<div class="flex justify-start items-center w-[13.5%]">

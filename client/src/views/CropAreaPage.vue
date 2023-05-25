@@ -82,7 +82,7 @@ export default {
 	<!-- <pre>{{ cropArea }}</pre> -->
 	<div class="bg-blue-100 p-4 w-full flex flex-col">
 		<div class="z-40 fixed flex bottom-3 right-8">
-			<RouterLink to="/cropareaform"
+			<RouterLink to="/croparea/form"
 				><BlueButton :type="'button'" :text="'NEW AREA'"
 			/></RouterLink>
 		</div>
@@ -118,7 +118,7 @@ export default {
 			>
 				<tr
 					class="whitespace-nowrap hover:bg-slate-200"
-					@click.prevent="this.$router.push(`/cropareadetail/${item.id}`)"
+					@click.prevent="this.$router.push(`/croparea/detail/${item.id}`)"
 					v-for="(item, index) in cropArea"
 					:key="item.id"
 				>

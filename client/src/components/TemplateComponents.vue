@@ -19,7 +19,7 @@ export default {
 	
 	<!-- looping in td -->
 	<td
-		class="h-14"
+		class="h-14 w-" 
 		v-for="fertilizer in item.fertilizerConjunctions"
 		:key="fertilizer.id"
 	>
@@ -34,7 +34,26 @@ export default {
 		</div>
 	</td>
 
-
+	<table>
+		<thead>
+			<tr>
+			
+			</tr>
+		</thead>
+		<tbody>
+			<td>
+				<div>
+					<p>ewef</p>
+				</div>
+				<div>
+					<p>wefv</p>
+				</div>
+				<div>
+					<h6>wef</h6>
+				</div>
+			</td>
+		</tbody>
+	</table>
 
 	<!-- ul li di detail plant -->
 	<ul v-if="activeTab === 'fertilizers'">

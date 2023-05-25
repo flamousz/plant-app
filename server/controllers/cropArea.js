@@ -110,8 +110,11 @@ class CropAreaController {
 	static async postCropArea(req, res, next) {
 		try {
 			let { name, area, type, detailPlace, map } = req.body;
+			console.log(map, '<<< ini map masih ada spasi');
 			let status = "draft";
 			let arcStatus = "avail";
+			const flattenedArray = map.replace(/\\n|\s/g, "");
+			console.log(flattenedArray, '<<< ini map flattenedArray');
 			let data = await CropArea.create({
 				status,
 				arcStatus,
@@ -119,7 +122,7 @@ class CropAreaController {
 				area,
 				type,
 				detailPlace,
-				map,
+				map: flattenedArray,
 			});
 
 			res.status(201).json(`${data.name} has been added`);

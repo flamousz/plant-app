@@ -45,7 +45,7 @@ export default {
     <!-- <pre>{{ employees }}</pre> -->
 	<div class="bg-blue-100 p-4 w-full h-full flex flex-col static">
 		<div class="z-40 fixed bottom-6 right-7 flex opacity-50 hover:opacity-90">
-			<RouterLink to="/employeeform"
+			<RouterLink to="/employee/form"
 				><BlueButton :type="'button'" :text="'+ Employee'"
 			/></RouterLink>
 		</div>
@@ -82,7 +82,7 @@ export default {
 				<tr
 					class="whitespace-nowrap hover:bg-slate-200"
 					v-for="(item, index) in employees"
-					@click.prevent="this.$router.push(`/employeedetail/${item.id}`)"
+					@click.prevent="this.$router.push(`/employee/detail/${item.id}`)"
 					:key="item.id"
 				>
 					<td class="h-14">

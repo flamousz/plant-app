@@ -79,7 +79,7 @@ export default {
 </script>
 
 <template>
-	<pre>{{ itemsData.filterDate }}</pre>
+	<!-- <pre>{{ itemsData.filterDate }}</pre> -->
 	<!-- <SideBar/> -->
 	<div class="bg-blue-100 p-4 w-full h-screen flex flex-col static">
 		<div class="z-40 fixed bottom-6 right-7 flex opacity-50 hover:opacity-90">

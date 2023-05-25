@@ -28,6 +28,29 @@ class ItemController {
 		}
 	}
 
+	static async getToolItem(req, res, next){
+		try {
+			const opt = {
+				where: {
+					categoryid: 12
+				},
+				attributes: ['name', 'id'],
+				order: [['name', 'DESC']]
+			}
+
+			const data = await Item.findAll(opt)
+			if (!data) {
+				throw{
+					name: 'NotFound'
+				}
+			}
+			res.status(200).json(data)
+		} catch (error) {
+			console.log(error);
+			next(error)
+		}
+	}
+
 	static async getItemAllPesticide(req, res, next) {
 		try {
 			const data = await Item.findAll({
@@ -451,6 +474,13 @@ class ItemController {
 				const randomNumber =
 					Math.floor(Math.random() * (max - min + 1)) + min;
 				code = `SEED00${randomNumber}`;
+			}
+			if (categoryid === 12) {
+				const min = 1000;
+				const max = 9999;
+				const randomNumber =
+					Math.floor(Math.random() * (max - min + 1)) + min;
+				code = `TOOL00${randomNumber}`;
 			}
 			let data = await Item.create({
 				name,

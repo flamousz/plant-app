@@ -93,7 +93,7 @@ export const usePlantScheduleStore = defineStore("plantschedule", {
 			} catch (error) {
 				console.log(error);
 				Toastify({
-					text: `${err.response.data.message}`,
+					text: `${error.response.data.message}`,
 					style: {
 						background: "linear-gradient(to right, #611302, #a62103)",
 					},
@@ -111,6 +111,24 @@ export const usePlantScheduleStore = defineStore("plantschedule", {
 				console.log(this.query, "<< query dari store plant schedule");
 				const { data } = await axios({
 					url: `${baseUrl}/plantschedule`,
+					method: "GET",
+					params: this.query,
+				});
+
+				this.plantSchedules = data;
+			} catch (error) {
+				console.log(error);
+			}
+		},
+		async fetchPlantSchedulesTaskSheet() {
+			try {
+				this.router.replace({
+					name: "Task Sheet",
+					query: this.query,
+				});
+				console.log(this.query, "<< query dari store plant schedule");
+				const { data } = await axios({
+					url: `${baseUrl}/plantschedule/task`,
 					method: "GET",
 					params: this.query,
 				});

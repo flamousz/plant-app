@@ -5,7 +5,8 @@ import { baseUrl } from "./crop";
 export const useUserStore = defineStore("user", {
 	state() {
 		return {
-			access_token:  ""
+			access_token:  "",
+			role: ''
 		};
 	},
 	actions: {

@@ -14,7 +14,10 @@ export default {
 		};
 	},
 	methods: {
-		...mapActions(useSeedNurseryStore, ['fetchSeedNursery', 'patchSeedNursery']),
+		...mapActions(useSeedNurseryStore, [
+			"fetchSeedNursery",
+			"patchSeedNursery",
+		]),
 		...mapActions(useSeedStore, ["fetchSeed"]),
 		formatDate(date) {
 			if (!date) {
@@ -67,7 +70,10 @@ export default {
 					<td class="h-14">
 						{{ index + 1 }}
 					</td>
-					<td class="h-14">
+					<td
+						class="h-14"
+						@click.prevent="this.$router.push(`/seednursery/${item.id}`)"
+					>
 						{{ item?.PlantSchedule.PlantSheet.plant.name }}
 					</td>
 					<td class="h-14">{{ item?.PlantSchedule.code }}</td>
@@ -80,7 +86,7 @@ export default {
 					<td v-if="item.SeedId" class="h-14">
 						{{ item.Item.name }} - {{ item.Item.description }}
 					</td>
-					<td v-if="!item.SeedId" class="h-14">
+					<td v-if="!item.SeedId" class="h-14 flex flex-row gap-2 justify-center items-center" >
 						<select id="seed-option" v-model="itemsData.SeedId">
 							<option
 								v-for="item in seed"
@@ -94,6 +100,7 @@ export default {
 							@click.prevent="
 								patchSeedNursery(item.id, itemsData.SeedId)
 							"
+							class="border-2 border-black rounded-md h-[35px] px-2 bg-red-300 hover:bg-red-400 active:bg-red-500 "
 						>
 							submit
 						</button>
@@ -102,6 +109,6 @@ export default {
 			</tbody>
 		</table>
 	</section>
-	<pre>{{ seedNursery }}</pre>
-	<pre>{{ seed }}</pre>
+	<!-- <pre>{{ seedNursery }}</pre>
+	<pre>{{ seed }}</pre> -->
 </template>
