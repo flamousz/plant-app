@@ -1,8 +1,7 @@
 <script>
 import { mapActions, mapState } from "pinia";
-import { useSeedStore } from "../stores/seed";
-import { useSeedNurseryStore } from "../stores/seedNursery";
 import { useTaskSheetStore } from "../stores/taskSheet";
+import {useEmployeeStore} from '../stores/employee'
 
 export default {
 	name: "TaskSheetPage",
@@ -18,12 +17,16 @@ export default {
 		};
 	},
 	methods: {
-		...mapActions(useTaskSheetStore, ["fetchTaskSheet"]),
-		...mapActions(useSeedNurseryStore, [
-			"fetchSeedNursery",
-			"patchSeedNursery",
-		]),
-		...mapActions(useSeedStore, ["fetchSeed"]),
+		...mapActions(useEmployeeStore, ['fetchEmployeeAtTaskSheet']),
+		...mapActions(useTaskSheetStore, ["fetchTaskSheet", 'fetchTaskSheetById']),
+		fetchDataInputEmployee(selectedDate, selectedTask, startWorkHour, finishWorkHour, durationTask){
+			console.log('masuk ke  fetchDataInputEmployee');
+			const data = {
+				selectedDate, selectedTask, startWorkHour, finishWorkHour, durationTask
+			}
+			console.log(data, 'data di fetchDataInputEmployee');
+			this.fetchEmployeeAtTaskSheet(data)
+		},
 		formatDate(date) {
 			if (!date) {
 				return "";
@@ -34,23 +37,19 @@ export default {
 				day: "numeric",
 			});
 		},
-		
+
 	},
 	computed: {
 		...mapState(useTaskSheetStore, ["taskSheets"]),
-		...mapState(useSeedNurseryStore, ["seedNursery"]),
-		...mapState(useSeedStore, ["seed"]),
+		...mapState(useEmployeeStore, ['employees'])
 	},
 	created() {
 		this.fetchTaskSheet();
-		this.fetchSeedNursery();
-		this.fetchSeed();
 	},
 };
 </script>
 
 <template>
-	<!-- <pre>{{ taskSheets }}</pre> -->
 	<section
 		id="seed-nursery-full-page"
 		class="bg-blue-100 p-4 w-full flex flex-col gap-2"
@@ -63,6 +62,7 @@ export default {
 				<tr class="rounded-t-3xl">
 					<th class="rounded-tl-md bg-red-400 w-[1%]">No</th>
 					<th class="w-[5%] bg-green-300">Plant</th>
+					<th class="w-[5%] bg-slate-300">Date</th>
 					<th class="w-[5%]">Block</th>
 					<th class="w-[5%]">HST</th>
 					<th class="w-[5%]">Task</th>
@@ -91,10 +91,11 @@ export default {
 					<td class="h-14">
 						{{ index + 1 }}
 					</td>
-					<td class="h-14">
+					<td class="h-14" @click="fetchTaskSheetById(item.id)" >
 						{{ item?.PlantSchedule.PlantSheet.plant.name }} -
 						{{ item?.PlantSchedule.code }}
 					</td>
+					<td class="h-14">{{ formatDate(item?.initialDate) }}</td>
 					<td class="h-14">{{ item?.PlantSchedule.CropArea.name }}</td>
 					<td class="h-14">
 						{{ item?.PlantsheetTaskConjunction.day }}
@@ -112,23 +113,27 @@ export default {
 					<td class="h-14">john doe</td>
 					<td class="h-14">
 						<div
-							class=" w-full flex flex-row justify-between"
+							class=" w-full  flex flex-row justify-around "
 						>
-							<div class="text-center w-[50%] ">07:00</div>
-							<div class=" w-[50%]">08:50</div>
+							<div>
+								02:00
+							</div>
+							<div >03:00</div>
 						</div>
 					</td>
 					<td class="h-14">
-						<select id="employee-option">
-							<option value="">dadang</option>
-							<option value="">dudung</option>
-							<option value="">acun</option>
+						<select id="employee-option" 
+						@click="fetchDataInputEmployee(item.initialDate, item.PlantsheetTaskConjunction.Task.name,new Date(), new Date().getDate() + 1, item.duration)"
+						
+						>
+							<option v-for="employee in employees" :key="employee.id">{{employee.employee.name}}</option>
 						</select>
 					</td>
 				</tr>
 			</tbody>
 		</table>
 	</section>
-	<!-- <pre>{{ seedNursery }}</pre>
-	<pre>{{ seed }}</pre> -->
+	<pre>ini employees{{ employees }}</pre>
+	<pre>{{ employeeFetchingData }}</pre>
+	<!-- <pre>{{ taskSheets }}</pre> -->
 </template>

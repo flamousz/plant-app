@@ -12,60 +12,81 @@ const {
 const { Op } = require("sequelize");
 
 class TaskController {
-	static async getTaskSheet(req, res, next) {
-		try {
-			const opt = {
+	static opt = {
+		include: [
+			{
+				model: PlantSchedule,
 				include: [
 					{
-						model: PlantSchedule,
-						include: [
-							{
-								model: PlantSheet,
-								include: {
-									model: Item,
-									as: "plant",
-									attributes: ["name"],
-								},
-								attributes: ["id"],
-							},
-							{
-								model: CropArea,
-								attributes: ["name"],
-							},
-						],
-						attributes: ["id", "code"],
-					},
-					{
-						model: PlantsheetTaskConjunction,
+						model: PlantSheet,
 						include: {
-							model: Task,
+							model: Item,
+							as: "plant",
 							attributes: ["name"],
 						},
-						attributes: {
-							exclude: ["createdAt", "updatedAt"],
-						},
+						attributes: ["id"],
+					},
+					{
+						model: CropArea,
+						attributes: ["name"],
 					},
 				],
-				where: {
-					[Op.and]: [
-						{
-							duration: {
-								[Op.ne]: null,
-							},
-						},
-						sequelize.where(
-							sequelize.fn("DATE", sequelize.col('initialDate')),
-							"=",
-							new Date()
-						),
-					],
+				attributes: ["id", "code"],
+			},
+			{
+				model: PlantsheetTaskConjunction,
+				include: {
+					model: Task,
+					attributes: ["name"],
 				},
 				attributes: {
-					exclude: ["updatedAt"],
+					exclude: ["createdAt", "updatedAt"],
 				},
-				order: [["id", "ASC"]],
-			};
-			const data = await PlantsheetTaskScheduleConjunction.findAll(opt);
+			},
+		],
+		where: {
+			[Op.and]: [
+				{
+					duration: {
+						[Op.ne]: null,
+					},
+				},
+				sequelize.where(
+					sequelize.fn("DATE", sequelize.col("initialDate")),
+					"=",
+					new Date()
+				),
+			],
+		},
+		attributes: {
+			exclude: ["updatedAt"],
+		},
+		order: [["id", "ASC"]],
+	};
+
+	static async getTaskSheetById(req, res, next) {
+		try {
+			const { id } = req.params;
+			console.log(id, '<<< ini id dari getTaskById');
+			const opt = {
+				...TaskController.opt,
+				where: {id},
+			  };
+
+			const data = await PlantsheetTaskScheduleConjunction.findOne(opt);
+			if (!data) {
+				throw { name: "NotFound" };
+			}
+			res.status(200).json(data);
+		} catch (error) {
+			next(error);
+		}
+	}
+	static async getTaskSheet(req, res, next) {
+		try {
+			const data = await PlantsheetTaskScheduleConjunction.findAll(
+				TaskController.opt
+			);
 			if (!data) {
 				throw {
 					name: "NotFound",

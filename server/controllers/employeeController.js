@@ -11,6 +11,7 @@ const {
 class EmployeeController {
 	static async getEmployeeAtTaskSheet(req, res, next) {
 		try {
+			console.log('masuk getEmployeeAtTaskSheet di controller');
 			const {
 				selectedDate,
 				selectedTask,
@@ -18,6 +19,7 @@ class EmployeeController {
 				finishWorkHour,
 				durationTask,
 			} = req.body;
+			console.log(req.body,'<<< ini req body nya');
 			const opt = {
 				include: {
 					model: Employee,
@@ -68,9 +70,27 @@ class EmployeeController {
 					name: "NotFound",
 				};
 			}
+			console.log(data[0],'<<< ini data');
 			res.status(200).json(data);
 		} catch (error) {
 			next(error);
+		}
+	}
+	static async putEmployeeAtTaskSheet(req, res, next){
+		try {
+			const {id, workMinuteQuota, workingTimeLog} = req.body
+
+			const findEmployee = await EmployeeTaskConjunction.findByPk(id)
+			if (!findEmployee) {
+				throw{name: 'NotFound'}
+			}
+			await EmployeeTaskConjunction.update({workMinuteQuota, workingTimeLog}, {
+				where: {id}
+			})
+
+			res.status(200).json(`${findEmployee.employee.name} has been assign`)
+		} catch (error) {
+			next(error)
 		}
 	}
 	static async getEmployee(req, res, next) {

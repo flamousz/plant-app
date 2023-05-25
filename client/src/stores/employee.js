@@ -9,21 +9,62 @@ export const useEmployeeStore = defineStore("employee", {
 			employeeDetail: {},
 			editFlag: false,
 			query: {
-                filter: '',
-            },
+				filter: "",
+			},
 		};
 	},
 	actions: {
-		async fetchEmployeeAtTaskSheet(val){
+		async putEmployeeAtTaskSheet(val) {
 			try {
-				console.log(val, 'ini val di fetchEmployeeAtTaskSheet, employee store');
-				const {data} = await axios({
+				console.log("masuk ke putEmployeeAtTaskSheet di useEmployeeStore");
+				console.log(
+					val,
+					"ini val di putEmployeeAtTaskSheet, employee store"
+				);
+
+				const { data } = await axios({
 					url: `${baseUrl}/employees/task`,
-					method: 'GET',
-					data: val
-				})
+					method: "PUT",
+					data: val,
+				});
+
+				Toastify({
+					text: data,
+					style: {
+						background: "linear-gradient(to right, #58c389, #7dd382)",
+					},
+
+					duration: 2000,
+				}).showToast();
+				console.log(this.editFlag, "ini edit flag di employee store");
+			} catch (error) {
+				console.log(err);
+				Toastify({
+					text: `${err.response.data.message}`,
+					style: {
+						background: "linear-gradient(to right, #611302, #a62103)",
+					},
+
+					duration: 2000,
+				}).showToast();
+			}
+		},
+		async fetchEmployeeAtTaskSheet(val) {
+			try {
+				console.log(
+					"masuk ke fetchEmployeeAtTaskSheet di useEmployeeStore"
+				);
+				console.log(
+					val,
+					"ini val di fetchEmployeeAtTaskSheet, employee store"
+				);
+				const { data } = await axios({
+					url: `${baseUrl}/employees/task`,
+					method: "POST",
+					data: val,
+				});
 				console.log(data, "ini data dari store");
-				this.employees = data
+				this.employees = data;
 			} catch (err) {
 				console.log(err);
 				Toastify({
@@ -46,7 +87,7 @@ export const useEmployeeStore = defineStore("employee", {
 					data: val,
 				});
 				this.editFlag = false;
-				this.getEmployeeById(id)
+				this.getEmployeeById(id);
 				Toastify({
 					text: data,
 					gravity: "bottom", // `top` or `bottom`
@@ -121,13 +162,13 @@ export const useEmployeeStore = defineStore("employee", {
 		},
 		async fetchEmployee() {
 			try {
-				let queryEmployee = this.query
-				this.router.replace({name: 'employee', query: queryEmployee})
+				let queryEmployee = this.query;
+				this.router.replace({ name: "employee", query: queryEmployee });
 
 				const { data } = await axios({
 					url: `${baseUrl}/employees`,
 					method: "GET",
-					params: queryEmployee
+					params: queryEmployee,
 				});
 				this.employees = data.rows;
 			} catch (err) {
@@ -138,7 +179,7 @@ export const useEmployeeStore = defineStore("employee", {
 			try {
 				const { data } = await axios({
 					url: `${baseUrl}/employees`,
-					method: 'POST',
+					method: "POST",
 					data: val,
 				});
 				this.router.push("/employee");
@@ -162,13 +203,13 @@ export const useEmployeeStore = defineStore("employee", {
 				}).showToast();
 			}
 		},
-		async deleteEmployee(id){
+		async deleteEmployee(id) {
 			try {
-				const {data}=await axios({
+				const { data } = await axios({
 					url: `${baseUrl}/employees/${id}`,
-					method: 'DELETE'
-				})
-				this.router.push('/employee')
+					method: "DELETE",
+				});
+				this.router.push("/employee");
 				Toastify({
 					text: data,
 					style: {
@@ -177,7 +218,6 @@ export const useEmployeeStore = defineStore("employee", {
 
 					duration: 2000,
 				}).showToast();
-				
 			} catch (err) {
 				console.log(err);
 				Toastify({
@@ -189,6 +229,6 @@ export const useEmployeeStore = defineStore("employee", {
 					duration: 2000,
 				}).showToast();
 			}
-		}
+		},
 	},
 });
