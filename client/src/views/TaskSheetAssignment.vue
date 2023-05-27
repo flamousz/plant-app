@@ -13,9 +13,12 @@ export default {
 		return {
 			role: localStorage.getItem("role"),
 			activeTab: "worktime",
+			inputDisabled: false,
+			totalEmployee: null,
 			employeeArray: [
 				{
 					id: 0,
+					status: false
 				},
 			],
 			employeeFetchingData: {
@@ -28,15 +31,50 @@ export default {
 			employeeAssignment: {
 				id: 0,
 				workMinuteQuota: 0,
-				workingTimeLog: ''
-			}
+				startTaskTime: null,
+				finishTaskTime: null,
+				PlantsheetTaskScheduleConjunctionId: null
+			},
 		};
 	},
 	methods: {
-		...mapActions(useEmployeeStore, ["fetchEmployeeAtTaskSheet", 'putEmployeeAtTaskSheet']),
+		disableInput() {
+			this.inputDisabled = true;
+		},
+		...mapActions(useEmployeeStore, [
+			"fetchEmployeeAtTaskSheet",
+			"putEmployeeAtTaskSheet",
+		]),
 		...mapActions(useTaskSheetStore, ["fetchTaskSheetById"]),
-		localputEmployeeAtTaskSheet(data){
-			this.putEmployeeAtTaskSheet(data)
+		localputEmployeeAtTaskSheet(
+			id,
+			workMinuteQuota,
+			startTaskTime,
+			finishTaskTime, idLocalEmployee
+		) {
+			this.employeeAssignment = {
+				id,
+				workMinuteQuota,
+				startTaskTime,
+				finishTaskTime,
+				PlantsheetTaskScheduleConjunctionId: this.$route.params.id
+			};
+			this.putEmployeeAtTaskSheet(this.employeeAssignment);
+			this.employeeAssignment = {
+				id: 0,
+				workMinuteQuota: 0,
+				startTaskTime: null,
+				finishTaskTime: null,
+				PlantsheetTaskScheduleConjunctionId: null
+			};
+			this.fetchDataInputEmployee(
+				this.taskSheetDetail.initialDate,
+				this.taskSheetDetail.PlantsheetTaskConjunction.Task.name,
+				this.employeeFetchingData.startWorkHour,
+				this.employeeFetchingData.finishWorkHour,
+				this.taskSheetDetail.duration
+			);
+			this.employeeArray[idLocalEmployee].status = true
 		},
 		fetchDataInputEmployee(
 			selectedDate,
@@ -87,7 +125,59 @@ export default {
 			});
 		},
 	},
+	watch: {
+		totalEmployee(value) {
+			const diff = value - this.employeeArray.length;
+			if (value > this.employees.length) {
+				this.totalEmployee = null
+				Toastify({
+					text: `Maximal employees are ${this.employees.length}`,
+					style: {
+						background: "linear-gradient(to right, #611302, #a62103)",
+					},
+
+					duration: 2000,
+				}).showToast();
+			}
+			if (diff > 0) {
+				for (let i = 1; i <= diff; i++) {
+					this.employeeArray.push({ id: i });
+				}
+			} else if (diff < 0) {
+				this.employeeArray.splice(value);
+			}
+		},
+		"employeeFetchingData.finishWorkHour": function (newValue) {
+			console.log("newValue:", newValue);
+			// Perform any actions or computations based on the new value
+			if (this.employeeFetchingData.startWorkHour >= newValue) {
+				this.employeeFetchingData.startWorkHour = null
+				this.employeeFetchingData.finishWorkHour = null
+				Toastify({
+					text: `finish work hour must be greater than start hour`,
+					style: {
+						background: "linear-gradient(to right, #611302, #a62103)",
+					},
+
+					duration: 2000,
+				}).showToast();
+			}
+			this.fetchDataInputEmployee(
+				this.taskSheetDetail.initialDate,
+				this.taskSheetDetail.PlantsheetTaskConjunction.Task.name,
+				this.employeeFetchingData.startWorkHour,
+				newValue,
+				this.taskSheetDetail.duration
+			);
+		},
+	},
 	computed: {
+		maxEmployeeCount() {
+			return this.employees.length;
+		},
+		isTotalEmployeeInputDone() {
+			return this.totalEmployee === null || this.totalEmployee === "";
+		},
 		...mapState(useEmployeeStore, ["employees"]),
 		...mapState(useTaskSheetStore, ["taskSheetDetail"]),
 		...mapState(useTaskStore, ["editFlag", "tasks", "taskDetail"]),
@@ -98,9 +188,9 @@ export default {
 				return "New";
 			}
 		},
-		computedFixedDuration(){
-			return this.taskSheetDetail.duration / this.employeeArray.length
-		}
+		computedFixedDuration() {
+			return this.taskSheetDetail.duration / this.employeeArray.length;
+		},
 	},
 	created() {
 		this.fetchTaskSheetById(this.$route.params.id);
@@ -144,114 +234,149 @@ export default {
 					</div>
 				</div>
 				<div
-					id="form-section"
-					class="flex flex-col p-4 bg-slate-100 mt-5 h-full border-2 border-black rounded tracking-wide gap-4"
+					id="information-section"
+					class="flex flex-row p-4 bg-slate-100 mt-5 h-full border-2 border-black rounded tracking-wide gap-4"
 				>
-					<div class="flex flex-row gap-2">
-						<div class="flex justify-between items-center w-[13%]">
-							<label>Task</label>
-							<label>:</label>
+					<section
+						id="first-box"
+						class="border-2 border-black rounded-md bg-slate-200 w-[400px] px-4 py-2"
+					>
+						<div class="flex flex-row gap-2">
+							<div class="flex justify-between items-center w-[50%]">
+								<label>Task</label>
+								<label>:</label>
+							</div>
+							<div>
+								<p>
+									{{
+										taskSheetDetail?.PlantsheetTaskConjunction?.Task
+											?.name
+									}}
+								</p>
+							</div>
 						</div>
-						<div>
-							<p>
-								{{
-									taskSheetDetail?.PlantsheetTaskConjunction?.Task
-										?.name
-								}}
-							</p>
+						<div class="flex flex-row gap-2">
+							<div class="flex justify-between items-center w-[50%]">
+								<label>Plant</label>
+								<label>:</label>
+							</div>
+							<div>
+								<p>
+									{{
+										taskSheetDetail?.PlantSchedule?.PlantSheet?.plant
+											?.name
+									}}
+								</p>
+							</div>
 						</div>
-					</div>
-					<div class="flex flex-row gap-2">
-						<div class="flex justify-between items-center w-[13%]">
-							<label>Plant</label>
-							<label>:</label>
+						<div class="flex flex-row gap-2">
+							<div class="flex justify-between items-center w-[50%]">
+								<label>Plant Schedule Code</label>
+								<label>:</label>
+							</div>
+							<div>
+								<p>
+									{{ taskSheetDetail?.PlantSchedule?.code }}
+								</p>
+							</div>
 						</div>
-						<div>
-							<p>
-								{{
-									taskSheetDetail?.PlantSchedule?.PlantSheet?.plant
-										?.name
-								}}
-							</p>
+						<div class="flex flex-row gap-2">
+							<div class="flex justify-between items-center w-[50%]">
+								<label>{{
+									taskSheetDetail?.PlantsheetTaskConjunction
+										?.description
+								}}</label>
+								<label>:</label>
+							</div>
+							<div>
+								<p>
+									{{ taskSheetDetail?.PlantsheetTaskConjunction?.day
+									}}<span
+										v-if="
+											taskSheetDetail?.PlantsheetTaskConjunction
+												?.day === '1'
+										"
+										>st</span
+									><span
+										v-else-if="
+											taskSheetDetail?.PlantsheetTaskConjunction
+												?.day === '2'
+										"
+										>nd</span
+									><span
+										v-else-if="
+											taskSheetDetail?.PlantsheetTaskConjunction
+												?.day === '3'
+										"
+										>rd</span
+									><span v-else>th</span> Day -
+									{{ formatDate(taskSheetDetail?.initialDate) }}
+								</p>
+							</div>
 						</div>
-					</div>
-					<div class="flex flex-row gap-2">
-						<div class="flex justify-between items-center w-[13%]">
-							<label>Plant Schedule Code</label>
-							<label>:</label>
+						<div class="flex flex-row gap-2">
+							<div class="flex justify-between items-center w-[50%]">
+								<label>Block</label>
+								<label>:</label>
+							</div>
+							<div>
+								<p>
+									{{ taskSheetDetail?.PlantSchedule?.CropArea?.name }}
+								</p>
+							</div>
 						</div>
-						<div>
-							<p>
-								{{ taskSheetDetail?.PlantSchedule?.code }}
-							</p>
+						<div class="flex flex-row gap-2">
+							<div class="flex justify-between items-center w-[50%]">
+								<label>Duration</label>
+								<label>:</label>
+							</div>
+							<div>
+								<p>{{ taskSheetDetail?.duration }} minutes</p>
+							</div>
 						</div>
-					</div>
-					<div class="flex flex-row gap-2">
-						<div class="flex justify-between items-center w-[13%]">
-							<label>{{
-								taskSheetDetail?.PlantsheetTaskConjunction?.description
-							}}</label>
-							<label>:</label>
+						<div class="flex flex-row gap-2">
+							<div class="flex justify-between items-center w-[50%]">
+								<label>Fixed Duration</label>
+								<label>:</label>
+							</div>
+							<div>
+								<!-- <p v-if="taskSheetDetail.fixedDuration">
+									{{ taskSheetDetail?.duration }}
+								</p>
+								<p v-else>Duration not fixed yet</p> -->
+								{{ computedFixedDuration }} minutes
+							</div>
 						</div>
-						<div>
-							<p>
-								{{ taskSheetDetail?.PlantsheetTaskConjunction?.day
-								}}<span
-									v-if="
-										taskSheetDetail?.PlantsheetTaskConjunction
-											?.day === '1'
-									"
-									>st</span
-								><span
-									v-else-if="
-										taskSheetDetail?.PlantsheetTaskConjunction
-											?.day === '2'
-									"
-									>nd</span
-								><span
-									v-else-if="
-										taskSheetDetail?.PlantsheetTaskConjunction
-											?.day === '3'
-									"
-									>rd</span
-								><span v-else>th</span> Day -
-								{{ formatDate(taskSheetDetail?.initialDate) }}
-							</p>
+					</section>
+					<section
+						id="second-box "
+						class="border-2 border-black rounded-md bg-slate-200 w-[400px] px-4 py-2"
+					>
+						<div class="flex flex-row gap-2">
+							<div class="flex justify-between items-center w-[55%]">
+								<label>Total Employee Available</label>
+								<label>:</label>
+							</div>
+							<div>
+								<p>{{ employees?.length }} People</p>
+							</div>
 						</div>
-					</div>
-					<div class="flex flex-row gap-2">
-						<div class="flex justify-between items-center w-[13%]">
-							<label>Block</label>
-							<label>:</label>
+						<div class="flex flex-col">
+							<div
+								class="flex justify-between items-center w-[55%] font-semibold"
+							>
+								<label>List of Employee</label>
+							</div>
+							<div>
+								<ul class="pl-2">
+									<li v-for="employee in employees" :key="employee.id">
+										• {{ employee.employee.name }} -
+										{{ employee.workMinuteQuota }} minutes left
+									</li>
+								</ul>
+							</div>
 						</div>
-						<div>
-							<p>
-								{{ taskSheetDetail?.PlantSchedule?.CropArea?.name }}
-							</p>
-						</div>
-					</div>
-					<div class="flex flex-row gap-2">
-						<div class="flex justify-between items-center w-[13%]">
-							<label>Duration</label>
-							<label>:</label>
-						</div>
-						<div>
-							<p>{{ taskSheetDetail?.duration }} minutes</p>
-						</div>
-					</div>
-					<div class="flex flex-row gap-2">
-						<div class="flex justify-between items-center w-[13%]">
-							<label>Fixed Duration</label>
-							<label>:</label>
-						</div>
-						<div>
-							<!-- <p v-if="taskSheetDetail.fixedDuration">
-								{{ taskSheetDetail?.duration }}
-							</p>
-							<p v-else>Duration not fixed yet</p> -->
-							{{ computedFixedDuration }} minutes
-						</div>
-					</div>
+					</section>
 				</div>
 			</section>
 			<form @submit.prevent="handlePutorPost">
@@ -303,7 +428,7 @@ export default {
 										v-model="employeeFetchingData.startWorkHour"
 									/>
 								</div>
-								<div class="flex flex-row gap-2">
+								<div class="flex flex-row gap-2" >
 									<div
 										class="flex justify-between items-center w-[13%]"
 									>
@@ -311,6 +436,7 @@ export default {
 										<label>:</label>
 									</div>
 									<input
+									:disabled="!employeeFetchingData.startWorkHour"
 										id="name"
 										class="placeholder:text-xs p-[6px] border-2 border-gray-300 rounded-md bg-green-100"
 										placeholder="Name ...."
@@ -324,18 +450,40 @@ export default {
 								class="flex flex-col gap-2"
 								v-if="activeTab === 'employee'"
 							>
-								<div>
+								<div class="flex flex-row gap-2" v-if="employeeFetchingData.finishWorkHour">
+									<div
+										class="flex justify-between items-center w-[13%]"
+									>
+										<label>Total Employee</label>
+										<label>:</label>
+									</div>
+									<input
+										@blur="disableInput"
+										:disabled="inputDisabled"
+										v-model="totalEmployee"
+										min="0"
+										:max="maxEmployeeCount"
+										class="border-2 border-black rounded-md text-center w-[50px]"
+										type="number"
+									/>
+								</div>
+								<div v-if="totalEmployee">
 									<div>
 										<div class="flex flex-row w-full">
 											<div
 												class="w-[10%] text-center border-black border rounded-tl-md"
 											>
-												Name
+												name
 											</div>
 											<div
-												class="w-[16%] border border-black text-center rounded-tr-md"
+												class="w-[7%] border border-black text-center "
 											>
-												Action
+												action
+											</div>
+											<div
+												class="w-[7%] border border-black text-center rounded-tr-md"
+											>
+												status
 											</div>
 										</div>
 									</div>
@@ -343,7 +491,9 @@ export default {
 										v-for="(el, index) in employeeArray"
 										class="w-full flex flex-row"
 									>
-										<div class="w-[10%] border border-black rounded-bl-md">
+										<div
+											class="w-[10%] border border-black rounded-bl-md"
+										>
 											<select
 												v-model="el.id"
 												@click="
@@ -363,7 +513,7 @@ export default {
 													Enter here ..
 												</option>
 												<option
-													v-for="employee in employees"
+													v-for="(employee) in employees"
 													:key="employee.id"
 													:value="employee.id"
 												>
@@ -372,39 +522,52 @@ export default {
 											</select>
 										</div>
 										<div
-											class="w-[16%] h-[35px] border border-black rounded-br-md flex flex-row justify-around items-center bg-yellow-200"
+											class="w-[7%] h-[35px] border border-black  flex flex-row justify-around items-center bg-yellow-200"
 										>
-											<button
-												class="bg-blue-600 w-[40%] rounded h-[25px] text-slate-200 tracking-wide font-semibold text-center text-sm hover:bg-blue-800 "
+											<button v-if="!employeeArray[index].status"
+												class="bg-blue-600 w-[60px] rounded h-[25px] text-slate-200 tracking-wide font-semibold text-center text-sm hover:bg-blue-800"
 												@click.prevent="
-													localputEmployeeAtTaskSheet(index)
+													localputEmployeeAtTaskSheet(
+														employeeArray[index].id,
+														computedFixedDuration,
+														employeeFetchingData.startWorkHour,
+														employeeFetchingData.finishWorkHour, index
+													)
 												"
 											>
 												accept
 											</button>
-											<button
-												class="bg-red-500 w-[40%] h-[25px]  rounded text-slate-200 tracking-wide font-semibold text-center text-sm hover:bg-red-800"
-												@click.prevent="
-													handleDeletedConjunctions(index)
-												"
+											<img 
+											v-if="employeeArray[index].status"
+											src="../assets/icons8-double-tick-48.png" alt="checked"
+											class="w-[25px]"
 											>
-												delete
-											</button>
+										</div>
+										<div
+											class="w-[7%] h-[35px] border border-black rounded-br-md flex flex-row justify-around items-center bg-yellow-200"
+										>
+											<div
+												v-if="!employeeArray[index].status"
+												class="bg-blue-600 w-[70px] rounded h-[25px] text-slate-200 tracking-wide font-semibold text-center text-sm "
+												
+											>
+												available
+											</div>
+											<div
+												v-if="employeeArray[index].status"
+												class="bg-green-400 w-[70px] rounded h-[25px] text-slate-200 tracking-wide font-semibold text-center text-sm "
+												
+											>
+												selected
+											</div>
 										</div>
 									</div>
 								</div>
-								<button
-									class="bg-red-500 w-[5%] h-full rounded text-slate-200 text-sm hover:bg-red-800"
-									@click.prevent="addColumn(this.employeeArray)"
-								>
-									<span class="text-2xl font-extrabold">+</span>
-									add
-								</button>
 							</div>
 						</div>
 					</section>
 				</div>
-				<div id="button-processing">
+				<div id="button-processing-status">
 					<div class="flex justify-end h-[50px] mb-3">
 						<div class="flex flex-row justify-end items-end gap-3">
 							<div @click="handleStatus('confirm')">
@@ -449,7 +612,8 @@ export default {
 			</form>
 		</div>
 	</section>
+	<pre>total employee: {{ totalEmployee }}</pre>
 	<pre>{{ employeeArray }}</pre>
-	<pre>{{ employees }}</pre>
+	<pre>ini employee {{ employees }}</pre>
 	<!-- <pre>{{ employeeFetchingData }}</pre> -->
 </template>

@@ -8,12 +8,29 @@ const {
 	PlantsheetTaskConjunction,
 	PlantSheet,
 	CropArea,
+	EmployeeTaskPlantsheettaskScheduleConjunction,
+	EmployeeTaskConjunction,
+	Employee
 } = require("../models/index");
 const { Op } = require("sequelize");
 
 class TaskController {
 	static opt = {
 		include: [
+			{
+				model: EmployeeTaskPlantsheettaskScheduleConjunction,
+				include: {
+					model: EmployeeTaskConjunction,
+					as: 'employeecon',
+					include: {
+						model: Employee,
+						as: 'employee',
+						attributes: ['name']
+					},
+					attributes: ['workMinuteQuota']
+				},
+				attributes: ['id']			
+			},
 			{
 				model: PlantSchedule,
 				include: [
@@ -84,9 +101,22 @@ class TaskController {
 	}
 	static async getTaskSheet(req, res, next) {
 		try {
+			// const opt = {
+			// 	include: {
+			// 		model: EmployeeTaskConjunction,
+			// 		include: {
+			// 			model: Employee,
+			// 			as: 'employee'
+			// 		}
+			// 	}
+			// }
+			// const data = await EmployeeTaskPlantsheettaskScheduleConjunction.findAll(
+			// 	opt
+			// );
 			const data = await PlantsheetTaskScheduleConjunction.findAll(
 				TaskController.opt
 			);
+			
 			if (!data) {
 				throw {
 					name: "NotFound",

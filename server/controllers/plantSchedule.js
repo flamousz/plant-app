@@ -916,7 +916,7 @@ class PlantScheduleController {
 						await EmployeeTaskConjunction.findOne({
 							where: {
 								EmployeeId: employee.id,
-								initialDate: currentDate,
+								workingDate: currentDate,
 							},
 						});
 					console.log(employee.id, "<<<< employee.id");
@@ -924,7 +924,7 @@ class PlantScheduleController {
 						// Create new EmployeeTaskConjunction if there is no existing row with the same initialDate
 						await EmployeeTaskConjunction.create({
 							EmployeeId: employee.id,
-							initialDate: currentDate,
+							workingDate: currentDate,
 							workMinuteQuota,
 							offDay: false,
 						});
@@ -1006,15 +1006,15 @@ class PlantScheduleController {
 						await EmployeeTaskConjunction.findOne({
 							where: {
 								EmployeeId: employee.id,
-								initialDate: currentDate,
+								workingDate: currentDate,
 							},
 						});
 					console.log(employee.id, "<<<< employee.id");
 					if (!existingConjunction) {
-						// Create new EmployeeTaskConjunction if there is no existing row with the same initialDate
+						// Create new EmployeeTaskConjunction if there is no existing row with the same workingDate
 						await EmployeeTaskConjunction.create({
 							EmployeeId: employee.id,
-							initialDate: currentDate,
+							workingDate: currentDate,
 							workMinuteQuota,
 							offDay: false,
 						});

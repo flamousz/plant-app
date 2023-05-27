@@ -1,17 +1,19 @@
 const { Op } = require("sequelize");
 const {
+	sequelize,
 	Employee,
 	EmployeeTaskConjunction,
 	TaskConjunction,
 	Task,
 	Item,
 	ToolConjunction,
+	EmployeeTaskPlantsheettaskScheduleConjunction
 } = require("../models/index");
 
 class EmployeeController {
 	static async getEmployeeAtTaskSheet(req, res, next) {
 		try {
-			console.log('masuk getEmployeeAtTaskSheet di controller');
+			console.log("masuk getEmployeeAtTaskSheet di controller");
 			const {
 				selectedDate,
 				selectedTask,
@@ -19,7 +21,7 @@ class EmployeeController {
 				finishWorkHour,
 				durationTask,
 			} = req.body;
-			console.log(req.body,'<<< ini req body nya');
+			console.log(req.body, "<<< ini req body nya");
 			const opt = {
 				include: {
 					model: Employee,
@@ -39,7 +41,7 @@ class EmployeeController {
 				where: {
 					[Op.and]: [
 						{
-							initialDate: selectedDate,
+							workingDate: selectedDate,
 						},
 						{
 							"$employee.taskConjunction.task.name$": selectedTask,
@@ -56,12 +58,12 @@ class EmployeeController {
 				},
 				attributes: [
 					"id",
-					"initialDate",
+					"workingDate",
 					"workMinuteQuota",
 					"offDay",
 					"workingTimeLog",
 				],
-				order: [["initialDate", "ASC"]],
+				order: [["id", "ASC"]],
 			};
 
 			const data = await EmployeeTaskConjunction.findAll(opt);
@@ -70,27 +72,56 @@ class EmployeeController {
 					name: "NotFound",
 				};
 			}
-			console.log(data[0],'<<< ini data');
+			// console.log(data[0], "<<< ini data");
 			res.status(200).json(data);
 		} catch (error) {
 			next(error);
 		}
 	}
-	static async putEmployeeAtTaskSheet(req, res, next){
+	static async putEmployeeAtTaskSheet(req, res, next) {
+		let transaction; // Declare a variable to hold the transaction
+
 		try {
-			const {id, workMinuteQuota, workingTimeLog} = req.body
-
-			const findEmployee = await EmployeeTaskConjunction.findByPk(id)
-			if (!findEmployee) {
-				throw{name: 'NotFound'}
+			console.log(req.body, "<<<< req.body");
+			const { id, workMinuteQuota, startTaskTime, finishTaskTime, PlantsheetTaskScheduleConjunctionId } =
+				req.body;
+			// Start the transaction
+			transaction = await sequelize.transaction();
+			const employeeTaskConjunction = await EmployeeTaskConjunction.findByPk(
+				id,
+				{ transaction }
+			);
+			if (!employeeTaskConjunction) {
+				throw { name: "NotFound" };
 			}
-			await EmployeeTaskConjunction.update({workMinuteQuota, workingTimeLog}, {
-				where: {id}
-			})
+			const updatedMinuteQuota =
+				employeeTaskConjunction.workMinuteQuota - workMinuteQuota;
+			let existingAvailableTime =
+				employeeTaskConjunction.workingTimeLog || [];
+			if (typeof existingAvailableTime === "string") {
+				existingAvailableTime = JSON.parse(existingAvailableTime);
+			}
+			const updatedAvailableTime = [
+				...existingAvailableTime,
+				[startTaskTime, finishTaskTime],
+			];
+			employeeTaskConjunction.workMinuteQuota = updatedMinuteQuota;
+			employeeTaskConjunction.workingTimeLog =
+				JSON.stringify(updatedAvailableTime);
 
-			res.status(200).json(`${findEmployee.employee.name} has been assign`)
+			await employeeTaskConjunction.save({ transaction });
+			await EmployeeTaskPlantsheettaskScheduleConjunction.create({
+				EmployeeTaskConjunctionId: id,
+				PlantsheetTaskScheduleConjunctionId
+			}, {transaction})
+			// Commit the transaction if all database operations are successful
+			await transaction.commit();
+			res.status(200).json(`employee has been assign`);
 		} catch (error) {
-			next(error)
+			if (transaction) {
+				await transaction.rollback();
+			}
+			next(error);
 		}
 	}
 	static async getEmployee(req, res, next) {

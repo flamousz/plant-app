@@ -17,6 +17,9 @@ module.exports = (sequelize, DataTypes) => {
       PlantsheetTaskScheduleConjunction.belongsTo(models.PlantsheetTaskConjunction, {
         foreignKey: 'PlantsheetTaskConjunctionsId'
       })
+      PlantsheetTaskScheduleConjunction.hasMany(models.EmployeeTaskPlantsheettaskScheduleConjunction, {
+        foreignKey: 'PlantsheetTaskScheduleConjunctionId'
+      })
     }
   }
   PlantsheetTaskScheduleConjunction.init({

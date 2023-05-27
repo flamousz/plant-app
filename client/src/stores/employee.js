@@ -20,7 +20,7 @@ export const useEmployeeStore = defineStore("employee", {
 				console.log(
 					val,
 					"ini val di putEmployeeAtTaskSheet, employee store"
-				);
+					)
 
 				const { data } = await axios({
 					url: `${baseUrl}/employees/task`,

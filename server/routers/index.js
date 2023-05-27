@@ -55,7 +55,7 @@ router.get("/test", async (req, res, next) => {
 			where: {
 				[Op.and]: [
 					{
-						initialDate: selectedDate,
+						workingDate: selectedDate,
 					},
 					{
 						"$employee.taskConjunction.task.name$": selectedTask,
@@ -72,12 +72,12 @@ router.get("/test", async (req, res, next) => {
 			},
 			attributes: [
 				"id",
-				"initialDate",
+				"workingDate",
 				"workMinuteQuota",
 				"offDay",
 				"workingTimeLog",
 			],
-			order: [["initialDate", "ASC"]],
+			order: [["workingDate", "ASC"]],
 		};
 
 		const data = await EmployeeTaskConjunction.findAll(opt);

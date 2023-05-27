@@ -121,19 +121,19 @@ export default {
 							<div >03:00</div>
 						</div>
 					</td>
-					<td class="h-14">
+					<!-- <td class="h-14">
 						<select id="employee-option" 
 						@click="fetchDataInputEmployee(item.initialDate, item.PlantsheetTaskConjunction.Task.name,new Date(), new Date().getDate() + 1, item.duration)"
 						
 						>
 							<option v-for="employee in employees" :key="employee.id">{{employee.employee.name}}</option>
 						</select>
-					</td>
+					</td> -->
 				</tr>
 			</tbody>
 		</table>
 	</section>
-	<pre>ini employees{{ employees }}</pre>
-	<pre>{{ employeeFetchingData }}</pre>
-	<!-- <pre>{{ taskSheets }}</pre> -->
+	<!-- <pre>ini employees{{ employees }}</pre> -->
+	<!-- <pre>{{ employeeFetchingData }}</pre> -->
+	<pre>{{ taskSheets }}</pre>
 </template>

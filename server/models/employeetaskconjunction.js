@@ -13,14 +13,18 @@ module.exports = (sequelize, DataTypes) => {
 				foreignKey: "EmployeeId",
 				as: "employee",
 			});
+			EmployeeTaskConjunction.hasMany(models.EmployeeTaskPlantsheettaskScheduleConjunction, {
+				foreignKey: 'EmployeeTaskConjunctionId',
+				as: 'employeecon'
+			})
 		}
 	}
 	EmployeeTaskConjunction.init(
 		{
-			initialDate: {
+			workingDate: {
 				type: DataTypes.DATE,
 				allowNull: {
-					msg: "Initial Date cannot be empty",
+					msg: "Working Date cannot be empty",
 				},
 			},
 			EmployeeId: {
