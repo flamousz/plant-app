@@ -128,7 +128,7 @@ export default {
 				</div>
 			</section>
 			<section
-				v-if="employeeDetail.TaskConjunctions[0]"
+				v-if="employeeDetail.taskConjunction[0]"
 				id="tool-table"
 				class="flex flex-col p-4 bg-slate-100 mt-5 h-[200px] border-2 border-black rounded tracking-wide gap-1 overflow-auto"
 			>
@@ -156,7 +156,7 @@ export default {
 						</thead>
 						<tbody>
 							<TableRow4Colum
-								v-for="(tasks, index) in employeeDetail.TaskConjunctions"
+								v-for="(tasks, index) in employeeDetail.taskConjunction"
 								:key="tasks.id"
 								:tasks="tasks"
 								:index="index"

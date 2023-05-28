@@ -6,6 +6,7 @@ import RedButton from "../components/Buttons/RedButton.vue";
 import BlueButton from "../components/Buttons/BlueButton.vue";
 import GreenButton from "../components/Buttons/GreenButton.vue";
 import { useEmployeeStore } from "../stores/employee";
+import BackButton from "../components/Buttons/BackButton.vue";
 
 export default {
 	name: "TaskSheetAssignment",
@@ -18,22 +19,24 @@ export default {
 			employeeArray: [
 				{
 					id: 0,
-					status: false
+					status: false,
 				},
 			],
 			employeeFetchingData: {
+				id: this.$route.params.id,
 				selectedDate: "",
 				selectedTask: "",
 				startWorkHour: "",
 				finishWorkHour: "",
 				durationTask: 0,
+				fixedDuration: 0,
 			},
 			employeeAssignment: {
 				id: 0,
 				workMinuteQuota: 0,
 				startTaskTime: null,
 				finishTaskTime: null,
-				PlantsheetTaskScheduleConjunctionId: null
+				PlantsheetTaskScheduleConjunctionId: null,
 			},
 		};
 	},
@@ -45,19 +48,20 @@ export default {
 			"fetchEmployeeAtTaskSheet",
 			"putEmployeeAtTaskSheet",
 		]),
-		...mapActions(useTaskSheetStore, ["fetchTaskSheetById"]),
+		...mapActions(useTaskSheetStore, ["fetchTaskSheetById", "postTaskSheet"]),
 		localputEmployeeAtTaskSheet(
 			id,
 			workMinuteQuota,
 			startTaskTime,
-			finishTaskTime, idLocalEmployee
+			finishTaskTime,
+			idLocalEmployee
 		) {
 			this.employeeAssignment = {
 				id,
 				workMinuteQuota,
 				startTaskTime,
 				finishTaskTime,
-				PlantsheetTaskScheduleConjunctionId: this.$route.params.id
+				PlantsheetTaskScheduleConjunctionId: this.$route.params.id,
 			};
 			this.putEmployeeAtTaskSheet(this.employeeAssignment);
 			this.employeeAssignment = {
@@ -65,7 +69,7 @@ export default {
 				workMinuteQuota: 0,
 				startTaskTime: null,
 				finishTaskTime: null,
-				PlantsheetTaskScheduleConjunctionId: null
+				PlantsheetTaskScheduleConjunctionId: null,
 			};
 			this.fetchDataInputEmployee(
 				this.taskSheetDetail.initialDate,
@@ -74,7 +78,7 @@ export default {
 				this.employeeFetchingData.finishWorkHour,
 				this.taskSheetDetail.duration
 			);
-			this.employeeArray[idLocalEmployee].status = true
+			this.employeeArray[idLocalEmployee].status = true;
 		},
 		fetchDataInputEmployee(
 			selectedDate,
@@ -94,11 +98,42 @@ export default {
 			console.log(data, "data di fetchDataInputEmployee");
 			this.fetchEmployeeAtTaskSheet(data);
 		},
+		formatDate(date) {
+			if (!date) {
+				return "";
+			}
+			return new Date(date).toLocaleDateString("en-AU", {
+				year: "numeric",
+				month: "long",
+				day: "numeric",
+			});
+		},
 		handlePutorPost() {
 			if (this.editFlag) {
 				this.putTask(this.taskData);
 			} else if (!this.editFlag) {
-				this.postTask(this.taskData);
+				if (this.employeeArray[0].id === 0) {
+					Toastify({
+						text: `employee must be assign`,
+						style: {
+							background: "linear-gradient(to right, #611302, #a62103)",
+						},
+
+						duration: 2000,
+					}).showToast();
+				} else if (this.employeeFetchingData.startWorkHour) {
+					this.employeeArray.forEach((el, index) => {
+						this.localputEmployeeAtTaskSheet(
+							el.id,
+							this.computedFixedDuration,
+							this.employeeFetchingData.startWorkHour,
+							this.employeeFetchingData.finishWorkHour,
+							index
+						);
+					});
+
+					this.postTaskSheet(this.employeeFetchingData);
+				}
 			}
 		},
 		buttonSelector(val) {
@@ -114,14 +149,14 @@ export default {
 		addColumn(array) {
 			array.push({});
 		},
-		formatDate(date) {
+		formatTime(date) {
 			if (!date) {
 				return "";
 			}
-			return new Date(date).toLocaleDateString("en-AU", {
-				year: "numeric",
-				month: "long",
-				day: "numeric",
+			return new Date(date).toLocaleTimeString("en-US", {
+				hour: "numeric",
+				minute: "numeric",
+				hour12: true,
 			});
 		},
 	},
@@ -129,7 +164,7 @@ export default {
 		totalEmployee(value) {
 			const diff = value - this.employeeArray.length;
 			if (value > this.employees.length) {
-				this.totalEmployee = null
+				this.totalEmployee = null;
 				Toastify({
 					text: `Maximal employees are ${this.employees.length}`,
 					style: {
@@ -151,8 +186,8 @@ export default {
 			console.log("newValue:", newValue);
 			// Perform any actions or computations based on the new value
 			if (this.employeeFetchingData.startWorkHour >= newValue) {
-				this.employeeFetchingData.startWorkHour = null
-				this.employeeFetchingData.finishWorkHour = null
+				this.employeeFetchingData.startWorkHour = null;
+				this.employeeFetchingData.finishWorkHour = null;
 				Toastify({
 					text: `finish work hour must be greater than start hour`,
 					style: {
@@ -189,6 +224,8 @@ export default {
 			}
 		},
 		computedFixedDuration() {
+			this.employeeFetchingData.fixedDuration =
+				this.taskSheetDetail.duration / this.employeeArray.length;
 			return this.taskSheetDetail.duration / this.employeeArray.length;
 		},
 	},
@@ -203,7 +240,7 @@ export default {
 			this.taskData.status = this.taskDetail.status;
 		}
 	},
-	components: { RedButton, BlueButton, GreenButton },
+	components: { RedButton, BlueButton, GreenButton, BackButton },
 };
 </script>
 
@@ -339,7 +376,10 @@ export default {
 								<label>Fixed Duration</label>
 								<label>:</label>
 							</div>
-							<div>
+							<div v-if="taskSheetDetail.fixedDuration">
+								{{ taskSheetDetail.fixedDuration }} minutes
+							</div>
+							<div v-if="!taskSheetDetail.fixedDuration">
 								<!-- <p v-if="taskSheetDetail.fixedDuration">
 									{{ taskSheetDetail?.duration }}
 								</p>
@@ -352,7 +392,14 @@ export default {
 						id="second-box "
 						class="border-2 border-black rounded-md bg-slate-200 w-[400px] px-4 py-2"
 					>
-						<div class="flex flex-row gap-2">
+						<div
+							v-if="
+								!taskSheetDetail
+									.EmployeeTaskPlantsheettaskScheduleConjunctions
+									.length
+							"
+							class="flex flex-row gap-2"
+						>
 							<div class="flex justify-between items-center w-[55%]">
 								<label>Total Employee Available</label>
 								<label>:</label>
@@ -367,11 +414,25 @@ export default {
 							>
 								<label>List of Employee</label>
 							</div>
-							<div>
+							<div
+								v-if="
+									!taskSheetDetail.EmployeeTaskPlantsheettaskScheduleConjunctions
+								"
+							>
 								<ul class="pl-2">
 									<li v-for="employee in employees" :key="employee.id">
 										• {{ employee.employee.name }} -
 										{{ employee.workMinuteQuota }} minutes left
+									</li>
+								</ul>
+							</div>
+							<div>
+								<ul class="pl-2">
+									<li
+										v-for="employee in taskSheetDetail.EmployeeTaskPlantsheettaskScheduleConjunctions"
+										:key="employee.id"
+									>
+										• {{ employee.employeecon.empl }}
 									</li>
 								</ul>
 							</div>
@@ -419,7 +480,11 @@ export default {
 										<label>Start Work Hour</label>
 										<label>:</label>
 									</div>
+									<p v-if="taskSheetDetail.startTaskTime">
+										{{ formatTime(taskSheetDetail.startTaskTime) }}
+									</p>
 									<input
+										v-else-if="!taskSheetDetail.startTaskTime"
 										id="name"
 										class="placeholder:text-xs p-[6px] border-2 border-gray-300 rounded-md bg-green-100"
 										placeholder="Name ...."
@@ -428,15 +493,19 @@ export default {
 										v-model="employeeFetchingData.startWorkHour"
 									/>
 								</div>
-								<div class="flex flex-row gap-2" >
+								<div class="flex flex-row gap-2">
 									<div
 										class="flex justify-between items-center w-[13%]"
 									>
 										<label>Finish Work Hour</label>
 										<label>:</label>
 									</div>
+									<p v-if="taskSheetDetail.finishTaskTime">
+										{{ formatTime(taskSheetDetail.finishTaskTime) }}
+									</p>
 									<input
-									:disabled="!employeeFetchingData.startWorkHour"
+										v-if="!taskSheetDetail.startTaskTime"
+										:disabled="!employeeFetchingData.startWorkHour"
 										id="name"
 										class="placeholder:text-xs p-[6px] border-2 border-gray-300 rounded-md bg-green-100"
 										placeholder="Name ...."
@@ -450,7 +519,10 @@ export default {
 								class="flex flex-col gap-2"
 								v-if="activeTab === 'employee'"
 							>
-								<div class="flex flex-row gap-2" v-if="employeeFetchingData.finishWorkHour">
+								<div
+									class="flex flex-row gap-2"
+									v-if="employeeFetchingData.finishWorkHour"
+								>
 									<div
 										class="flex justify-between items-center w-[13%]"
 									>
@@ -467,6 +539,75 @@ export default {
 										type="number"
 									/>
 								</div>
+								<div
+									v-if="
+										taskSheetDetail
+											.EmployeeTaskPlantsheettaskScheduleConjunctions
+											.length
+									"
+								>
+									<div>
+										<div class="flex flex-row w-full">
+											<div
+												class="w-[3%] text-center border-black border rounded-tl-md"
+											>
+												no
+											</div>
+											<div
+												class="w-[10%] text-center border-black border"
+											>
+												name
+											</div>
+											<div
+												class="w-[7%] border border-black text-center rounded-tr-md"
+											>
+												status
+											</div>
+										</div>
+									</div>
+									<div
+										v-for="(
+											el, index
+										) in taskSheetDetail.EmployeeTaskPlantsheettaskScheduleConjunctions"
+										class="w-full flex flex-row text-center"
+									>
+										<div
+											:class="[
+												'w-[3%] border border-black ',
+												index ===
+												taskSheetDetail
+													.EmployeeTaskPlantsheettaskScheduleConjunctions
+													.length -
+													1
+													? 'rounded-bl-md '
+													: '',
+											]"
+										>
+											{{ index + 1 }}
+										</div>
+										<div class="w-[10%] border border-black">
+											{{ el.employeecon.empl }}
+										</div>
+										<div
+											:class="[
+												'w-[7%] h-[35px] border border-black flex flex-row justify-around items-center bg-yellow-200',
+												index ===
+												taskSheetDetail
+													.EmployeeTaskPlantsheettaskScheduleConjunctions
+													.length -
+													1
+													? 'rounded-br-md '
+													: '',
+											]"
+										>
+											<div
+												class="bg-green-400 w-[70px] rounded h-[25px] text-slate-200 tracking-wide font-semibold text-center text-sm"
+											>
+												selected
+											</div>
+										</div>
+									</div>
+								</div>
 								<div v-if="totalEmployee">
 									<div>
 										<div class="flex flex-row w-full">
@@ -476,7 +617,7 @@ export default {
 												name
 											</div>
 											<div
-												class="w-[7%] border border-black text-center "
+												class="w-[7%] border border-black text-center"
 											>
 												action
 											</div>
@@ -513,7 +654,7 @@ export default {
 													Enter here ..
 												</option>
 												<option
-													v-for="(employee) in employees"
+													v-for="employee in employees"
 													:key="employee.id"
 													:value="employee.id"
 												>
@@ -522,41 +663,36 @@ export default {
 											</select>
 										</div>
 										<div
-											class="w-[7%] h-[35px] border border-black  flex flex-row justify-around items-center bg-yellow-200"
+											class="w-[7%] h-[35px] border border-black flex flex-row justify-around items-center bg-yellow-200"
 										>
-											<button v-if="!employeeArray[index].status"
+											<button
+												v-if="!employeeArray[index].status"
 												class="bg-blue-600 w-[60px] rounded h-[25px] text-slate-200 tracking-wide font-semibold text-center text-sm hover:bg-blue-800"
 												@click.prevent="
-													localputEmployeeAtTaskSheet(
-														employeeArray[index].id,
-														computedFixedDuration,
-														employeeFetchingData.startWorkHour,
-														employeeFetchingData.finishWorkHour, index
-													)
+													employeeArray[index].status = true
 												"
 											>
 												accept
 											</button>
-											<img 
-											v-if="employeeArray[index].status"
-											src="../assets/icons8-double-tick-48.png" alt="checked"
-											class="w-[25px]"
-											>
+											<img
+												v-if="employeeArray[index].status"
+												src="../assets/icons8-double-tick-48.png"
+												alt="checked"
+												class="w-[25px]"
+											/>
 										</div>
 										<div
 											class="w-[7%] h-[35px] border border-black rounded-br-md flex flex-row justify-around items-center bg-yellow-200"
 										>
 											<div
 												v-if="!employeeArray[index].status"
-												class="bg-blue-600 w-[70px] rounded h-[25px] text-slate-200 tracking-wide font-semibold text-center text-sm "
-												
+												class="bg-blue-600 w-[70px] rounded h-[25px] text-slate-200 tracking-wide font-semibold text-center text-sm"
 											>
 												available
 											</div>
 											<div
 												v-if="employeeArray[index].status"
-												class="bg-green-400 w-[70px] rounded h-[25px] text-slate-200 tracking-wide font-semibold text-center text-sm "
-												
+												class="bg-green-400 w-[70px] rounded h-[25px] text-slate-200 tracking-wide font-semibold text-center text-sm"
 											>
 												selected
 											</div>
@@ -587,7 +723,10 @@ export default {
 							<GreenButton
 								:type="'submit'"
 								:text="'Submit'"
-								v-if="role === 'super' || editFlag === false"
+								v-if="
+									(role === 'super' || editFlag === false) &&
+									!taskSheetDetail.fixedDuration
+								"
 							/>
 							<button
 								class="bg-red-500 rounded flex hover:bg-red-900 justify-center items-center font-semibold text-[11px] text-slate-100 lg:h-[30px] w-[90px]"
@@ -600,11 +739,22 @@ export default {
 							</button>
 							<RouterLink to="/tasksheet">
 								<button
-									v-if="editFlag === false"
+									v-if="
+										editFlag === false &&
+										!taskSheetDetail.fixedDuration
+									"
 									class="bg-[#c52b2b] rounded flex hover:bg-red-900 justify-center items-center font-semibold text-[11px] text-slate-100 lg:h-[30px] w-[90px]"
 								>
 									Cancel
 								</button>
+							</RouterLink>
+							<RouterLink
+								to="/tasksheet"
+								v-if="
+									editFlag === false && taskSheetDetail.fixedDuration
+								"
+							>
+								<BackButton />
 							</RouterLink>
 						</div>
 					</div>
@@ -612,8 +762,9 @@ export default {
 			</form>
 		</div>
 	</section>
-	<pre>total employee: {{ totalEmployee }}</pre>
-	<pre>{{ employeeArray }}</pre>
-	<pre>ini employee {{ employees }}</pre>
+	<!-- <pre>total employee: {{ totalEmployee }}</pre> -->
+	<pre>ini employeeArray {{ employeeArray }}</pre>
+	<!-- <pre>ini employee {{ employees }}</pre> -->
 	<!-- <pre>{{ employeeFetchingData }}</pre> -->
+	<!-- <pre>{{ taskSheetDetail }}</pre> -->
 </template>

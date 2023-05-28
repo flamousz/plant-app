@@ -159,8 +159,10 @@ class EmployeeController {
 			const data = await Employee.findByPk(id, {
 				include: {
 					model: TaskConjunction,
+					as: 'taskConjunction',
 					include: {
 						model: Task,
+						as: 'task',
 						include: {
 							model: ToolConjunction,
 							include: {

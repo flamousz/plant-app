@@ -26,8 +26,7 @@ class TaskController {
 						model: Employee,
 						as: 'employee',
 						attributes: ['name']
-					},
-					attributes: ['workMinuteQuota']
+					}
 				},
 				attributes: ['id']			
 			},
@@ -71,7 +70,7 @@ class TaskController {
 				sequelize.where(
 					sequelize.fn("DATE", sequelize.col("initialDate")),
 					"=",
-					new Date()
+					new Date('2023-05-26')
 				),
 			],
 		},
@@ -80,7 +79,27 @@ class TaskController {
 		},
 		order: [["id", "ASC"]],
 	};
+	static async postTaskSheet(req, res, next) {
+		try {
+			const {startWorkHour, finishWorkHour, fixedDuration, id} = req.body
+			console.log(req.body, '<<<< ini req.body');
 
+			const data = await PlantsheetTaskScheduleConjunction.findByPk(id)
+			if (!data) {
+				throw{name: 'NotFound'}
+			}
+			await PlantsheetTaskScheduleConjunction.update({
+				startTaskTime: startWorkHour,
+				finishTaskTime: finishWorkHour,
+				fixedDuration
+			},{
+				where: {id}
+			})
+			res.status(200).json('Task successfully added with time.')
+		} catch (error) {
+			next(error)
+		}
+	}
 	static async getTaskSheetById(req, res, next) {
 		try {
 			const { id } = req.params;

@@ -24,10 +24,10 @@ export default {
 	<!-- <pre>{{ tools }}</pre> -->
 	<tr v-if="tasks" class="w-[80%] flex flex-row  bg-slate-100">
 		<td class=" w-[4.5%] text-center pl-1 border border-black h-[33px] pt-1">{{ index+1 }}</td>
-		<td class=" w-[18.4%] pl-1 border border-black text-left h-[33px] pt-1">{{ tasks?.Task?.name }}</td>
-		<td class=" border border-black w-[13.1%] text-center pt-1">{{ tasks?.Task?.TaskPerMinute }}</td>
-		<td class="border border-black w-[55%] text-center pt-1">{{ tasks?.Task?.description }} </td>
-		<td class="border border-r-2 border-black w-[10%] text-center pt-1">{{ tasks?.Task?.arcStatus }}</td>
+		<td class=" w-[18.4%] pl-1 border border-black text-left h-[33px] pt-1">{{ tasks?.task?.name }}</td>
+		<td class=" border border-black w-[13.1%] text-center pt-1">{{ tasks?.task?.TaskPerMinute }}</td>
+		<td class="border border-black w-[55%] text-center pt-1">{{ tasks?.task?.description }} </td>
+		<td class="border border-r-2 border-black w-[10%] text-center pt-1">{{ tasks?.task?.arcStatus }}</td>
 	</tr>
 	<tr v-if="tools" class="w-[80%] flex flex-row  bg-slate-100">
 		<td class=" w-[4.5%] text-center pl-1 border border-black h-[33px] pt-1">{{ index+1 }}</td>
