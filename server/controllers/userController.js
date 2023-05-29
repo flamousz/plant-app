@@ -27,7 +27,8 @@ class UserController{
 			};
 			const role = user.role;
 			const access_token = createToken(payload);
-			res.status(200).json({ access_token, email, role, id });
+			const {approvalLevel} = user
+			res.status(200).json({ access_token, email, role, id,  approvalLevel});
 		} catch (err) {
 			console.log(err);
 			next(err);

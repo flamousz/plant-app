@@ -20,6 +20,7 @@ const {
 	Employee,
 	Notification,
 	EmployeeTaskConjunction,
+	Approval
 } = require("../models/index");
 
 class PlantScheduleController {
@@ -87,15 +88,19 @@ class PlantScheduleController {
 				{
 					where: { id },
 					returning: true,
-				}
+				}  
 			);
 			const description = `new approval with code ${findData.code}`
 			const isRead = false
-			await Notification.create({
+			const data = await Notification.create({
 				UserId: userId,
 				PlantScheduleId: findData.id,
 				description,
 				isRead
+			})
+
+			await Approval.create({
+				NotificationId: data.id
 			})
 			res.status(200).json(`Schedule has been validated`);
 		} catch (error) {
@@ -535,12 +540,6 @@ class PlantScheduleController {
 						),
 					};
 				}
-				// const oneDay = 24 * 60 * 60 * 1000; // number of milliseconds in a day
-				// const newDates = commonDate.map((date) => {
-				// 	const oldDate = new Date(date);
-				// 	const newDate = new Date(oldDate.getTime() + oneDay);
-				// 	return newDate.toISOString();
-				// });
 			}
 
 			const data = await PlantSchedule.findAll(opt);

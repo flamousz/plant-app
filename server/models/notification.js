@@ -17,6 +17,9 @@ module.exports = (sequelize, DataTypes) => {
       Notification.belongsTo(models.PlantSchedule, {
         foreignKey: 'PlantScheduleId'
       })
+      Notification.hasMany(models.Approval, {
+        foreignKey: 'NotificationId'
+      })
     }
   }
   Notification.init({

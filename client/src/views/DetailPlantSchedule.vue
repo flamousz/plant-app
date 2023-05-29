@@ -261,6 +261,12 @@ export default {
 				this.calendarData();
 			}
 		},
+		"$route.params.id": function (newId, oldId) {
+			// Handle the changes in the route parameter ID here
+			// You can perform any necessary actions or fetch data based on the new ID
+			this.fetchPlantSchedulesById(newId);
+			this.fetchHarvestRealization(newId);
+		},
 	},
 	components: { RedButton, BlueButton, TableRow4Colum },
 };
@@ -278,14 +284,17 @@ export default {
 					{{ cropDetail.status }} - {{ cropDetail.arcStatus }}
 				</div>
 			</div> -->
-			<div class="flex flex-row h-[50px] mb-3 justify-between ">
+			<div class="flex flex-row h-[50px] mb-3 justify-between">
 				<div
 					class="w-[40%] flex justify-start items-end text-5xl font-bold"
 				>
 					{{ plantSchedulesDetail?.PlantSheet?.plant?.name
 					}}<span class="text-slate-100">{{ cropAreaReady }}</span>
 				</div>
-				<div v-if="plantSchedulesDetail.statusPlantSchedule === 'draft'" class="w-[60%] flex flex-row justify-end items-end gap-3">
+				<div
+					v-if="plantSchedulesDetail.statusPlantSchedule === 'draft'"
+					class="w-[60%] flex flex-row justify-end items-end gap-3"
+				>
 					<!-- <div @click="patchLocal" v-if="role !== 'super'">
 						<RedButton :type="'button'" :text="archive" />
 					</div>
@@ -306,12 +315,17 @@ export default {
 						<BlueButton :type="'button'" :text="'VALIDATION'" />
 					</div>
 				</div>
-				<div v-if="plantSchedulesDetail.statusPlantSchedule === 'submitted'" class="flex flex-row items-end gap-2 font-bold text-2xl">
+				<div
+					v-if="plantSchedulesDetail.statusPlantSchedule === 'submitted'"
+					class="flex flex-row items-end gap-2 font-bold text-2xl"
+				>
 					<div class="">
 						<h3>STATUS:</h3>
 					</div>
-					<div class="bg-yellow-300 h-[35px] rounded-md border-[3px] border-black items-center flex w-item p-2 justify-center">
-						{{plantSchedulesDetail.statusPlantSchedule}}
+					<div
+						class="bg-yellow-300 h-[35px] rounded-md border-[3px] border-black items-center flex w-item p-2 justify-center"
+					>
+						{{ plantSchedulesDetail.statusPlantSchedule }}
 					</div>
 				</div>
 			</div>
@@ -704,7 +718,7 @@ export default {
 							<tr
 								v-for="(item, index) in plantSchedulesDetail?.PlantSheet
 									?.PlantsheetTaskConjunctions"
-								class=" flex flex-row bg-slate-100"
+								class="flex flex-row bg-slate-100"
 							>
 								<td
 									class="w-[4.661%] text-center pl-1 border border-black h-[33px] pt-1"
@@ -714,7 +728,12 @@ export default {
 								<td
 									class="w-[20.89%] pl-1 border border-black text-left h-[33px] pt-1"
 								>
-									{{ formatDate(plantSchedulesDetail.plantingDate, index) }}
+									{{
+										formatDate(
+											plantSchedulesDetail.plantingDate,
+											index
+										)
+									}}
 								</td>
 								<td
 									class="border border-black w-[15%] text-center pt-1"

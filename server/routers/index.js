@@ -22,6 +22,7 @@ const {
 } = require("../models/index");
 const { Op } = require("sequelize");
 const notificationRouter = require("./notification");
+const approvalRouter = require("./approval");
 
 router.use("/", userRouter);
 // router.use(authentication)
@@ -133,6 +134,7 @@ router.get("/test/task", async (req, res, next) => {
 		next(error);
 	}
 });
+router.use('/approvals', approvalRouter)
 router.use('/notifications', notificationRouter)
 router.use("/employees", employeeRouter);
 router.use("/cropareas", cropAreRouter);

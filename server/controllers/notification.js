@@ -25,6 +25,17 @@ class NotificationController {
 			next(error);
 		}
 	}
+	static async patchIsReadNotification(req, res, next){
+		try {
+			console.log(req.body, '<<< ini req body di patchIsReadNotification');
+			const {id, isRead} = req.body
+			await Notification.update({isRead}, { where: {id}})
+
+			res.status(200).json('successfuly patch isRead to true')
+		} catch (error) {
+			next(error)
+		}
+	}
 }
 
 module.exports = NotificationController;
