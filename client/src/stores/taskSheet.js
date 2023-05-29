@@ -6,7 +6,13 @@ export const useTaskSheetStore = defineStore("tasksheet", {
 	state() {
 		return {
 			taskSheets: [],
+			editFlag: false,
 			taskSheetDetail: {},
+			query: {
+				filterPlant: null,
+				filterLocation: null,
+				commonDate: [new Date(), null],
+			},
 		};
 	},
 	actions: {
@@ -61,9 +67,15 @@ export const useTaskSheetStore = defineStore("tasksheet", {
 		},
 		async fetchTaskSheet() {
 			try {
+				this.router.replace({
+					name: "Task Sheet",
+					query: this.query,
+				});
+				console.log(this.query, '"<< query dari useTaskSheetStore"');
 				const { data } = await axios({
 					url: `${baseUrl}/task/sheet`,
 					method: "GET",
+					params: this.query
 				});
 				this.taskSheets = data;
 			} catch (error) {

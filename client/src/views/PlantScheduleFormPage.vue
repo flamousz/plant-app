@@ -21,7 +21,8 @@ export default {
 				PlantsheetId: 0,
 				CropAreaId: 0,
 				totalPopulation: null,
-				seedNursery: null
+				seedNursery: null,
+				userId: localStorage.getItem('userId')
 			},
 			isDateDisabled: {
 				seedlingDate: false,
@@ -296,7 +297,7 @@ export default {
 							:disabled="isDateDisabled.plantingDate"
 							class="p-[6px] border border-gray-300 rounded-md bg-green-100"
 							name="plantingDate"
-							type="datetime-local"
+							type="date"
 							v-model="cropData.plantingDate"
 							@change="seedOrPlant"
 						/>

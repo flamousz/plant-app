@@ -278,14 +278,14 @@ export default {
 					{{ cropDetail.status }} - {{ cropDetail.arcStatus }}
 				</div>
 			</div> -->
-			<div class="flex flex-row h-[50px] mb-3">
+			<div class="flex flex-row h-[50px] mb-3 justify-between ">
 				<div
 					class="w-[40%] flex justify-start items-end text-5xl font-bold"
 				>
 					{{ plantSchedulesDetail?.PlantSheet?.plant?.name
 					}}<span class="text-slate-100">{{ cropAreaReady }}</span>
 				</div>
-				<div class="w-[60%] flex flex-row justify-end items-end gap-3">
+				<div v-if="plantSchedulesDetail.statusPlantSchedule === 'draft'" class="w-[60%] flex flex-row justify-end items-end gap-3">
 					<!-- <div @click="patchLocal" v-if="role !== 'super'">
 						<RedButton :type="'button'" :text="archive" />
 					</div>
@@ -304,6 +304,14 @@ export default {
 						"
 					>
 						<BlueButton :type="'button'" :text="'VALIDATION'" />
+					</div>
+				</div>
+				<div v-if="plantSchedulesDetail.statusPlantSchedule === 'submitted'" class="flex flex-row items-end gap-2 font-bold text-2xl">
+					<div class="">
+						<h3>STATUS:</h3>
+					</div>
+					<div class="bg-yellow-300 h-[35px] rounded-md border-[3px] border-black items-center flex w-item p-2 justify-center">
+						{{plantSchedulesDetail.statusPlantSchedule}}
 					</div>
 				</div>
 			</div>

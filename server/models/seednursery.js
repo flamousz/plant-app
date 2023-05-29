@@ -19,7 +19,8 @@ module.exports = (sequelize, DataTypes) => {
   }
   SeedNursery.init({
     PlantScheduleId: DataTypes.INTEGER,
-    SeedId: DataTypes.INTEGER
+    SeedId: DataTypes.INTEGER,
+    statusNursery: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'SeedNursery',

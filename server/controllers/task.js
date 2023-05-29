@@ -10,7 +10,7 @@ const {
 	CropArea,
 	EmployeeTaskPlantsheettaskScheduleConjunction,
 	EmployeeTaskConjunction,
-	Employee
+	Employee,
 } = require("../models/index");
 const { Op } = require("sequelize");
 
@@ -21,14 +21,14 @@ class TaskController {
 				model: EmployeeTaskPlantsheettaskScheduleConjunction,
 				include: {
 					model: EmployeeTaskConjunction,
-					as: 'employeecon',
+					as: "employeecon",
 					include: {
 						model: Employee,
-						as: 'employee',
-						attributes: ['name']
-					}
+						as: "employee",
+						attributes: ["name"],
+					},
 				},
-				attributes: ['id']			
+				attributes: ["id"],
 			},
 			{
 				model: PlantSchedule,
@@ -48,6 +48,7 @@ class TaskController {
 					},
 				],
 				attributes: ["id", "code"],
+				order: [["code", "ASC"]],
 			},
 			{
 				model: PlantsheetTaskConjunction,
@@ -60,54 +61,43 @@ class TaskController {
 				},
 			},
 		],
-		where: {
-			[Op.and]: [
-				{
-					duration: {
-						[Op.ne]: null,
-					},
-				},
-				sequelize.where(
-					sequelize.fn("DATE", sequelize.col("initialDate")),
-					"=",
-					new Date('2023-05-26')
-				),
-			],
-		},
 		attributes: {
 			exclude: ["updatedAt"],
 		},
-		order: [["id", "ASC"]],
+		order: [["initialDate", "ASC"]],
 	};
 	static async postTaskSheet(req, res, next) {
 		try {
-			const {startWorkHour, finishWorkHour, fixedDuration, id} = req.body
-			console.log(req.body, '<<<< ini req.body');
+			const { startWorkHour, finishWorkHour, fixedDuration, id } = req.body;
+			console.log(req.body, "<<<< ini req.body");
 
-			const data = await PlantsheetTaskScheduleConjunction.findByPk(id)
+			const data = await PlantsheetTaskScheduleConjunction.findByPk(id);
 			if (!data) {
-				throw{name: 'NotFound'}
+				throw { name: "NotFound" };
 			}
-			await PlantsheetTaskScheduleConjunction.update({
-				startTaskTime: startWorkHour,
-				finishTaskTime: finishWorkHour,
-				fixedDuration
-			},{
-				where: {id}
-			})
-			res.status(200).json('Task successfully added with time.')
+			await PlantsheetTaskScheduleConjunction.update(
+				{
+					startTaskTime: startWorkHour,
+					finishTaskTime: finishWorkHour,
+					fixedDuration,
+				},
+				{
+					where: { id },
+				}
+			);
+			res.status(200).json("Task successfully added with time.");
 		} catch (error) {
-			next(error)
+			next(error);
 		}
 	}
 	static async getTaskSheetById(req, res, next) {
 		try {
 			const { id } = req.params;
-			console.log(id, '<<< ini id dari getTaskById');
+			console.log(id, "<<< ini id dari getTaskById");
 			const opt = {
 				...TaskController.opt,
-				where: {id},
-			  };
+				where: { id },
+			};
 
 			const data = await PlantsheetTaskScheduleConjunction.findOne(opt);
 			if (!data) {
@@ -119,23 +109,267 @@ class TaskController {
 		}
 	}
 	static async getTaskSheet(req, res, next) {
+		const filterDate = "initialDate";
 		try {
-			// const opt = {
-			// 	include: {
-			// 		model: EmployeeTaskConjunction,
-			// 		include: {
-			// 			model: Employee,
-			// 			as: 'employee'
-			// 		}
-			// 	}
-			// }
-			// const data = await EmployeeTaskPlantsheettaskScheduleConjunction.findAll(
-			// 	opt
-			// );
+			const { filterPlant, filterLocation, commonDate } = req.query;
+			console.log(req.query, "<<< ini req query");
+			console.log(commonDate, "<< commonDate");
+			console.log(filterDate, "<< filterDate");
+			console.log(filterPlant, "<< filterPlant");
+			console.log(filterLocation, "<< filterLocation");
+
+			if (
+				filterPlant !== "" &&
+				typeof filterPlant !== "undefined" &&
+				filterLocation !== "" &&
+				typeof filterLocation !== "undefined" &&
+				commonDate !== "" &&
+				typeof commonDate !== "undefined"
+			) {
+				console.log("masuk ke if 3 perbandingan");
+				const query = filterPlant.split(",").map((item) => ({
+					[Op.eq]: item,
+				}));
+				const queryLocation = filterLocation.split(",").map((item) => ({
+					[Op.eq]: item,
+				}));
+
+				if (commonDate.length > 1) {
+					console.log(
+						"masuk ke if 3 perbandingan dengan commonDate.length > 1"
+					);
+					TaskController.opt.where = {
+						"$PlantSchedule.PlantSheet.plant.name$": {
+							[Op.or]: query,
+						},
+						"$PlantSchedule.CropArea.name$": {
+							[Op.or]: queryLocation,
+						},
+						[Op.and]: [
+							sequelize.where(
+								sequelize.fn("DATE", sequelize.col(filterDate)),
+								">=",
+								commonDate[0]
+							),
+							sequelize.where(
+								sequelize.fn("DATE", sequelize.col(filterDate)),
+								"<=",
+								commonDate[1]
+							),
+						],
+					};
+				} else {
+					console.log(
+						"masuk ke if 3 perbandingan dengan commonDate.length < 2"
+					);
+					TaskController.opt.where = {
+						"$PlantSchedule.PlantSheet.plant.name$": {
+							[Op.or]: query,
+						},
+						"$PlantSchedule.CropArea.name$": {
+							[Op.or]: queryLocation,
+						},
+						[Op.and]: sequelize.where(
+							sequelize.fn("DATE", sequelize.col(filterDate)),
+							"=",
+							commonDate[0]
+						),
+					};
+				}
+			} else if (
+				filterPlant !== "" &&
+				typeof filterPlant !== "undefined" &&
+				commonDate !== "" &&
+				typeof commonDate !== "undefined"
+			) {
+				console.log(
+					"masuk ke if 2 perbandingan antara filterPlant dan commonDate"
+				);
+				const query = filterPlant.split(",").map((item) => ({
+					[Op.eq]: item,
+				}));
+
+				if (commonDate.length > 1) {
+					console.log(
+						"masuk ke if 2 perbandingan antara filterPlant dan commonDate dengan commonDate.length > 1"
+					);
+					TaskController.opt.where = {
+						"$PlantSchedule.PlantSheet.plant.name$": {
+							[Op.or]: query,
+						},
+						[Op.and]: [
+							sequelize.where(
+								sequelize.fn("DATE", sequelize.col(filterDate)),
+								">=",
+								commonDate[0]
+							),
+							sequelize.where(
+								sequelize.fn("DATE", sequelize.col(filterDate)),
+								"<=",
+								commonDate[1]
+							),
+						],
+					};
+				} else {
+					console.log(
+						"masuk ke if 2 perbandingan antara filterPlant dan commonDate dengan commonDate.length < 2"
+					);
+					TaskController.opt.where = {
+						"$PlantSchedule.PlantSheet.plant.name$": {
+							[Op.or]: query,
+						},
+						[Op.and]: sequelize.where(
+							sequelize.fn("DATE", sequelize.col(filterDate)),
+							"=",
+							commonDate[0]
+						),
+					};
+				}
+			} else if (
+				filterLocation !== "" &&
+				typeof filterLocation !== "undefined" &&
+				commonDate !== "" &&
+				typeof commonDate !== "undefined"
+			) {
+				console.log(
+					"masuk ke if 2 perbandingan antara filterLocation dan commonDate"
+				);
+				const queryLocation = filterLocation.split(",").map((item) => ({
+					[Op.eq]: item,
+				}));
+
+				if (commonDate.length > 1) {
+					console.log(
+						"masuk ke if 2 perbandingan dengan commonDate.length > 1"
+					);
+
+					TaskController.opt.where = {
+						"$PlantSchedule.CropArea.name$": {
+							[Op.or]: queryLocation,
+						},
+						[Op.and]: [
+							sequelize.where(
+								sequelize.fn("DATE", sequelize.col(filterDate)),
+								">=",
+								commonDate[0]
+							),
+							sequelize.where(
+								sequelize.fn("DATE", sequelize.col(filterDate)),
+								"<=",
+								commonDate[1]
+							),
+						],
+					};
+				} else {
+					console.log(
+						"masuk ke if 2 perbandingan dengan commonDate.length < 2"
+					);
+					TaskController.opt.where = {
+						"$PlantSchedule.CropArea.name$": {
+							[Op.or]: queryLocation,
+						},
+						[Op.and]: sequelize.where(
+							sequelize.fn("DATE", sequelize.col(filterDate)),
+							"=",
+							commonDate[0]
+						),
+					};
+				}
+			} else if (
+				filterPlant !== "" &&
+				typeof filterPlant !== "undefined" &&
+				filterLocation !== "" &&
+				typeof filterLocation !== "undefined"
+			) {
+				console.log(
+					"masuk ke if 2 perbandingan antara filterLocation dan filterPlant"
+				);
+				const query = filterPlant.split(",").map((item) => ({
+					[Op.eq]: item,
+				}));
+
+				const queryLocation = filterLocation.split(",").map((item) => ({
+					[Op.eq]: item,
+				}));
+				TaskController.opt.where = {
+					"$PlantSchedule.PlantSheet.plant.name$": {
+						[Op.or]: query,
+					},
+					"$PlantSchedule.CropArea.name$": {
+						[Op.or]: queryLocation,
+					},
+				};
+			} else if (
+				filterLocation !== "" &&
+				typeof filterLocation !== "undefined"
+			) {
+				console.log("masuk ke perbandingan hanya location");
+				const query = filterLocation.split(",").map((item) => ({
+					[Op.eq]: item,
+				}));
+				TaskController.opt.where = {
+					"$PlantSchedule.CropArea.name$": {
+						[Op.or]: query,
+					},
+				};
+			} else if (filterPlant !== "" && typeof filterPlant !== "undefined") {
+				console.log("masuk ke perbandingan hanya filterPlant");
+				const query = filterPlant.split(",").map((item) => ({
+					[Op.eq]: item,
+				}));
+				TaskController.opt.where = {
+					"$PlantSchedule.PlantSheet.plant.name$": {
+						[Op.or]: query,
+					},
+				};
+			} else if (
+				commonDate !== "" &&
+				typeof commonDate !== "undefined" &&
+				filterDate !== "" &&
+				typeof filterDate !== "undefined"
+			) {
+				// const query = commonDate.split(",").map((item) => ({
+				// 	[Op.eq]: item,
+				// }));
+				// console.log(query, "<<< INI QUERY");
+				console.log("masuk ke perbandingan hanya tanggal");
+				console.log(commonDate.length, "<<< INI commonDate.length");
+				console.log(commonDate, "<<< INI commonDate original");
+				console.log(
+					typeof commonDate,
+					"<<< typeof commonDate sebelum di convert"
+				);
+
+				if (commonDate.length > 1) {
+					TaskController.opt.where = {
+						[Op.and]: [
+							sequelize.where(
+								sequelize.fn("DATE", sequelize.col(filterDate)),
+								">=",
+								commonDate[0]
+							),
+							sequelize.where(
+								sequelize.fn("DATE", sequelize.col(filterDate)),
+								"<=",
+								commonDate[1]
+							),
+						],
+					};
+				} else {
+					TaskController.opt.where = {
+						[Op.and]: sequelize.where(
+							sequelize.fn("DATE", sequelize.col(filterDate)),
+							"=",
+							commonDate[0]
+						),
+					};
+				}
+			}
+
 			const data = await PlantsheetTaskScheduleConjunction.findAll(
 				TaskController.opt
 			);
-			
+
 			if (!data) {
 				throw {
 					name: "NotFound",

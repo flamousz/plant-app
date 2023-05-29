@@ -18,6 +18,7 @@ const {
 	Task,
 	PlantsheetTaskScheduleConjunction,
 	Employee,
+	Notification,
 	EmployeeTaskConjunction,
 } = require("../models/index");
 
@@ -62,7 +63,9 @@ class PlantScheduleController {
 				totalPopulation,
 				id,
 				seedNursery,
+				userId
 			} = req.body;
+			const statusPlantSchedule = 'submitted'
 			const findData = await PlantSchedule.findByPk(id);
 			if (!findData) {
 				throw {
@@ -79,12 +82,21 @@ class PlantScheduleController {
 					CropAreaId,
 					totalPopulation,
 					seedNursery,
+					statusPlantSchedule
 				},
 				{
 					where: { id },
 					returning: true,
 				}
 			);
+			const description = `new approval with code ${findData.code}`
+			const isRead = false
+			await Notification.create({
+				UserId: userId,
+				PlantScheduleId: findData.id,
+				description,
+				isRead
+			})
 			res.status(200).json(`Schedule has been validated`);
 		} catch (error) {
 			console.log();
@@ -861,7 +873,8 @@ class PlantScheduleController {
 			const max = 9999;
 			const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
 			const code = `nonmush-${randomNumber}`;
-
+			const statusPlantSchedule = 'draft'
+			const statusNursery = 'draft'
 			seedNursery = Math.ceil(seedNursery);
 			console.log(seedNursery, "<<< seedNursery setelah dibulatkan");
 			const data = await PlantSchedule.create({
@@ -874,10 +887,12 @@ class PlantScheduleController {
 				totalPopulation,
 				code,
 				seedNursery,
+				statusPlantSchedule
 			});
 
 			await SeedNursery.create({
 				PlantScheduleId: data.id,
+				statusNursery
 			});
 
 			const taskPlantsheetNursery = await PlantsheetTaskConjunction.findAll({
@@ -1001,7 +1016,7 @@ class PlantScheduleController {
 				// Retrieve all employees
 				const employees = await Employee.findAll();
 
-				for (const employee of employees) {
+				for (const employee of employees) { // harus dicek lagi disini
 					const existingConjunction =
 						await EmployeeTaskConjunction.findOne({
 							where: {

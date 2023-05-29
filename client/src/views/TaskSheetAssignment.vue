@@ -22,6 +22,7 @@ export default {
 					status: false,
 				},
 			],
+			employeesLocal: [],
 			employeeFetchingData: {
 				id: this.$route.params.id,
 				selectedDate: "",
@@ -95,7 +96,10 @@ export default {
 				finishWorkHour,
 				durationTask,
 			};
-			console.log(data, "data di fetchDataInputEmployee");
+			console.log(
+				data,
+				"data di fetchDataInputEmployee fetchDataInputEmployee"
+			);
 			this.fetchEmployeeAtTaskSheet(data);
 		},
 		formatDate(date) {
@@ -161,12 +165,25 @@ export default {
 		},
 	},
 	watch: {
+		employees: {
+			// Watch for changes in the "employees" property
+			immediate: true, // Trigger the handler immediately when the component is created
+			handler(newEmployees) {
+				// The handler function that will be executed when "employees" changes
+				this.employeesLocal = []; // Clear the array before populating it again with new values
+
+				// Iterate over the "newEmployees" array and perform operations on each element
+				newEmployees.forEach((el) => {
+					this.employeesLocal.push(el); // Push the element to the "employeesLocal" array
+				});
+			},
+		},
 		totalEmployee(value) {
 			const diff = value - this.employeeArray.length;
-			if (value > this.employees.length) {
+			if (value > this.employeesLocal.length) {
 				this.totalEmployee = null;
 				Toastify({
-					text: `Maximal employees are ${this.employees.length}`,
+					text: `Maximal employees are ${this.employeesLocal.length}`,
 					style: {
 						background: "linear-gradient(to right, #611302, #a62103)",
 					},
@@ -196,19 +213,20 @@ export default {
 
 					duration: 2000,
 				}).showToast();
+			} else {
+				this.fetchDataInputEmployee(
+					this.taskSheetDetail.initialDate,
+					this.taskSheetDetail.PlantsheetTaskConjunction.Task.name,
+					this.employeeFetchingData.startWorkHour,
+					newValue,
+					this.taskSheetDetail.duration
+				);
 			}
-			this.fetchDataInputEmployee(
-				this.taskSheetDetail.initialDate,
-				this.taskSheetDetail.PlantsheetTaskConjunction.Task.name,
-				this.employeeFetchingData.startWorkHour,
-				newValue,
-				this.taskSheetDetail.duration
-			);
 		},
 	},
 	computed: {
 		maxEmployeeCount() {
-			return this.employees.length;
+			return this.employeesLocal.length;
 		},
 		isTotalEmployeeInputDone() {
 			return this.totalEmployee === null || this.totalEmployee === "";
@@ -225,8 +243,8 @@ export default {
 		},
 		computedFixedDuration() {
 			this.employeeFetchingData.fixedDuration =
-				this.taskSheetDetail.duration / this.employeeArray.length;
-			return this.taskSheetDetail.duration / this.employeeArray.length;
+				Math.ceil(this.taskSheetDetail.duration / this.employeeArray.length)
+			return Math.ceil(this.taskSheetDetail.duration / this.employeeArray.length)
 		},
 	},
 	created() {
@@ -405,7 +423,7 @@ export default {
 								<label>:</label>
 							</div>
 							<div>
-								<p>{{ employees?.length }} People</p>
+								<p>{{ employeesLocal?.length }} People</p>
 							</div>
 						</div>
 						<div class="flex flex-col">
@@ -416,13 +434,16 @@ export default {
 							</div>
 							<div
 								v-if="
-									!taskSheetDetail.EmployeeTaskPlantsheettaskScheduleConjunctions
+									!taskSheetDetail
+										.EmployeeTaskPlantsheettaskScheduleConjunctions
+										.length
 								"
 							>
 								<ul class="pl-2">
-									<li v-for="employee in employees" :key="employee.id">
+									<li v-for="employee in employeesLocal" :key="employee.id">
 										• {{ employee.employee.name }} -
-										{{ employee.workMinuteQuota }} minutes left
+										{{ employee.workMinuteQuota }} minutes left -
+										{{ employee.workingTimeLog }}
 									</li>
 								</ul>
 							</div>
@@ -654,7 +675,7 @@ export default {
 													Enter here ..
 												</option>
 												<option
-													v-for="employee in employees"
+													v-for="employee in employeesLocal"
 													:key="employee.id"
 													:value="employee.id"
 												>
@@ -763,8 +784,11 @@ export default {
 		</div>
 	</section>
 	<!-- <pre>total employee: {{ totalEmployee }}</pre> -->
-	<pre>ini employeeArray {{ employeeArray }}</pre>
-	<!-- <pre>ini employee {{ employees }}</pre> -->
+	<!-- <pre>ini employeeArray {{ employeeArray }}</pre> -->
+	<div class="flex flex-row">
+		<pre>ini employee local {{ employeesLocal }}</pre>
+		<pre>ini employee {{ employees }}</pre>
+	</div>
 	<!-- <pre>{{ employeeFetchingData }}</pre> -->
-	<!-- <pre>{{ taskSheetDetail }}</pre> -->
+	<pre>{{ taskSheetDetail }}</pre>
 </template>
