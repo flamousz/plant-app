@@ -23,15 +23,33 @@ export default {
 		};
 	},
 	methods: {
-		formatDate(date) {
+		employeeCalculation(val) {
+			const totalTime = Math.ceil(
+				this.plantSchedulesDetail.CropArea.area / val
+			);
+			if (totalTime >= 420) {
+				return 2;
+			} else {
+				return 1;
+			}
+		},
+		formatDate(date, dayOffset) {
 			if (!date) {
 				return "";
 			}
+			if (dayOffset) {
+				const adjustedDate = new Date(date);
+				adjustedDate.setDate(adjustedDate.getDate() + dayOffset);
+				return adjustedDate.toLocaleDateString("en-AU", {
+					year: "numeric",
+					month: "long",
+					day: "numeric",
+				});
+			}
 			return new Date(date).toLocaleDateString("en-AU", {
-				
 				year: "numeric",
 				month: "long",
-				day: 'numeric'
+				day: "numeric",
 			});
 		},
 		calendarData() {
@@ -174,6 +192,27 @@ export default {
 			"harvestRealization",
 			"editFlag",
 		]),
+
+		todayTask() {
+			const currentDate = new Date();
+
+			const matchingTask =
+				this.plantSchedulesDetail.PlantsheetTaskScheduleConjunctions.find(
+					(conjunction) => {
+						const initialDate = new Date(conjunction.initialDate);
+						return (
+							initialDate.toDateString() === currentDate.toDateString()
+						);
+					}
+				);
+
+			if (matchingTask) {
+				return matchingTask.PlantsheetTaskConjunction.Ta;
+			} else {
+				return "No Task";
+			}
+		},
+
 		cropAreaReady() {
 			return this.plantSchedulesDetail.CropArea.map.length > 0;
 		},
@@ -228,6 +267,7 @@ export default {
 </script>
 
 <template>
+	<!-- <pre>{{ plantSchedulesDetail }}</pre> -->
 	<section class="w-full">
 		<div class="flex flex-col px-10 bg-slate-100 gap-3">
 			<!-- <div class="w-full flex justify-end items-end pt-4">
@@ -238,14 +278,14 @@ export default {
 					{{ cropDetail.status }} - {{ cropDetail.arcStatus }}
 				</div>
 			</div> -->
-			<div class="flex flex-row h-[50px] mb-3">
+			<div class="flex flex-row h-[50px] mb-3 justify-between ">
 				<div
 					class="w-[40%] flex justify-start items-end text-5xl font-bold"
 				>
 					{{ plantSchedulesDetail?.PlantSheet?.plant?.name
 					}}<span class="text-slate-100">{{ cropAreaReady }}</span>
 				</div>
-				<div class="w-[60%] flex flex-row justify-end items-end gap-3">
+				<div v-if="plantSchedulesDetail.statusPlantSchedule === 'draft'" class="w-[60%] flex flex-row justify-end items-end gap-3">
 					<!-- <div @click="patchLocal" v-if="role !== 'super'">
 						<RedButton :type="'button'" :text="archive" />
 					</div>
@@ -266,13 +306,23 @@ export default {
 						<BlueButton :type="'button'" :text="'VALIDATION'" />
 					</div>
 				</div>
+				<div v-if="plantSchedulesDetail.statusPlantSchedule === 'submitted'" class="flex flex-row items-end gap-2 font-bold text-2xl">
+					<div class="">
+						<h3>STATUS:</h3>
+					</div>
+					<div class="bg-yellow-300 h-[35px] rounded-md border-[3px] border-black items-center flex w-item p-2 justify-center">
+						{{plantSchedulesDetail.statusPlantSchedule}}
+					</div>
+				</div>
 			</div>
 			<section
 				id="upper-block"
 				class="h-[360px] flex flex-col-reverse border-2 border-black bg-slate-300 rounded-md"
 			>
 				<div class="flex flex-row justify-between">
-					<div class="w-[30%] h-[340px] bg-slate-100 border-black border-[3px] rounded-lg p-2 m-2">
+					<div
+						class="w-[30%] h-[340px] bg-slate-100 border-black border-[3px] rounded-lg p-2 m-2"
+					>
 						<div class="flex flex-col">
 							<div
 								class="bg-yellow-500 h-[90px] border-black border-[3px] rounded-lg m-2 p-0 w-[95%] flex flex-col justify-center items-center gap-2"
@@ -324,13 +374,17 @@ export default {
 						</div>
 						<div>
 							<div
-								class="bg-yellow-500 h-[90px] border-black border-[3px] w-[45.5%] rounded-lg m-2  flex flex-col justify-center items-center gap-2"
+								class="bg-yellow-500 h-[90px] border-black border-[3px] w-[45.5%] rounded-lg m-2 flex flex-col justify-center items-center gap-2"
 							>
 								<div
-									class="flex flex-col border-2 bg-yellow-300 border-black  rounded-lg w-[90%]"
+									class="flex flex-col border-2 bg-yellow-300 border-black rounded-lg w-[90%]"
 								>
-									<div class="text-xl text-center font-bold pl-[5px]">Code</div>
-									<div class="text-lg font-semibold text-center w-[100%]">
+									<div class="text-xl text-center font-bold pl-[5px]">
+										Code
+									</div>
+									<div
+										class="text-lg font-semibold text-center w-[100%]"
+									>
 										{{ plantSchedulesDetail?.code }}
 									</div>
 								</div>
@@ -338,22 +392,22 @@ export default {
 						</div>
 					</div>
 					<div
-						class="h-[340px] w-[70%] bg-slate-100 border-black border-[3px] pt-[57px] rounded-lg m-2 flex flex-row  gap-1 p-2"
+						class="h-[340px] w-[70%] bg-slate-100 border-black border-[3px] pt-[57px] rounded-lg m-2 flex flex-row gap-1 p-2"
 					>
-						<div class=" h-[250px] text-center mb-6">
-							<div class=" font-bold">
-								Planting Date
-							</div>
+						<div class="h-[250px] text-center mb-6">
+							<div class="font-bold">Planting Date</div>
 							<div class="">0 Day (HST)</div>
-							<div >
+							<div>
 								<img
 									src="../assets/3rd-process.png"
 									alt="Initial seedling"
 								/>
 							</div>
-							<div >{{ formatDate(plantSchedulesDetail?.plantingDate) }}</div>
+							<div>
+								{{ formatDate(plantSchedulesDetail?.plantingDate) }}
+							</div>
 						</div>
-						<div class=" h-[100px] w-[300px]  mt-[77px]">
+						<div class="h-[100px] w-[300px] mt-[77px]">
 							<div class="w-[100%] text-sm text-center">(HST)</div>
 							<div class="w-full text-center">
 								1 -
@@ -363,7 +417,7 @@ export default {
 								<img src="../assets/arrow.png" alt="arrow" />
 							</div>
 						</div>
-						<div class=" h-[250px] text-center mb-6">
+						<div class="h-[250px] text-center mb-6">
 							<div class="w-[100%] font-bold">Harvest Date</div>
 							<div class="  ">
 								{{ plantSchedulesDetail?.PlantSheet?.harvestAge }}th Day
@@ -375,9 +429,11 @@ export default {
 									alt="Initial seedling"
 								/>
 							</div>
-							<div >{{ formatDate(plantSchedulesDetail?.harvestDate) }}</div>
+							<div>
+								{{ formatDate(plantSchedulesDetail?.harvestDate) }}
+							</div>
 						</div>
-						<div class=" h-[100px] w-[300px] mt-[57px]">
+						<div class="h-[100px] w-[300px] mt-[57px]">
 							<div class="w-[100%] text-sm text-center font-bold">
 								Harvest Time
 							</div>
@@ -389,7 +445,7 @@ export default {
 								<img src="../assets/arrow.png" alt="arrow" />
 							</div>
 						</div>
-						<div class=" h-[250px] text-center mb-6">
+						<div class="h-[250px] text-center mb-6">
 							<div class="w-[100%] font-bold">Unload Date</div>
 							<div class="  ">
 								{{ plantSchedulesDetail?.PlantSheet?.cropAge }}th Day
@@ -401,30 +457,68 @@ export default {
 									alt="Initial seedling"
 								/>
 							</div>
-							<div >{{ formatDate(plantSchedulesDetail?.unloadDate) }}</div>
-							
+							<div>
+								{{ formatDate(plantSchedulesDetail?.unloadDate) }}
+							</div>
 						</div>
 					</div>
 				</div>
 			</section>
-			<section class="h-[400px] flex flex-col border-2  border-black bg-slate-300 rounded-md">
-				<div class="flex flex-row w-full mb-2 h-full justify-center items-center">
-					<div
-						id="map-section"
-						class="w-full flex flex-col h-full m-[14px]"
-					>
-						<div class="flex justify-center h-[20%] w-full items-center">
+			<section
+				class="h-[400px] flex flex-col border-2 border-black bg-slate-300 rounded-md"
+			>
+				<div class="flex flex-row w-full h-full">
+					<div class="w-[20%] h-full">
+						<div class="h-[20%] flex justify-center w-full items-center">
+							<h2 class="text-5xl font-semibold">Today Task</h2>
+						</div>
+						<div
+							class="h-[75%] rounded-md bg-slate-50 border-[3px] border-black m-2 flex flex-col gap-2 justify-center items-center"
+						>
+							<div
+								class="bg-yellow-500 h-[90px] w-[60%] border-black border-[3px] rounded-lg flex flex-col justify-center items-center gap-2"
+							>
+								<div
+									class="flex flex-col border-2 justify-center items-center w-[80%] bg-yellow-300 border-black rounded-lg"
+								>
+									<div class="text-xl font-bold">Date</div>
+									<div class="text-lg font-semibold">
+										{{ formatDate(new Date()) }}
+									</div>
+								</div>
+							</div>
+							<div
+								class="bg-yellow-500 h-[90px] w-[60%] border-black border-[3px] rounded-lg flex flex-col justify-center items-center gap-2"
+							>
+								<div
+									class="flex flex-col border-2 justify-center items-center w-[80%] bg-yellow-300 border-black rounded-lg"
+								>
+									<div class="text-xl font-bold">Task</div>
+									<div class="text-lg font-semibold">
+										{{ todayTask }}
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div id="map-section" class="w-[80%] flex flex-col h-full">
+						<div
+							class="flex justify-center h-[20%] border-black w-full items-center"
+						>
 							<h2 class="text-5xl font-semibold">
 								Location of Plant Schedule
 							</h2>
 						</div>
-						<div class="h-[80%] w-full bg-slate-200" id="map"></div>
+						<div
+							class="h-[75%] mt-2 mr-2 w-full bg-slate-200 border-l-[3px] border-t-[3px] rounded border-b-[3px] border-black"
+							id="map"
+						></div>
 					</div>
 				</div>
 			</section>
 			<section
 				id="calendar-section"
-				class="h-[410px] border-2 w-full rounded-md border-black bg-slate-300  flex flex-row"
+				class="h-[410px] border-2 w-full rounded-md border-black bg-slate-300 flex flex-row"
 			>
 				<div class="flex flex-col w-[30%]">
 					<div class="h-[20%] w-full flex justify-center items-center">
@@ -479,26 +573,37 @@ export default {
 							<template #left-sidebar class="">
 								<ul class="p-2">
 									<li class="h-14 w-60">
-										- <span class="text-blue-400">Blue Line </span>
+										-
+										<span class="text-blue-400 font-bold"
+											>Blue Line
+										</span>
 										<p class="w-full pl-3">
 											Seedling Date to Planting Date
 										</p>
 									</li>
 									<li class="h-14 w-60">
-										- <span class="text-red-400">Red Line </span>
+										-
+										<span class="text-red-400 font-bold"
+											>Red Line
+										</span>
 										<p class="w-full pl-3">
 											Planting Date to Harvest Date
 										</p>
 									</li>
 									<li class="h-14 w-60">
 										-
-										<span class="text-yellow-400">Yellow Line </span>
+										<span class="text-yellow-400 font-bold"
+											>Yellow Line
+										</span>
 										<p class="w-full pl-3">
 											Harvest Date to Unload Date
 										</p>
 									</li>
 									<li class="h-14 w-60">
-										- <span class="text-green-400">Green Line </span>
+										-
+										<span class="text-green-400 font-bold"
+											>Green Line
+										</span>
 										<p class="w-full pl-3">Unload Date</p>
 									</li>
 								</ul>
@@ -508,83 +613,138 @@ export default {
 				</div>
 			</section>
 			<div
-				class="flex flex-col  relative bg-slate-300 h-[300px] mb-5 p-2 border-2 border-black rounded overflow-auto"
+				class="flex flex-col relative bg-slate-300 h-[300px] mb-5 p-2 border-2 border-black rounded overflow-auto"
 			>
-				<div class="flex flex-row w-full gap-2 sticky top-0">
+				<div class="flex flex-row w-full gap-2 bg-slate-300">
 					<button
 						@click.prevent="buttonSelector('pesticides')"
 						type="button"
-						:class="{'text-red-100': activeTab === 'pesticides', 'bg-[#EE6363]': activeTab === 'pesticides'}"
-						class="border bg-slate-300 active:bg-red-300 hover:bg-red-400  border-black p-1 w-[7%] text-center rounded-md "
+						:class="{
+							'bg-red-500': activeTab === 'pesticides',
+							'text-red-100': activeTab === 'pesticides',
+						}"
+						class="border active:bg-red-300 hover:bg-red-400 border-black p-1 w-[7%] text-center rounded-md"
 					>
 						Pesticides
 					</button>
 					<button
 						@click.prevent="buttonSelector('fertilizers')"
 						type="button"
-						:class="{'text-red-100': activeTab === 'fertilizers', 'bg-[#EE6363]': activeTab === 'fertilizers'}"
-						class="border bg-slate-300 border-black p-1 w-[7%] text-center rounded-md active:bg-red-300 hover:bg-red-400 "
+						:class="{
+							'bg-red-500': activeTab === 'fertilizers',
+							'text-red-100': activeTab === 'fertilizers',
+						}"
+						class="border border-black p-1 w-[7%] text-center rounded-md active:bg-red-300 hover:bg-red-400"
 					>
 						Fertilizers
 					</button>
 					<button
 						@click.prevent="buttonSelector('materials')"
 						type="button"
-						:class="{'text-red-100': activeTab === 'materials', 'bg-[#EE6363]': activeTab === 'materials'}"
-						class="border bg-slate-300 border-black p-1 w-[7%] text-center rounded-md active:bg-red-300 hover:bg-red-400 "
+						:class="{
+							'bg-red-500': activeTab === 'materials',
+							'text-red-100': activeTab === 'materials',
+						}"
+						class="border border-black p-1 w-[7%] text-center rounded-md active:bg-red-300 hover:bg-red-400"
 					>
 						Materials
 					</button>
 					<button
 						@click.prevent="buttonSelector('realization')"
 						type="button"
-						:class="{'text-red-100': activeTab === 'realization', 'bg-[#EE6363]': activeTab === 'realization'}"
-						class="border bg-slate-300 border-black p-1 w-[7%] text-center rounded-md active:bg-red-300 hover:bg-red-400 "
+						:class="{
+							'bg-red-500': activeTab === 'realization',
+							'text-red-100': activeTab === 'realization',
+						}"
+						class="border border-black p-1 w-[7%] text-center rounded-md active:bg-red-300 hover:bg-red-400"
 					>
 						Realization
 					</button>
-					<!-- <button
-						@click.prevent="buttonSelector('estimation')"
+					<button
+						@click.prevent="buttonSelector('tasks')"
 						type="button"
-						class="border bg-slate-300 border-black p-1 w-[7%] text-center rounded-md active:bg-red-300 hover:bg-red-400 focus:bg-red-500 focus:text-red-100"
+						:class="{
+							'bg-red-500': activeTab === 'tasks',
+							'text-red-100': activeTab === 'tasks',
+						}"
+						class="border border-black p-1 w-[7%] text-center rounded-md active:bg-red-300 hover:bg-red-400"
 					>
-						Estimation
-					</button> -->
+						Tasks
+					</button>
 				</div>
 				<div class="pt-2">
-					<!-- <div
-						v-if="activeTab === 'estimation'"
-						class="bg-slate-400 bg-opacity-50 w-[100%] h-[220px] rounded-md mt-2 flex flex-row justify-center items-center gap-3"
-					>
-						<div
-							class="bg-yellow-300 h-[120px] border-black border-[3px] w-[18%] rounded-lg flex flex-col justify-center items-center gap-2"
-						>
-							<div
-								class="flex flex-col border-2 bg-yellow-500 border-black px-3 rounded-lg w-[85%]"
+					<div v-if="activeTab === 'tasks'" class="w-[90%] flex flex-col">
+						<thead class="sticky top-0">
+							<tr class="flex flex-row w-full">
+								<th class="w-[4.661%] bg-slate-400 border-black border">
+									No
+								</th>
+								<th class="w-[20.89%] bg-slate-400 border border-black">
+									Date
+								</th>
+								<th class="w-[15%] bg-slate-400 border border-black">
+									HST
+								</th>
+								<th class="w-[20%] border bg-slate-400 border-black">
+									Task
+								</th>
+								<th
+									class="w-[20%] border border-r-2 bg-slate-400 border-black"
+								>
+									Time
+								</th>
+								<th
+									class="w-[20%] border border-r-2 bg-slate-400 border-black"
+								>
+									Total Employee
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr
+								v-for="(item, index) in plantSchedulesDetail?.PlantSheet
+									?.PlantsheetTaskConjunctions"
+								class=" flex flex-row bg-slate-100"
 							>
-								<div class="text-xl font-bold pl-[5px] text-center">
-									Total Harvest Estimation
-								</div>
-								<div class="text-lg font-semibold text-center">
-									{{ harvestTotalExpectation }} Kg
-								</div>
-							</div>
-						</div>
-						<div
-							class="bg-yellow-300 h-[120px] border-black border-[3px] w-[18%] rounded-lg flex flex-col justify-center items-center gap-2"
-						>
-							<div
-								class="flex flex-col border-2 bg-yellow-500 border-black px-3 rounded-lg w-[85%]"
-							>
-								<div class="text-xl font-bold pl-[5px] text-center">
-									Harvest per Day Estimation
-								</div>
-								<div class="text-lg font-semibold text-center">
-									{{ harvestPerDayExpectation }} Kg
-								</div>
-							</div>
-						</div>
-					</div> -->
+								<td
+									class="w-[4.661%] text-center pl-1 border border-black h-[33px] pt-1"
+								>
+									{{ index + 1 }}
+								</td>
+								<td
+									class="w-[20.89%] pl-1 border border-black text-left h-[33px] pt-1"
+								>
+									{{ formatDate(plantSchedulesDetail.plantingDate, index) }}
+								</td>
+								<td
+									class="border border-black w-[15%] text-center pt-1"
+								>
+									{{ item.description }} {{ item.day }}
+								</td>
+								<td
+									class="border border-black w-[20%] text-center pt-1"
+								>
+									{{ item.Task.name }}
+								</td>
+								<td
+									class="border border-r-2 border-black w-[20%] text-center pt-1"
+								>
+									{{
+										Math.ceil(
+											plantSchedulesDetail.CropArea.area /
+												item.Task.TaskPerMinute
+										)
+									}}
+									minutes
+								</td>
+								<td
+									class="border border-r-2 border-black w-[20%] text-center pt-1"
+								>
+									{{ employeeCalculation(item?.Task?.TaskPerMinute) }}
+								</td>
+							</tr>
+						</tbody>
+					</div>
 					<div
 						v-if="activeTab === 'realization'"
 						class="w-[90%] flex flex-col"
@@ -615,7 +775,9 @@ export default {
 								<th class="w-[20%] border bg-slate-400 border-black">
 									Harvest Weight Estimation
 								</th>
-								<th class="w-[20%] border bg-slate-400 border-black">
+								<th
+									class="w-[20%] border border-r-2 bg-slate-400 border-black"
+								>
 									Harvest Weight Realization
 								</th>
 							</tr>
@@ -631,20 +793,15 @@ export default {
 					</div>
 					<div
 						v-if="activeTab === 'fertilizers'"
-						class="bg-yellow-400 w-[90%] flex flex-col"
+						class="bg-slate-50 w-[90%] flex flex-col"
 					>
 						<thead>
-							<tr class="flex flex-row w-full bg-red-600">
-								<th class="w-[43%] bg-slate-400 border-black border">
-									Name
-								</th>
-								<th class="w-[10%] bg-green-600 border-y border-black">
-									Dose
-								</th>
-								<th class="w-[10%] bg-white border border-black">
-									UOM
-								</th>
-								<th class="w-[37%] border border-black">Description</th>
+							<tr class="flex flex-row w-full bg-slate-400">
+								<th class="w-[23%] border-black border">Name</th>
+								<th class="w-[10%] border-y border-black">Dose</th>
+								<th class="w-[10%] border border-black">UOM</th>
+								<th class="w-[47%] border border-black">Description</th>
+								<th class="w-[10%] border border-black">Type</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -659,23 +816,15 @@ export default {
 					</div>
 					<div
 						v-if="activeTab === 'pesticides'"
-						class="bg-yellow-400 w-[90%] flex flex-col"
+						class="bg-slate-50 w-[90%] flex flex-col"
 					>
 						<thead>
-							<tr class="flex flex-row w-full bg-red-600">
-								<th class="w-[22%] bg-slate-400 border-black border">
-									Name
-								</th>
-								<th class="w-[21%] bg-slate-400 border-black border">
-									Category
-								</th>
-								<th class="w-[10%] bg-green-600 border-y border-black">
-									Dose
-								</th>
-								<th class="w-[10%] bg-white border border-black">
-									UOM
-								</th>
-								<th class="w-[37%] border border-black">Description</th>
+							<tr class="flex flex-row w-full bg-slate-400">
+								<th class="w-[23%] border-black border">Name</th>
+								<th class="w-[10%] border-y border-black">Dose</th>
+								<th class="w-[10%] border border-black">UOM</th>
+								<th class="w-[47%] border border-black">Description</th>
+								<th class="w-[10%] border border-black">Type</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -690,20 +839,15 @@ export default {
 					</div>
 					<div
 						v-if="activeTab === 'materials'"
-						class="bg-yellow-400 w-[90%] flex flex-col"
+						class="bg-slate-50 w-[90%] flex flex-col"
 					>
 						<thead>
-							<tr class="flex flex-row w-full bg-red-600">
-								<th class="w-[43%] bg-slate-400 border-black border">
-									Name
-								</th>
-								<th class="w-[10%] bg-green-600 border-y border-black">
-									Dose
-								</th>
-								<th class="w-[10%] bg-white border border-black">
-									UOM
-								</th>
-								<th class="w-[37%] border border-black">Description</th>
+							<tr class="flex flex-row w-full bg-slate-400">
+								<th class="w-[23%] border-black border">Name</th>
+								<th class="w-[10%] border-y border-black">Dose</th>
+								<th class="w-[10%] border border-black">UOM</th>
+								<th class="w-[47%] border border-black">Description</th>
+								<th class="w-[10%] border border-black">Type</th>
 							</tr>
 						</thead>
 						<tbody>

@@ -89,7 +89,7 @@ export default {
 	<!-- <pre>{{ itemsData.category }}</pre> -->
 	<div class="bg-blue-100 p-4 w-full flex flex-col">
 		<div class="z-40 fixed bottom-7 opacity-40 hover:opacity-90 right-8 flex">
-			<RouterLink to="/itemform"
+			<RouterLink to="/item/form"
 				><BlueButton :type="'button'" :text="'NEW ITEM'"
 			/></RouterLink>
 		</div>
@@ -146,7 +146,7 @@ export default {
 			>
 				<tr
 					class="whitespace-nowrap hover:bg-slate-200"
-					@click.prevent="this.$router.push(`/itemdetail/${item.id}`)"
+					@click.prevent="this.$router.push(`/item/detail/${item.id}`)"
 					v-for="(item, index) in items"
 					:key="item.id"
 				>

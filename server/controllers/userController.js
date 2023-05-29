@@ -21,13 +21,13 @@ class UserController{
 			if (!comparePassword) {
 				throw { name: "InvalidEmailorPassword" };
 			}
-
+			const id = user.id
 			const payload = {
 				id: user.id,
 			};
 			const role = user.role;
 			const access_token = createToken(payload);
-			res.status(200).json({ access_token, email, role });
+			res.status(200).json({ access_token, email, role, id });
 		} catch (err) {
 			console.log(err);
 			next(err);

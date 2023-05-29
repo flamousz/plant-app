@@ -21,7 +21,8 @@ export default {
 				PlantsheetId: 0,
 				CropAreaId: 0,
 				totalPopulation: null,
-				seedNursery: null
+				seedNursery: null,
+				userId: localStorage.getItem('userId')
 			},
 			isDateDisabled: {
 				seedlingDate: false,
@@ -102,7 +103,7 @@ export default {
 				return null
 			}
 			
-			return this.cropData.seedNursery = this.cropData.totalPopulation + (this.cropData.totalPopulation*this.cropDetail.fallacyNursery) 
+			return this.cropData.seedNursery = Math.ceil(this.cropData.totalPopulation + (this.cropData.totalPopulation*(0.01*this.cropDetail.fallacyNursery)) )
 		},
 		populationCalculation(){
 			if (!this.cropDetail.plantPerMetre) {
@@ -320,7 +321,13 @@ export default {
 						<div class="flex justify-start items-center w-[13.5%]">
 							Population :
 						</div>
-						<p>{{ populationCalculation }} <span class="text-slate-100" >{{ seedNurseryCalculation }}</span> </p>
+						<p>{{ populationCalculation }} crop </p>
+					</div>
+					<div class="flex flex-row gap-2">
+						<div class="flex justify-start items-center w-[13.5%]">
+							Seed Nursery :
+						</div>
+						<p>{{seedNurseryCalculation}} seed</p>
 					</div>
 					<div class="flex flex-row gap-2">
 						<div class="flex justify-start items-center w-[13.5%]">

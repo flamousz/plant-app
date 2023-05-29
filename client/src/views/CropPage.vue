@@ -12,7 +12,7 @@ export default {
 			this.query = {
 				filter: value,
 			};
-			this.fetchCrop()
+			this.fetchCrop();
 		},
 	},
 	computed: {
@@ -28,6 +28,7 @@ export default {
 
 <template>
 	<!-- <pre>{{ crop }}</pre> -->
+	<!-- <pre>{{ query }}</pre> -->
 	<div class="z-40 fixed bottom-4 opacity-50 hover:opacity-90 right-6 flex">
 		<RouterLink to="/formplantsheet"
 			><BlueButton :type="'button'" :text="'NEW CROP'"
@@ -37,12 +38,26 @@ export default {
 		<div class="overflow-auto rounded-lg shadow">
 			<div class="flex flex-row justify-end items-end gap-3 pr-1 mb-2">
 				<div class="flex flex-row gap-1">
-					<button  @click.prevent="queryAction('archived')" class="border border-black p-1 w-[100%] text-center rounded-md active:bg-red-300 hover:bg-red-400 focus:bg-red-500 focus:text-red-100 bg-red-100" >
+					<button
+						:class="{
+							'bg-red-500': query.filter === 'archived',
+							'text-red-100': query.filter === 'archived',
+						}"
+						@click.prevent="queryAction('archived')"
+						class="border border-black p-1 w-[100%] text-center rounded-md active:bg-red-300 hover:bg-red-400 focus:bg-red-500 focus:text-red-100 bg-red-100"
+					>
 						Archived
 					</button>
 				</div>
 				<div class="flex flex-row gap-1">
-					<button  @click.prevent="queryAction('avail')" class="border border-black p-1 w-[100%] h-[5%] text-center rounded-md active:bg-red-300 hover:bg-red-400 focus:bg-red-500 focus:text-red-100 bg-red-100">
+					<button
+					:class="{
+							'bg-red-500': query.filter === 'avail',
+							'text-red-100': query.filter === 'avail',
+						}"
+						@click.prevent="queryAction('avail')"
+						class="border border-black p-1 w-[100%] h-[5%] text-center rounded-md active:bg-red-300 hover:bg-red-400 focus:bg-red-500 focus:text-red-100 bg-red-100"
+					>
 						Available
 					</button>
 				</div>

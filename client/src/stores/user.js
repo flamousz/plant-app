@@ -5,7 +5,9 @@ import { baseUrl } from "./crop";
 export const useUserStore = defineStore("user", {
 	state() {
 		return {
-			access_token:  ""
+			access_token:  "",
+			role: '',
+			notification: []
 		};
 	},
 	actions: {
@@ -46,7 +48,16 @@ export const useUserStore = defineStore("user", {
 				localStorage.setItem("access_token", data.access_token);
 				localStorage.setItem('role', data.role)
 				localStorage.setItem('email', data.email)
+				localStorage.setItem('userId', data.id)
 				this.access_token = data.access_token;
+
+				const notificationRequest = await axios({
+					url: `${baseUrl}/notifications`,
+					method: 'GET'
+				})
+				
+				this.notification = notificationRequest.data
+				console.log(this.notification, '<<< ini notif di user store');
 				this.router.push("/plantschedule");
                 Toastify({
                     text: "Welcome to Plantation App",

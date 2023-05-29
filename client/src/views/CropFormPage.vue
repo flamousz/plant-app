@@ -59,7 +59,7 @@ export default {
 </script>
 
 <template>
-	<!-- <pre>{{ editFlag }}</pre> -->
+	<pre>{{ cropData }}</pre>
 	<section class="w-full">
 		<form @submit.prevent="handlePutorPost">
 			<div class="flex flex-col px-10">
@@ -96,7 +96,7 @@ export default {
 								class="bg-red-500 rounded flex hover:bg-red-900 justify-center items-center font-semibold text-[11px] text-slate-100 lg:h-[30px] w-[90px]"
 								@click.prevent="
 									this.$router.push(
-										`/cropareadetail/${cropAreaDetail.id}`
+										`/croparea/detail/${cropAreaDetail.id}`
 									)
 								"
 								v-if="editFlag === true"

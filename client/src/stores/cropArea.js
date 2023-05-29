@@ -43,7 +43,7 @@ export const useCropAreaStore = defineStore('cropArea', {
 					data: val,
 				});
 				this.editFlag = false;
-				this.router.push(`/cropareadetail/${id}`);
+				this.router.push(`/croparea/detail/${id}`);
 				Toastify({
 					text: data,
 					style: {
@@ -121,7 +121,7 @@ export const useCropAreaStore = defineStore('cropArea', {
 				this.editFlag = true;
 				console.log(data, "ini data dari store");
 				this.cropAreaDetail = data;
-				this.router.push(`/cropareaform`);
+				this.router.push(`/croparea/form`);
 				// console.log(this.cropDetail, "< crop detail");
 			} catch (err) {
 				console.log(err);

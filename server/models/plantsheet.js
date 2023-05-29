@@ -31,6 +31,7 @@ module.exports = (sequelize, DataTypes) => {
 			PlantSheet.hasMany(models.fertilizerConjunction, {
 				foreignKey: 'plantsheetid'
 			})
+			PlantSheet.hasMany(models.PlantsheetTaskConjunction)
 		}
 	}
 	PlantSheet.init(

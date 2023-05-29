@@ -107,6 +107,7 @@ export default {
 </script>
 
 <template>
+	<!-- <pre>{{ seednurseryDetail }}</pre> -->
 	<section class="w-full">
 		<div class="flex flex-col px-10 bg-slate-100 gap-3">
 			<!-- <div class="w-full flex justify-end items-end pt-4">
@@ -159,8 +160,10 @@ export default {
 										<div class="text-xl font-bold">Prepared Seed</div>
 										<div class="text-lg font-semibold">
 											{{
-												seednurseryDetail?.PlantSchedule?.seedNursery
-											}} unit
+												seednurseryDetail?.PlantSchedule
+													?.seedNursery
+											}}
+											seed
 										</div>
 									</div>
 								</div>
@@ -172,7 +175,11 @@ export default {
 									>
 										<div class="text-xl font-bold">Population</div>
 										<div class="text-lg font-semibold">
-											{{ seednurseryDetail?.PlantSchedule?.totalPopulation }} 
+											{{
+												seednurseryDetail?.PlantSchedule
+													?.totalPopulation
+											}}
+											crop
 										</div>
 									</div>
 								</div>
@@ -191,7 +198,12 @@ export default {
 									<div
 										class="text-lg font-semibold text-center w-[100%]"
 									>
-										{{ formatDate(seednurseryDetail?.PlantSchedule?.seedlingDate) }}
+										{{
+											formatDate(
+												seednurseryDetail?.PlantSchedule
+													?.seedlingDate
+											)
+										}}
 									</div>
 								</div>
 							</div>
@@ -207,7 +219,12 @@ export default {
 									<div
 										class="text-lg font-semibold text-center w-[100%]"
 									>
-										{{ formatDate(seednurseryDetail?.PlantSchedule?.plantingDate) }}
+										{{
+											formatDate(
+												seednurseryDetail?.PlantSchedule
+													?.plantingDate
+											)
+										}}
 									</div>
 								</div>
 							</div>
@@ -219,7 +236,7 @@ export default {
 					>
 						<div class="flex flex-col w-[33%] text-center mb-6">
 							<div class="font-bold">First Day Nursery</div>
-							<div class="">0 Day (HSS)</div>
+							<div class="">1 Day (HSS)</div>
 							<div class="flex justify-center">
 								<img
 									class="w-[80%]"
@@ -239,7 +256,11 @@ export default {
 							<div class="text-sm text-center">(HSS)</div>
 							<div class="text-center">
 								1 -
-								{{ seednurseryDetail?.PlantSchedule?.PlantSheet?.seedlingAge}} Day
+								{{
+									seednurseryDetail?.PlantSchedule?.PlantSheet
+										?.seedlingAge
+								}}
+								Day
 							</div>
 							<div class="flex justify-center">
 								<img
@@ -252,8 +273,10 @@ export default {
 						<div class="text-center mb-6 w-[33%]">
 							<div class="font-bold">Last Day Nursery</div>
 							<div class="  ">
-								{{ seednurseryDetail?.PlantSchedule?.PlantSheet?.seedlingAge }}th Day
-								(HSS)
+								{{
+									seednurseryDetail?.PlantSchedule?.PlantSheet
+										?.seedlingAge
+								}}th Day (HSS)
 							</div>
 							<div class="flex justify-center">
 								<img
@@ -263,7 +286,11 @@ export default {
 								/>
 							</div>
 							<div>
-								{{ formatDateMinusOneday(seednurseryDetail?.PlantSchedule?.plantingDate) }}
+								{{
+									formatDateMinusOneday(
+										seednurseryDetail?.PlantSchedule?.plantingDate
+									)
+								}}
 							</div>
 						</div>
 					</section>
@@ -272,15 +299,18 @@ export default {
 			<div
 				class="flex flex-col relative bg-slate-300 h-[300px] mb-5 p-2 border-2 border-black rounded overflow-auto"
 			>
-				<section id="breadcrumbs-list" class="flex flex-row w-full gap-2 sticky top-0">
+				<section
+					id="breadcrumbs-list"
+					class="flex flex-row w-full gap-2 sticky top-0"
+				>
 					<button
 						@click.prevent="buttonSelector('pesticides')"
 						type="button"
 						:class="{
 							'text-red-100': activeTab === 'pesticides',
-							'bg-red-400': activeTab === 'pesticides',
+							'bg-red-500': activeTab === 'pesticides',
 						}"
-						class="border bg-slate-300 active:bg-red-300 hover:bg-red-400 border-black p-1 w-[7%] text-center rounded-md"
+						class="border active:bg-red-300 hover:bg-red-400 border-black p-1 w-[7%] text-center rounded-md"
 					>
 						Pesticides
 					</button>
@@ -289,9 +319,9 @@ export default {
 						type="button"
 						:class="{
 							'text-red-100': activeTab === 'fertilizers',
-							'bg-red-400': activeTab === 'fertilizers',
+							'bg-red-500': activeTab === 'fertilizers',
 						}"
-						class="border bg-slate-300 border-black p-1 w-[7%] text-center rounded-md active:bg-red-300 hover:bg-red-400"
+						class="border border-black p-1 w-[7%] text-center rounded-md active:bg-red-300 hover:bg-red-400"
 					>
 						Fertilizers
 					</button>
@@ -300,9 +330,9 @@ export default {
 						type="button"
 						:class="{
 							'text-red-50': activeTab === 'materials',
-							'bg-red-400': activeTab === 'materials',
+							'bg-red-500': activeTab === 'materials',
 						}"
-						class="border bg-slate-300 border-black p-1 w-[7%] text-center rounded-md active:bg-red-300 hover:bg-red-400"
+						class="border border-black p-1 w-[7%] text-center rounded-md active:bg-red-300 hover:bg-red-400"
 					>
 						Materials
 					</button>
@@ -310,52 +340,44 @@ export default {
 				<section id="table-conjunction" class="pt-2">
 					<div
 						v-if="activeTab === 'fertilizers'"
-						class=" w-[90%] flex flex-col"
+						class="w-[90%] flex flex-col"
 					>
 						<thead>
 							<tr class="flex flex-row w-full bg-slate-400">
-								<th class="w-[43%] bg-slate-400 border-black border">
-									Name
-								</th>
-								<th class="w-[10%] bg-slate-400 border-y border-black">
-									Dose
-								</th>
-								<th class="w-[10%] bg-slate-400 border border-black">
-									UOM
-								</th>
-								<th class="w-[37%] border border-black">Description</th>
+								<th class="w-[23%] border-black border">Name</th>
+								<th class="w-[10%] border-y border-black">Dose</th>
+								<th class="w-[10%] border border-black">UOM</th>
+								<th class="w-[47%] border border-black">Description</th>
+								<th class="w-[10%] border border-black">Type</th>
 							</tr>
 						</thead>
 						<tbody>
 							<TableRow4Colum
-								v-for="(fertilizer, index) in seednurseryDetail?.PlantSchedule?.PlantSheet?.fertilizerConjunctions"
-								:key="fertilizer.id"
-								:fertilizer="fertilizer"
+								v-for="(fertilizersNursery, index) in seednurseryDetail
+									?.PlantSchedule?.PlantSheet?.fertilizerConjunctions"
+								:key="fertilizersNursery.id"
+								:fertilizersNursery="fertilizersNursery"
 								:index="index"
 							/>
 						</tbody>
 					</div>
 					<div
 						v-if="activeTab === 'pesticides'"
-						class=" w-[90%] flex flex-col"
+						class="w-[90%] flex flex-col"
 					>
 						<thead>
-							<tr class="flex flex-row w-full ">
-								<th class="w-[22%] bg-slate-400 border-black border">
-									Name
-								</th>
-								<th class="w-[10%] bg-slate-400 border-y border-black">
-									Dose
-								</th>
-								<th class="w-[10%] bg-slate-400 border border-black">
-									UOM
-								</th>
-								<th class="w-[37%] border border-black bg-slate-400">Description</th>
+							<tr class="flex flex-row w-full bg-slate-400">
+								<th class="w-[23%] border-black border">Name</th>
+								<th class="w-[10%] border-y border-black">Dose</th>
+								<th class="w-[10%] border border-black">UOM</th>
+								<th class="w-[47%] border border-black">Description</th>
+								<th class="w-[10%] border border-black">Type</th>
 							</tr>
 						</thead>
 						<tbody>
 							<TableRow4Colum
-								v-for="(pesticideNursery, index) in seednurseryDetail?.PlantSchedule?.PlantSheet?.PesticideConjunctions"
+								v-for="(pesticideNursery, index) in seednurseryDetail
+									?.PlantSchedule?.PlantSheet?.PesticideConjunctions"
 								:key="pesticideNursery.id"
 								:pesticideNursery="pesticideNursery"
 								:index="index"
@@ -364,25 +386,21 @@ export default {
 					</div>
 					<div
 						v-if="activeTab === 'materials'"
-						class=" w-[90%] flex flex-col"
+						class="w-[90%] flex flex-col"
 					>
 						<thead>
 							<tr class="flex flex-row w-full bg-slate-400">
-								<th class="w-[43%] bg-slate-400 border-black border">
-									Name
-								</th>
-								<th class="w-[10%] bg-slate-400 border-y border-black">
-									Dose
-								</th>
-								<th class="w-[10%] bg-slate-400 border border-black">
-									UOM
-								</th>
-								<th class="w-[37%] border border-black">Description</th>
+								<th class="w-[23%] border-black border">Name</th>
+								<th class="w-[10%] border-y border-black">Dose</th>
+								<th class="w-[10%] border border-black">UOM</th>
+								<th class="w-[47%] border border-black">Description</th>
+								<th class="w-[10%] border border-black">Type</th>
 							</tr>
 						</thead>
 						<tbody>
 							<TableRow4Colum
-								v-for="(materials, index) in seednurseryDetail?.PlantSchedule?.PlantSheet?.materialConjunctions"
+								v-for="(materials, index) in seednurseryDetail
+									?.PlantSchedule?.PlantSheet?.materialConjunctions"
 								:key="materials.id"
 								:material="materials"
 								:index="index"
