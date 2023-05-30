@@ -110,4 +110,7 @@ export default {
 	<div class="flex justify-center items-center h-[500px]">
 		<div class="h-[500px] w-[1000px] bg-slate-200" id="map"></div>
 	</div>
+	<!-- <div>
+		{{ cropAreaReady }}
+	</div> -->
 </template>

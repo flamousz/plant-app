@@ -4,55 +4,175 @@ import SideBar from "./SideBar.vue";
 import { mapActions, mapState } from "pinia";
 import { useUomStore } from "../stores/uom";
 import { useUserStore } from "../stores/user";
+import { useApprovalStore } from "../stores/approval";
+import CloseButton from "./Buttons/CloseButton.vue";
+import BlueButton from "./Buttons/BlueButton.vue";
+import GreenButton from "./Buttons/GreenButton.vue";
+import RedButton from "./Buttons/RedButton.vue";
+import { usePlantScheduleStore } from "../stores/plantschedule";
+import ChecklistButton from "./Buttons/ChecklistButton.vue";
 
 export default {
 	name: "Navbar",
 	components: {
 		SideBar,
 		RouterLink,
+		CloseButton,
+		GreenButton,
+		RedButton,
+		BlueButton,
+		ChecklistButton,
 	},
 	data() {
 		return {
+			approvalLocal: [],
+			isApprovalSection: false,
 			isMobileMenuOpen: false,
+			isPatchHasBeenClicked: false,
 			email: localStorage.getItem("email"),
 			role: localStorage.getItem("role"),
+			isApproveNotif: false,
 			isNotif: false,
-			buttonNotif:false
+			buttonNotif: false,
+			navbarData: {
+				approvalSequence: localStorage.getItem("approvalSequence") - 1,
+			},
 		};
 	},
+	watch: {
+		approval: {
+			immidiate: true,
+			handler(newApproval) {
+				this.approvalLocal = [];
+				newApproval.forEach((el) => {
+					el.approvalStatusLocal = false;
+					this.approvalLocal.push(el);
+				});
+			},
+		},
+	},
 	methods: {
+		...mapActions(usePlantScheduleStore, ["patchStatusPlantSchedules"]),
 		...mapActions(useUomStore, ["handleSidebarFlag"]),
-		...mapActions(useUserStore, ["handleLogout"]),
+		...mapActions(useApprovalStore, ["fetchApprovals"]),
+		...mapActions(useUserStore, [
+			"handleLogout",
+			"fetchNotification",
+			"patchNotification",
+		]),
+		patchStatusPlantSchedulesLocal(val, indexNotificationStatus, notifId) {
+			console.log("masuk ke patchStatusPlantSchedulesLocal component");
+			const data = {
+				id: val,
+			};
+			const notifData = {
+				id: notifId,
+				isRead: false,
+			};
+			console.log(
+				this.approvalLocal[indexNotificationStatus].Notification.isRead,
+				"<<< this.approvalLocal[indexNotificationStatus].Notification.isRead sebelum"
+			);
+			this.approvalLocal[
+				indexNotificationStatus
+			].Notification.approvalStatusLocal = true;
+			console.log(
+				this.approvalLocal[indexNotificationStatus].Notification.isRead,
+				"<<< this.approvalLocal[indexNotificationStatus].Notification.isRead sesudah"
+			);
+
+			this.patchStatusPlantSchedules(data);
+			this.patchNotification(notifData);
+			// this.fetchApprovals(this.navbarData)
+		},
 		subString(val) {
 			const startIndex = 0; // Start index of the desired substring
 			const endIndex = 15; // End index of the desired substring
 
-			return val.map((str) =>
-				str.substring(startIndex, endIndex)
-			);
+			return val.map((str) => str.substring(startIndex, endIndex));
 		},
-		isNotifChanger(){
-			this.isNotif = !this.isNotif
-		},
-		routerLocal(id){
-			this.isNotifChanger()
-			this.$router.push(`/plantschedule/${id}`)
+		/*
 
-		}
+		buat halaman khusus untuk approval yg terdiri dari list notifikasi plantshedule yg harus di approvve
+		ketika user klik button approve maka akan mengupdate approvalSequence from Approvals dan statusPlantSchedule di PlantSchedules
+		input:
+			- findAll from Approvals where approvalSequence === User.approvalLevel 
+		ouput:
+			- id dari selected approval
+		
+		approval table: 
+			- nama plant
+			- code plant schedule
+			- status plant schedule
+			- action
+
+		*/
+		isApproveNotifChanger() {
+			this.isApproveNotif = !this.isApproveNotif;
+			this.isNotifChanger();
+			this.fetchApprovals(this.navbarData);
+		},
+		isNotifChanger() {
+			this.isNotif = !this.isNotif;
+		},
+		isApprovalSectionChanger() {
+			this.isApprovalSection = !this.isApprovalSection;
+		},
+		routerLocal(id) {
+			this.$router.push(`/plantschedule/${id}`);
+		},
+		isReadNOTIFinApproval(notifId) {
+			console.log("masuk ke isReadNotifinApproval di method");
+			this.isApprovalSectionChanger();
+			this.isNotifChanger();
+			const notifData = {
+				id: notifId,
+				isRead: true,
+			};
+			this.patchNotification(notifData);
+			this.fetchApprovals(this.navbarData);
+		},
 	},
 	computed: {
+		...mapState(useApprovalStore, ["approval"]),
 		...mapState(useUserStore, ["notification"]),
 		notificationIsNotRead() {
 			// Check if any notification has isRead set to false
-			return this.notification.some((notification) => !notification.isRead);
+			if (
+				this.approval.some(
+					(notification) => !notification.Notification.isRead
+				)
+			) {
+				this.isApproveNotif = true;
+			} else {
+				this.isApproveNotif = false;
+			}
 		},
 		notificationContent() {
-			const content = this.notification.map((el) => {
-				return [el.description, el.PlantScheduleId]
+			const content = this.approval.map((el) => {
+				return [
+					el.Notification.description,
+					el.Notification.PlantSchedule.id,
+					el.NotificationId,
+					el.Notification.isRead,
+					false,
+				];
 			});
 
 			return content;
 		},
+	},
+	created() {
+		this.fetchNotification();
+		this.fetchApprovals(this.navbarData);
+		// if (localStorage.getItem('approvalSequence')) {
+		// }
+		// console.log(this.notificationContent);
+		// approvalChangerLocal(){
+		// 	this.approval.forEach(el => {
+		// 			this.approvalLocal.push(el)
+		// 		})
+		// }
 	},
 	setup() {
 		const router = useRouter();
@@ -62,29 +182,135 @@ export default {
 </script>
 
 <template>
-	<!-- {{ email }} -->
-	<!-- <pre>{{ notificationContent }}</pre> -->
+	<!-- <pre>this isApprovalSection{{ isApprovalSection }}</pre>
+	<pre>notificationContent[index][4]{{ notificationContent }}</pre> -->
+	<!-- <pre>ini isApproveNotif {{ isApproveNotif }}</pre> -->
+	<!-- <pre>ini notification {{ notification }}</pre> -->
+	<!-- <div class="flex flex-row">
+		<pre>approvalLocal {{ approvalLocal }}</pre>
+		<pre>ini approval {{ approval }}</pre>
+		<pre>INI notificationContent{{ notificationContent }}</pre>
+	</div> -->
 	<!-- <pre>ini isNotif is {{ isNotif }}</pre> -->
 	<!-- <pre>ini notificationIsNotRead is {{ notificationIsNotRead }}</pre> -->
-	<!-- <pre>{{ notification }}</pre> -->
 	<SideBar />
 	<nav class="bg-blue-200">
+		<section id="approval-section" v-if="isApprovalSection">
+			<div
+				@click.prevent="isApprovalSection = !isApprovalSection"
+				class="bg-slate-500 h-full w-screen z-10 absolute opacity-60"
+			></div>
+			<div
+				id="approval-table"
+				class="bg-slate-100 rounded w-[600px] flex flex-col h-[400px] absolute z-40 top-[10%] left-1/2 transform -translate-x-1/2"
+			>
+				<div @click.prevent="isApprovalSection = !isApprovalSection">
+					<CloseButton />
+				</div>
+				<div>Approval</div>
+				<div>
+					<table>
+						<thead>
+							<tr>
+								<th>No</th>
+								<th>Name</th>
+								<th>Code</th>
+								<th>Status</th>
+								<th>Action</th>
+							</tr>
+						</thead>
+						<tbody v-for="(item, index) in approval" :key="item.id">
+							<tr>
+								<td>
+									{{ index + 1 }}
+								</td>
+								<td>
+									<button>
+										{{
+											item.Notification.PlantSchedule.PlantSheet
+												.plant.name
+										}}
+									</button>
+								</td>
+								<td>
+									{{ item.Notification.PlantSchedule.code }}
+								</td>
+								<td>
+									<p
+										v-if="
+											!approvalLocal[index].Notification
+												.approvalStatusLocal
+										"
+									>
+										{{
+											item.Notification.PlantSchedule
+												.statusPlantSchedule
+										}}
+									</p>
+									<GreenButton
+										class="cursor-default"
+										v-else
+										:nohover="true"
+										:type="'button'"
+										:text="'Updated'"
+									/>
+								</td>
+								<td>
+									<div
+										v-if="
+											!approvalLocal[index].Notification
+												.approvalStatusLocal
+										"
+										class="flex flex-row gap-1 "
+									>
+										<BlueButton
+											@click.prevent="
+												patchStatusPlantSchedulesLocal(
+													item.id,
+													index,
+													item.NotificationId
+												)
+											"
+											:type="'button'"
+											:text="'Approve'"
+										/>
+										<RedButton type="'button'" :text="'Reject'" />
+									</div>
+<div v-else class="flex items-center justify-center">
+	<ChecklistButton />
+</div>
+									
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</section>
 		<div
 			v-if="isNotif"
-			class="  z-40 absolute top-[43px] right-[155px] h-item w-[180px] p-2 bg-slate-300"
+			class="z-40 absolute top-[43px] right-[45px] h-[250px] w-[200px] p-2 bg-slate-50 rounded-md border-2 border-slate-500"
 		>
-			
+			<h3 class="text-right border-b-2 border-black">Notification</h3>
+			<div class="h-[200px] w-full overflow-auto">
 				<button
-					class="text-sm hover:text-slate-500"
-					v-for="item in notificationContent"
+					class="flex flex-row gap-1 text-sm text-left pl-2 font-medium hover:text-slate-500"
+					v-for="item in approval"
 					:key="item.id"
-					@click.prevent="routerLocal(item[1])"
+					@click="isReadNOTIFinApproval(item.NotificationId)"
 				>
-				• {{ item[0] }}
+					<p class="text-end">•</p>
+					<span
+						:class="{
+							'font-normal hover:text-slate-500 text-slate-600 text-sm':
+								item.Notification.isRead === true,
+						}"
+						>{{ item.Notification.description }}</span
+					>
 				</button>
-			
+			</div>
 		</div>
-		<div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
+		<div class="max-w-[1435px] mx-auto px-2 sm:px-6 lg:px-0">
 			<div class="relative flex items-center justify-between h-16">
 				<div class="absolute inset-y-0 left-0 flex items-center sm:hidden">
 					<button
@@ -140,6 +366,9 @@ export default {
 								>
 									{{ this.$route.name }}
 								</div>
+								<button class="text-blue-200">
+									{{ notificationIsNotRead }}
+								</button>
 								<!-- <router-link
 									to="/crop"
 									class="text-md font-medium text-slate-500 hover:text-slate-700 "
@@ -172,20 +401,20 @@ export default {
 								Log Out
 							</button>
 						</li>
-						<li v-if="notificationIsNotRead">
-							<button @click.prevent="isNotif = !isNotif">
+						<li v-if="!isApproveNotif">
+							<button @click.prevent="isApproveNotifChanger">
 								<img
-								src="../assets/icons8-notification-48.png"
-									alt="bell empty"
+									src="../assets/icons8-notification-48.png"
+									alt="black empty bell"
 									class="w-[30px]"
 								/>
 							</button>
 						</li>
-						<li v-if="!notificationIsNotRead">
-							<button @click.prevent="isNotifChanger">
+						<li v-if="isApproveNotif">
+							<button @click.prevent="isApproveNotifChanger">
 								<img
 									src="../assets/icons8-alarm-48.png"
-									alt="bell empty"
+									alt="red full bell"
 									class="w-[30px]"
 								/>
 							</button>
@@ -210,4 +439,6 @@ export default {
 			</div>
 		</div>
 	</nav>
+	<!-- <router-view :key="$route.params.id" /> -->
+	<!-- <router-view -->
 </template>

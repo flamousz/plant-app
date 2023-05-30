@@ -75,6 +75,10 @@ module.exports = (sequelize, DataTypes) => {
           msg: 'minimal password character is 5'
         }
       }
+    },
+    approvalLevel: {
+      type: DataTypes.INTEGER,
+      defaultValue: 1
     }
   }, {
     sequelize,

@@ -38,6 +38,48 @@ export const useUserStore = defineStore("user", {
                   }).showToast();
 			}
 		},
+		async patchNotification(val){
+			try {
+				console.log('masuk ke patchNotification di store');
+				console.log(val, 'ini val patchNotification di store');
+				await axios({
+					url: `${baseUrl}/notifications`,
+					method: 'PATCH',
+					data: val
+				})
+			} catch (error) {
+				console.log(error);
+				Toastify({
+                    text: `${error.response.data.message}`,
+                    style: {
+                      background: "linear-gradient(to right, #611302, #a62103)",
+                    },
+        
+                    duration: 2000,
+                  }).showToast();
+			}
+		},
+		async fetchNotification(){
+			try {
+				const notificationRequest = await axios({
+					url: `${baseUrl}/notifications`,
+					method: 'GET'
+				})
+				
+				this.notification = notificationRequest.data
+				console.log(this.notification, '<<< ini notif di user store');
+			} catch (error) {
+				console.log(error);
+				Toastify({
+                    text: `${error.response.data.message}`,
+                    style: {
+                      background: "linear-gradient(to right, #611302, #a62103)",
+                    },
+        
+                    duration: 2000,
+                  }).showToast();
+			}
+		},
 		async handleLogin(val) {
 			try {
 				const { data } = await axios({
@@ -49,15 +91,10 @@ export const useUserStore = defineStore("user", {
 				localStorage.setItem('role', data.role)
 				localStorage.setItem('email', data.email)
 				localStorage.setItem('userId', data.id)
+				localStorage.setItem('approvalSequence', data.approvalLevel)
 				this.access_token = data.access_token;
 
-				const notificationRequest = await axios({
-					url: `${baseUrl}/notifications`,
-					method: 'GET'
-				})
 				
-				this.notification = notificationRequest.data
-				console.log(this.notification, '<<< ini notif di user store');
 				this.router.push("/plantschedule");
                 Toastify({
                     text: "Welcome to Plantation App",

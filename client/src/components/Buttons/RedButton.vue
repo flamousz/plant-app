@@ -1,6 +1,4 @@
 <script>
-import { mapActions } from 'pinia';
-import { useCropStore } from '../../stores/crop';
 
 export default {
 	name: "RedButton",
