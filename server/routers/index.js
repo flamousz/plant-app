@@ -19,6 +19,12 @@ const {
 	Employee,
 	TaskConjunction,
 	Task,
+	ApprovalMaster,
+	Approval,
+	sequelize,
+	PlantSchedule,
+	Notification,
+	PlantSchedules,
 } = require("../models/index");
 const { Op } = require("sequelize");
 const notificationRouter = require("./notification");
@@ -26,6 +32,113 @@ const approvalRouter = require("./approval");
 
 router.use("/", userRouter);
 // router.use(authentication)
+router.get("/test/approval", async (req, res, next) => {
+	let transaction;
+
+	try {
+		transaction = await sequelize.transaction();
+		const id = 3; // Approval ID
+		const PlantScheduleRaw = await Approval.findOne(
+			{
+				include: {
+					model: Notification,
+					attributes: ["id"],
+					include: {
+						model: PlantSchedule,
+						attributes: ["id"],
+					},
+				},
+				where: { id },
+				attributes: ["id"],
+			},
+			{ transaction }
+		);
+		const PlantScheduleId = PlantScheduleRaw.Notification.PlantSchedule.id;
+		console.log(PlantScheduleId, "<< PlantScheduleId");
+		console.log(typeof PlantScheduleId, "<< typeof PlantScheduleId");
+		const approval = await Approval.findOne(
+			{
+				attributes: ["approvalSequence"],
+				where: { id }, // ini harus dipastikan lagi supaya id nya beneran untuk Approval table
+			},
+			{ transaction }
+		);
+		const approvalSequence = approval.get("approvalSequence"); //melihat value approvalSequence dari approval table
+		console.log(approvalSequence, "<<< ini approvalSequence dari selected Approval");
+		const dataMax = await ApprovalMaster.max("sequenceLevel", {
+			transaction,
+		}); //mencari nilai terbesar dari sequence from approvalSequenceMaster
+		console.log(dataMax, "<< ini value terbesar sequenceLevel di ApprovalMaster");
+		if (approvalSequence < dataMax) {
+			const updatedSequence = approvalSequence + 1;
+			await Approval.update(
+				{
+					approvalSequence: updatedSequence,
+				},
+				{
+					where: { id },
+				},
+				{ transaction }
+			);
+			let listMasterSequence = await ApprovalMaster.findAll(
+				{
+					attributes: ["sequenceLevel", "pronoun"],
+				},
+				{ transaction }
+			);
+			const listMasterSequenceArray = listMasterSequence.map((item) => [
+				item.dataValues.sequenceLevel,
+				item.dataValues.pronoun,
+			]);
+
+			const matchingItem = listMasterSequenceArray.find(
+				(item) => item[0] === updatedSequence
+			);
+
+			const matchingPronoun = matchingItem
+				? matchingItem[1]
+				: "No matching pronoun found";
+			console.log(matchingPronoun, "<<< matchingPronoun");
+			if (matchingPronoun === "No matching pronoun found") {
+				throw { name: "SequenceValueError" };
+			} else {
+				const selectedPlantSchedule = await PlantSchedule.findByPk(
+					PlantScheduleId,
+					{ transaction }
+				);
+				if (!selectedPlantSchedule) {
+					throw { name: "NotFound" };
+				}
+				await PlantSchedule.update(
+					{
+						statusPlantSchedule: matchingPronoun,
+					},
+					{
+						where: {
+							id: PlantScheduleId,
+						},
+					},
+					{ transaction }
+				);
+
+				res.status(200).json(
+					`Plant Shedule status with code ${selectedPlantSchedule.code} changed to ${matchingPronoun} `
+				);
+			}
+		} else {
+			throw {
+				name: "SequenceValueError",
+			};
+		}
+
+		await transaction.commit();
+	} catch (error) {
+		if (transaction) {
+			await transaction.rollback();
+		}
+		next(error);
+	}
+});
 router.get("/test", async (req, res, next) => {
 	try {
 		const selectedDate = new Date("2023-05-23");
@@ -33,11 +146,12 @@ router.get("/test", async (req, res, next) => {
 		const durationTask = 200;
 		const selectedStartHour = "2023-05-23T18:11:00";
 		const selectedFinishHour = "2023-05-23T19:11:00";
-		let  availTimeFlag = false
-		const workingTimeLog = [["2023-05-23T14:10:00","2023-05-23T15:40:00"],["2023-05-23T15:11:00","2023-05-23T17:40:00"],["2023-05-23T18:11:00","2023-05-23T23:23:00"]]
-
-		// can you make logic to searching available time. i have two input, selectedStartHour for starting hour and selectedFinishHour for finish hour. the two input compare with each index array of workingTimeLog with typeof string that have index[0] for selectedStartHour comparisson and index[1] for selectedFinishHour comparisson if there is no match then availTimeFlag become true
-
+		let availTimeFlag = false;
+		const workingTimeLog = [
+			["2023-05-23T14:10:00", "2023-05-23T15:40:00"],
+			["2023-05-23T15:11:00", "2023-05-23T17:40:00"],
+			["2023-05-23T18:11:00", "2023-05-23T23:23:00"],
+		];
 		const opt = {
 			include: {
 				model: Employee,
@@ -107,8 +221,14 @@ router.get("/test/task", async (req, res, next) => {
 
 		// Retrieve the existing workingTimeLog array from the EmployeeTaskConjunction
 		let existingAvailableTime = employeeTaskConjunction.workingTimeLog || [];
-		console.log(existingAvailableTime, "<< existingAvailableTime sebelum diparse");
-		console.log(typeof existingAvailableTime, "<<typeof existingAvailableTime sebelum diparse");
+		console.log(
+			existingAvailableTime,
+			"<< existingAvailableTime sebelum diparse"
+		);
+		console.log(
+			typeof existingAvailableTime,
+			"<<typeof existingAvailableTime sebelum diparse"
+		);
 
 		// Convert the existingAvailableTime to an array if it's a string
 		if (typeof existingAvailableTime === "string") {
@@ -124,7 +244,8 @@ router.get("/test/task", async (req, res, next) => {
 		console.log(typeof updatedAvailableTime, "<<typeof updatedAvailableTime");
 
 		// Update the EmployeeTaskConjunction entry with the updated workingTimeLog array
-		employeeTaskConjunction.workingTimeLog = JSON.stringify(updatedAvailableTime);
+		employeeTaskConjunction.workingTimeLog =
+			JSON.stringify(updatedAvailableTime);
 
 		await employeeTaskConjunction.save();
 
@@ -134,8 +255,8 @@ router.get("/test/task", async (req, res, next) => {
 		next(error);
 	}
 });
-router.use('/approvals', approvalRouter)
-router.use('/notifications', notificationRouter)
+router.use("/approvals", approvalRouter);
+router.use("/notifications", notificationRouter);
 router.use("/employees", employeeRouter);
 router.use("/cropareas", cropAreRouter);
 router.use("/categories", categoryRouter);

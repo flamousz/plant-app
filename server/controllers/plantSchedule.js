@@ -20,7 +20,8 @@ const {
 	Employee,
 	Notification,
 	EmployeeTaskConjunction,
-	Approval
+	Approval,
+	ApprovalMaster,
 } = require("../models/index");
 
 class PlantScheduleController {
@@ -51,8 +52,124 @@ class PlantScheduleController {
 		}
 	}
 
+	static async patchStatusPlantSchedule(req, res, next) {
+		let transaction;
+
+		try {
+			transaction = await sequelize.transaction();
+			const {id} = req.body; // Approval ID
+			console.log(req.body, '<<<< req.body di patchStatusPlantSchedule');
+			const PlantScheduleRaw = await Approval.findOne(
+				{
+					include: {
+						model: Notification,
+						attributes: ["id"],
+						include: {
+							model: PlantSchedule,
+							attributes: ["id"],
+						},
+					},
+					where: { id },
+					attributes: ["id"],
+				},
+				{ transaction }
+			);
+			const PlantScheduleId = PlantScheduleRaw.Notification.PlantSchedule.id;
+			console.log(PlantScheduleId, "<< PlantScheduleId");
+			console.log(typeof PlantScheduleId, "<< typeof PlantScheduleId");
+			const approval = await Approval.findOne(
+				{
+					attributes: ["approvalSequence"],
+					where: { id }, // ini harus dipastikan lagi supaya id nya beneran untuk Approval table
+				},
+				{ transaction }
+			);
+			const approvalSequence = approval.get("approvalSequence"); //melihat value approvalSequence dari approval table
+			console.log(
+				approvalSequence,
+				"<<< ini approvalSequence dari selected Approval"
+			);
+			const dataMax = await ApprovalMaster.max("sequenceLevel", {
+				transaction,
+			}); //mencari nilai terbesar dari sequence from approvalSequenceMaster
+			console.log(
+				dataMax,
+				"<< ini value terbesar sequenceLevel di ApprovalMaster"
+			);
+			if (approvalSequence < dataMax) {
+				const updatedSequence = approvalSequence + 1;
+				await Approval.update(
+					{
+						approvalSequence: updatedSequence,
+					},
+					{
+						where: { id },
+					},
+					{ transaction }
+				);
+				let listMasterSequence = await ApprovalMaster.findAll(
+					{
+						attributes: ["sequenceLevel", "pronoun"],
+					},
+					{ transaction }
+				);
+				const listMasterSequenceArray = listMasterSequence.map((item) => [
+					item.dataValues.sequenceLevel,
+					item.dataValues.pronoun,
+				]);
+
+				const matchingItem = listMasterSequenceArray.find(
+					(item) => item[0] === updatedSequence
+				);
+
+				const matchingPronoun = matchingItem?matchingItem[1]: "No matching pronoun found";
+				console.log(matchingPronoun, "<<< matchingPronoun");
+				if (matchingPronoun === "No matching pronoun found") {
+					throw { name: "SequenceValueError" };
+				} else {
+					const selectedPlantSchedule = await PlantSchedule.findByPk(
+						PlantScheduleId,
+						{ transaction }
+					);
+					if (!selectedPlantSchedule) {
+						throw { name: "NotFound" };
+					}
+					await PlantSchedule.update(
+						{
+							statusPlantSchedule: matchingPronoun,
+						},
+						{
+							where: {
+								id: PlantScheduleId,
+							},
+						},
+						{ transaction }
+					);
+
+					res.status(200).json(
+						`Plant Shedule status with code ${selectedPlantSchedule.code} changed to ${matchingPronoun} `
+					);
+				}
+			} else {
+				throw {
+					name: "SequenceValueError",
+				};
+			}
+
+			await transaction.commit();
+		} catch (error) {
+			if (transaction) {
+				await transaction.rollback();
+			}
+			next(error);
+		}
+	}
+
 	static async putSchedule(req, res, next) {
 		try {
+			/*
+				
+			*/
 			console.log(req.body, "<<<<<<< ini req.body dari putSchedule");
 			const {
 				seedlingDate,
@@ -64,9 +181,9 @@ class PlantScheduleController {
 				totalPopulation,
 				id,
 				seedNursery,
-				userId
+				userId,
 			} = req.body;
-			const statusPlantSchedule = 'submitted'
+			const statusPlantSchedule = "submitted";
 			const findData = await PlantSchedule.findByPk(id);
 			if (!findData) {
 				throw {
@@ -83,25 +200,26 @@ class PlantScheduleController {
 					CropAreaId,
 					totalPopulation,
 					seedNursery,
-					statusPlantSchedule
+					statusPlantSchedule,
 				},
 				{
 					where: { id },
 					returning: true,
-				}  
+				}
 			);
-			const description = `new approval with code ${findData.code}`
-			const isRead = false
+			const description = `new approval with code ${findData.code}`;
+			const isRead = false;
 			const data = await Notification.create({
 				UserId: userId,
 				PlantScheduleId: findData.id,
 				description,
-				isRead
-			})
+				isRead,
+			});
 
 			await Approval.create({
-				NotificationId: data.id
-			})
+				NotificationId: data.id,
+				approvalSequence: 1,
+			});
 			res.status(200).json(`Schedule has been validated`);
 		} catch (error) {
 			console.log();
@@ -872,8 +990,8 @@ class PlantScheduleController {
 			const max = 9999;
 			const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
 			const code = `nonmush-${randomNumber}`;
-			const statusPlantSchedule = 'draft'
-			const statusNursery = 'draft'
+			const statusPlantSchedule = "draft";
+			const statusNursery = "draft";
 			seedNursery = Math.ceil(seedNursery);
 			console.log(seedNursery, "<<< seedNursery setelah dibulatkan");
 			const data = await PlantSchedule.create({
@@ -886,12 +1004,12 @@ class PlantScheduleController {
 				totalPopulation,
 				code,
 				seedNursery,
-				statusPlantSchedule
+				statusPlantSchedule,
 			});
 
 			await SeedNursery.create({
 				PlantScheduleId: data.id,
-				statusNursery
+				statusNursery,
 			});
 
 			const taskPlantsheetNursery = await PlantsheetTaskConjunction.findAll({
@@ -1015,7 +1133,8 @@ class PlantScheduleController {
 				// Retrieve all employees
 				const employees = await Employee.findAll();
 
-				for (const employee of employees) { // harus dicek lagi disini
+				for (const employee of employees) {
+					// harus dicek lagi disini
 					const existingConjunction =
 						await EmployeeTaskConjunction.findOne({
 							where: {

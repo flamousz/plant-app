@@ -8,6 +8,10 @@ async function errHandler(err, req, res, next) {
 			message = "Unauthenticated";
 			break;
 
+		case "SequenceValueError":
+			status = 500;
+			message = "Sequence from Approve table is larger than Approve Master table"
+			break;
 		case "JsonWebTokenError":
 			status = 401;
 			message = "Invalid token";

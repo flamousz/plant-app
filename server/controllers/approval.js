@@ -3,13 +3,15 @@ const {
 	Notification,
 	PlantSchedule,
 	User,
+	Item,
+	PlantSheet,
 } = require("../models/index");
 
 class ApprovalController {
 	static async getAllApproval(req, res, next) {
 		try {
-            console.log('masuk getAllApproval di server');
-            console.log(req.body, '<<< req body di getAllApproval');
+			console.log("masuk getAllApproval di server");
+			console.log(req.body, "<<< req body di getAllApproval");
 			const { approvalSequence } = req.body;
 			const opt = {
 				include: {
@@ -17,6 +19,15 @@ class ApprovalController {
 					include: [
 						{
 							model: PlantSchedule,
+							include: {
+								model: PlantSheet,
+								include: {
+									model: Item,
+									as: "plant",
+									attributes: ["name", "id"],
+								},
+								attributes: ["id"],
+							},
 							attributes: ["id", "code", "statusPlantSchedule"],
 						},
 						{
@@ -27,9 +38,9 @@ class ApprovalController {
 					attributes: ["id", "description", "isRead"],
 				},
 				where: { approvalSequence },
-                attributes: {
-                    exclude: ['createdAt', 'updatedAt']
-                }
+				attributes: {
+					exclude: ["createdAt", "updatedAt"],
+				},
 			};
 
 			const data = await Approval.findAll(opt);

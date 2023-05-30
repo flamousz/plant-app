@@ -8,5 +8,6 @@ plantScheduleRouter.post('/', PlantScheduleController.postSchedule)
 plantScheduleRouter.put('/', PlantScheduleController.putSchedule)
 plantScheduleRouter.put('/code', PlantScheduleController.putCodeSchedule)
 plantScheduleRouter.get('/:id', PlantScheduleController.getScheduleById)
+plantScheduleRouter.patch('/', PlantScheduleController.patchStatusPlantSchedule)
 
 module.exports = plantScheduleRouter

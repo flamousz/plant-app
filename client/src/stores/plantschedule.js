@@ -41,6 +41,34 @@ export const usePlantScheduleStore = defineStore("plantschedule", {
 			console.log("masuk ke handleFalseEditFlag");
 			this.editFlag = false;
 		},
+		async patchStatusPlantSchedules(val){
+			try {
+				console.log(val, 'ini val di patchStatusPlantSchedules store');
+				const {data} = await axios({
+					url: `${baseUrl}/plantschedule`,
+					method: 'PATCH',
+					data: val
+				})
+				Toastify({
+					text: data,
+					style: {
+						background: "linear-gradient(to right, #58c389, #7dd382)",
+					},
+
+					duration: 2000,
+				}).showToast();
+			} catch (error) {
+				console.log(error);
+				Toastify({
+					text: `${error.response.data.message}`,
+					style: {
+						background: "linear-gradient(to right, #611302, #a62103)",
+					},
+
+					duration: 2000,
+				}).showToast();
+			}
+		},
 		async putPlantSchedules(value) {
 			try {
                 console.log('masuk ke putPlantSchedules');

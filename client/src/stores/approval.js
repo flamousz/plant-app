@@ -13,7 +13,7 @@ export const useApprovalStore = defineStore('approval', {
     actions: {
         async fetchApprovals(val){
             try {
-                console.log(val, 'ini val dan masuk ke fetchApprovals di useApprovalStore');
+                console.log(val, 'ini val dan masuk ke fetchApprovals di USEAPPROVALSTORE');
                 const {data} = await axios({
                     url: `${baseUrl}/approvals`,
                     method: 'POST',
