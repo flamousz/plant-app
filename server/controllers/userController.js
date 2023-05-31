@@ -1,6 +1,6 @@
 const { compareHash } = require("../helpers/bcrypt");
 const { createToken } = require("../helpers/jwt");
-const { User } = require("../models/index");
+const { User, ApprovalMaster } = require("../models/index");
 
 
 class UserController{
@@ -10,10 +10,17 @@ class UserController{
 			if (!email || !password) {
 				throw { name: "EmailorPasswordRequired" };
 			}
-			const user = await User.findOne({
-				where: { email },
-			});
-
+			const opt = {
+				include: {
+					model: ApprovalMaster,
+					attributes: ['sequenceLevel']
+				},
+				where: {email},
+				attributes: {
+					exclude: ['createdAt', 'updatedAt']
+				}
+			}
+			const user = await User.findOne(opt);
 			if (!user) {
 				throw { name: "InvalidEmailorPassword" };
 			}
@@ -27,7 +34,7 @@ class UserController{
 			};
 			const role = user.role;
 			const access_token = createToken(payload);
-			const {approvalLevel} = user
+			const approvalLevel = user.ApprovalMaster.sequenceLevel
 			res.status(200).json({ access_token, email, role, id,  approvalLevel});
 		} catch (err) {
 			console.log(err);

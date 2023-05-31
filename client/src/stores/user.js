@@ -13,7 +13,6 @@ export const useUserStore = defineStore("user", {
 	actions: {
 		async handleLogout(){
 			try {
-				console.log('masuk ke handleLogout useUserStore');
 				localStorage.clear()
 				this.access_token = ''
 				this.role = ''
@@ -40,8 +39,6 @@ export const useUserStore = defineStore("user", {
 		},
 		async patchNotification(val){
 			try {
-				console.log('masuk ke patchNotification di store');
-				console.log(val, 'ini val patchNotification di store');
 				await axios({
 					url: `${baseUrl}/notifications`,
 					method: 'PATCH',
@@ -67,7 +64,6 @@ export const useUserStore = defineStore("user", {
 				})
 				
 				this.notification = notificationRequest.data
-				console.log(this.notification, '<<< ini notif di user store');
 			} catch (error) {
 				console.log(error);
 				Toastify({

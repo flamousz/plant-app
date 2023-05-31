@@ -15,6 +15,9 @@ module.exports = (sequelize, DataTypes) => {
       User.hasMany(models.Notification, {
         foreignKey:'UserId'
       })
+      User.belongsTo(models.ApprovalMaster, {
+        foreignKey: 'ApprovalMasterId'
+      })
     }
   }
   User.init({
@@ -76,9 +79,8 @@ module.exports = (sequelize, DataTypes) => {
         }
       }
     },
-    approvalLevel: {
-      type: DataTypes.INTEGER,
-      defaultValue: 1
+    ApprovalMasterId: {
+      type: DataTypes.INTEGER
     }
   }, {
     sequelize,
