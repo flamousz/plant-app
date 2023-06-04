@@ -15,6 +15,9 @@ module.exports = (sequelize, DataTypes) => {
       User.hasMany(models.Notification, {
         foreignKey:'UserId'
       })
+      User.hasOne(models.ApprovalMaster, {
+        foreignKey: 'UserId'
+      })
     }
   }
   User.init({
@@ -75,10 +78,6 @@ module.exports = (sequelize, DataTypes) => {
           msg: 'minimal password character is 5'
         }
       }
-    },
-    approvalLevel: {
-      type: DataTypes.INTEGER,
-      defaultValue: 1
     }
   }, {
     sequelize,

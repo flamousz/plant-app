@@ -7,13 +7,31 @@ export const useUserStore = defineStore("user", {
 		return {
 			access_token:  "",
 			role: '',
-			notification: []
+			notification: [],
+			users: []
 		};
 	},
 	actions: {
+		async fetchUsers(){
+			try {
+				const {data} = await axios({
+					url: `${baseUrl}`,
+					method: 'GET'
+				})
+				this.users = data
+			} catch (error) {
+				Toastify({
+                    text: `${error.response.data.message}`,
+                    style: {
+                      background: "linear-gradient(to right, #611302, #a62103)",
+                    },
+        
+                    duration: 2000,
+                  }).showToast();
+			}
+		},
 		async handleLogout(){
 			try {
-				console.log('masuk ke handleLogout useUserStore');
 				localStorage.clear()
 				this.access_token = ''
 				this.role = ''
@@ -40,8 +58,6 @@ export const useUserStore = defineStore("user", {
 		},
 		async patchNotification(val){
 			try {
-				console.log('masuk ke patchNotification di store');
-				console.log(val, 'ini val patchNotification di store');
 				await axios({
 					url: `${baseUrl}/notifications`,
 					method: 'PATCH',
@@ -67,7 +83,6 @@ export const useUserStore = defineStore("user", {
 				})
 				
 				this.notification = notificationRequest.data
-				console.log(this.notification, '<<< ini notif di user store');
 			} catch (error) {
 				console.log(error);
 				Toastify({

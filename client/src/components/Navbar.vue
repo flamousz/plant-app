@@ -52,7 +52,10 @@ export default {
 		},
 	},
 	methods: {
-		...mapActions(usePlantScheduleStore, ["patchStatusPlantSchedules"]),
+		...mapActions(usePlantScheduleStore, [
+			"patchStatusPlantSchedules",
+			"fetchPlantSchedulesById",
+		]),
 		...mapActions(useUomStore, ["handleSidebarFlag"]),
 		...mapActions(useApprovalStore, ["fetchApprovals"]),
 		...mapActions(useUserStore, [
@@ -60,11 +63,26 @@ export default {
 			"fetchNotification",
 			"patchNotification",
 		]),
-		patchStatusPlantSchedulesLocal(val, indexNotificationStatus, notifId) {
+		fetchPlantSchedulesByIdLocal(id) {
+			console.log("masuk ke fetchPlantSchedulesByIdLocal");
+			this.isApprovalSectionChanger();
+			this.$router.push(`/plantschedule/${id}`);
+		},
+		patchStatusPlantSchedulesLocal(
+			val,
+			indexNotificationStatus,
+			notifId,
+			statusPlantSchedule
+		) {
 			console.log("masuk ke patchStatusPlantSchedulesLocal component");
 			const data = {
 				id: val,
+				statusFromClient: statusPlantSchedule,
 			};
+			console.log(
+				data,
+				"<< data from patchStatusPlantSchedulesLocal function"
+			);
 			const notifData = {
 				id: notifId,
 				isRead: false,
@@ -202,89 +220,117 @@ export default {
 			></div>
 			<div
 				id="approval-table"
-				class="bg-slate-100 rounded w-[600px] flex flex-col h-[400px] absolute z-40 top-[10%] left-1/2 transform -translate-x-1/2"
+				class="p-1 bg-slate-100 rounded w-[600px] flex flex-col h-[400px] absolute z-40 top-[10%] left-1/2 transform -translate-x-1/2"
 			>
-				<div @click.prevent="isApprovalSection = !isApprovalSection">
+				<div
+					class="flex justify-end"
+					@click.prevent="isApprovalSection = !isApprovalSection"
+				>
 					<CloseButton />
 				</div>
-				<div>Approval</div>
-				<div>
-					<table>
-						<thead>
-							<tr>
-								<th>No</th>
-								<th>Name</th>
-								<th>Code</th>
-								<th>Status</th>
-								<th>Action</th>
-							</tr>
-						</thead>
-						<tbody v-for="(item, index) in approval" :key="item.id">
-							<tr>
-								<td>
-									{{ index + 1 }}
-								</td>
-								<td>
-									<button>
+				<section id="body-approval" class="p-3 flex flex-col gap-1">
+					<div class="text-2xl font-semibold"><h3>Approval</h3></div>
+					<div class=" ">
+						<table class=" w-full  border-2 border-black ">
+							<thead class=" border-2 border-black ">
+								<tr >
+									<th class=" border-2 border-black ">No</th>
+									<th class=" border-2 border-black ">Name</th>
+									<th class=" border-2 border-black "> Code</th>
+									<th class=" border-2 border-black ">Status</th>
+									<th class=" border-2 border-black ">Action</th>
+								</tr>
+							</thead>
+							<tbody  class="h-[10px] " v-for="(item, index) in approval" :key="item.id">
+								<tr class="text-center  text-sm h-[5px] ">
+									<td class="  ">
+										{{ index + 1 }}
+									</td>
+									<td class="cursor-default border-x-2 border-black">
 										{{
 											item.Notification.PlantSchedule.PlantSheet
 												.plant.name
 										}}
-									</button>
-								</td>
-								<td>
-									{{ item.Notification.PlantSchedule.code }}
-								</td>
-								<td>
-									<p
-										v-if="
-											!approvalLocal[index].Notification
-												.approvalStatusLocal
-										"
-									>
-										{{
-											item.Notification.PlantSchedule
-												.statusPlantSchedule
-										}}
-									</p>
-									<GreenButton
-										class="cursor-default"
-										v-else
-										:nohover="true"
-										:type="'button'"
-										:text="'Updated'"
-									/>
-								</td>
-								<td>
-									<div
-										v-if="
-											!approvalLocal[index].Notification
-												.approvalStatusLocal
-										"
-										class="flex flex-row gap-1 "
-									>
-										<BlueButton
+									</td>
+									<td class="  ">
+										<button
+											class="hover:text-blue-600 "
 											@click.prevent="
-												patchStatusPlantSchedulesLocal(
-													item.id,
-													index,
-													item.NotificationId
+												fetchPlantSchedulesByIdLocal(
+													item.Notification.PlantSchedule.id
 												)
 											"
-											:type="'button'"
-											:text="'Approve'"
-										/>
-										<RedButton type="'button'" :text="'Reject'" />
-									</div>
-<div v-else class="flex items-center justify-center">
-	<ChecklistButton />
-</div>
-									
-								</td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
+										>
+											{{ item.Notification.PlantSchedule.code }}
+										</button>
+									</td>
+									<td class=" border-x-2 border-black ">
+										<div class="flex justify-center">
+											<p
+												v-if="
+													!approvalLocal[index].Notification
+														.approvalStatusLocal
+												"
+											>
+												{{
+													item.Notification.PlantSchedule
+														.statusPlantSchedule
+												}}
+											</p>
+											<GreenButton
+												class="cursor-default   "
+												v-else
+												:nohover="true"
+												:type="'button'"
+												:text="'Updated'"
+											/>
+										</div>
+									</td>
+									<td class=" ">
+										<div
+											v-if="
+												!approvalLocal[index].Notification
+													.approvalStatusLocal
+											"
+											class="flex flex-row gap-1 justify-center"
+										>
+											<BlueButton
+												@click.prevent="
+													patchStatusPlantSchedulesLocal(
+														item.id,
+														index,
+														item.NotificationId,
+														'norejected'
+													)
+												"
+												:type="'button'"
+												:text="'Approve'"
+											/>
+											<RedButton
+												@click.prevent="
+													patchStatusPlantSchedulesLocal(
+														item.id,
+														index,
+														item.NotificationId,
+														'rejected'
+													)
+												"
+												type="'button'"
+												:text="'Reject'"
+											/>
+										</div>
+										<div
+											v-else
+											class="flex items-center justify-center"
+										>
+											<ChecklistButton />
+										</div>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</section>
 			</div>
 		</section>
 		<div

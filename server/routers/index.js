@@ -24,7 +24,7 @@ const {
 	sequelize,
 	PlantSchedule,
 	Notification,
-	PlantSchedules,
+	User,
 } = require("../models/index");
 const { Op } = require("sequelize");
 const notificationRouter = require("./notification");
@@ -64,11 +64,17 @@ router.get("/test/approval", async (req, res, next) => {
 			{ transaction }
 		);
 		const approvalSequence = approval.get("approvalSequence"); //melihat value approvalSequence dari approval table
-		console.log(approvalSequence, "<<< ini approvalSequence dari selected Approval");
+		console.log(
+			approvalSequence,
+			"<<< ini approvalSequence dari selected Approval"
+		);
 		const dataMax = await ApprovalMaster.max("sequenceLevel", {
 			transaction,
 		}); //mencari nilai terbesar dari sequence from approvalSequenceMaster
-		console.log(dataMax, "<< ini value terbesar sequenceLevel di ApprovalMaster");
+		console.log(
+			dataMax,
+			"<< ini value terbesar sequenceLevel di ApprovalMaster"
+		);
 		if (approvalSequence < dataMax) {
 			const updatedSequence = approvalSequence + 1;
 			await Approval.update(
@@ -141,72 +147,166 @@ router.get("/test/approval", async (req, res, next) => {
 });
 router.get("/test", async (req, res, next) => {
 	try {
-		const selectedDate = new Date("2023-05-23");
-		const selectedTask = "menyebor";
-		const durationTask = 200;
-		const selectedStartHour = "2023-05-23T18:11:00";
-		const selectedFinishHour = "2023-05-23T19:11:00";
-		let availTimeFlag = false;
-		const workingTimeLog = [
-			["2023-05-23T14:10:00", "2023-05-23T15:40:00"],
-			["2023-05-23T15:11:00", "2023-05-23T17:40:00"],
-			["2023-05-23T18:11:00", "2023-05-23T23:23:00"],
+		const approvalDummy = [
+			{ id: 1, sequenceLevel: 1, pronoun: "submitted", userId: 1 },
+			{ id: 2, sequenceLevel: 2, pronoun: "approval 1", userId: 2 },
+			{ id: 3, sequenceLevel: 3, pronoun: "approval 2", userId: 3 },
+			{ id: 4, sequenceLevel: 4, pronoun: "confirm", userId: 4 },
 		];
 		const opt = {
 			include: {
-				model: Employee,
-				as: "employee",
-				include: {
-					model: TaskConjunction,
-					as: "taskConjunction",
-					include: {
-						model: Task,
-						as: "task",
-						attributes: ["id", "name"],
-					},
-					attributes: ["EmployeeId", "TaskId"],
-				},
-				attributes: ["id", "name"],
+				model: User,
+				attributes: ["id", "email"],
 			},
-			where: {
-				[Op.and]: [
-					{
-						workingDate: selectedDate,
-					},
-					{
-						"$employee.taskConjunction.task.name$": selectedTask,
-					},
-					{
-						offDay: false,
-					},
-					{
-						workMinuteQuota: {
-							[Op.gte]: durationTask,
-						},
-					},
-				],
+			attributes: {
+				exclude: ["createdAt", "updatedAt"],
 			},
-			attributes: [
-				"id",
-				"workingDate",
-				"workMinuteQuota",
-				"offDay",
-				"workingTimeLog",
-			],
-			order: [["workingDate", "ASC"]],
+			order: [["sequenceLevel", "ASC"]],
 		};
-
-		const data = await EmployeeTaskConjunction.findAll(opt);
-		if (!data) {
-			throw {
-				name: "NotFound",
-			};
+		const initialApproval = await ApprovalMaster.findAll(opt);
+		if (!initialApproval) {
+			throw { name: "NotFound" };
 		}
-		res.status(200).json(data);
+
+		// new const with only id
+		const initialIDapproval = initialApproval.map((el) => el.id);
+
+		const approvalNotDeletedPlan = approvalDummy.map(el => el.id)
+
+		// filtering choosen delete id from initial id approval and comparing with approval notdeletedplan
+		const approvalDeletedPlan = initialIDapproval.filter(el => !approvalNotDeletedPlan.includes(el))
+
+		
+		// searching element that not have 'id' key
+		const newApprovalWithoutId = approvalDummy.filter(el => !el.hasOwnProperty('id'))
+
+		// searching element that  have 'id' key
+		const newApprovalWithId = approvalDummy.filter(el => el.hasOwnProperty('id'))
+		if (approvalDeletedPlan.length) {
+			for (const el of approvalDeletedPlan) {
+				await ApprovalMaster.destroy({
+					where: {id:el}
+				})
+			}
+		}
+		if (newApprovalWithId.length) {
+			for (const el of newApprovalWithId) {
+				await ApprovalMaster.update({
+					sequenceLevel: el.sequenceLevel,
+					pronoun: el.pronoun,
+					UserId: el.userId
+				}, {
+					where: {
+						id: el.id
+					}
+				})
+				
+			}
+		}
+		if (newApprovalWithoutId.length) {
+			await ApprovalMaster.bulkCreate(newApprovalWithoutId)
+		}
+		res.status(200).json('approval sequance successfully changed');
 	} catch (error) {
-		console.log(error);
 		next(error);
 	}
+	// try {
+	// 	const id = 66;
+	// 	const opt = {
+	// 		include: {
+	// 			model: Notification,
+	// 			include: {
+	// 				model: Approval,
+	// 				attributes: ["id", "approvalSequence"],
+	// 			},
+	// 			attributes: ["id"],
+	// 		},
+	// 		where: { id },
+	// 		attributes: ["id"],
+	// 	};
+
+	// 	const plantScheduleFinder = await PlantSchedule.findOne(opt);
+	// 	if (plantScheduleFinder.Notifications.length) {
+	// 		console.log(true, '<<<<<< perbandingan cari notif');
+	// 		const sequencePlantSchedule =
+	// 			plantScheduleFinder.Notifications[0].Approvals[0].id;
+	// 		console.log(sequencePlantSchedule, "<<<<<<<<< sequencePlantSchedule");
+	// 		console.log(typeof sequencePlantSchedule, "<<<<<<<<< typeof sequencePlantSchedule");
+	// 	} else {
+	// 		console.log(false, '<<<<<< perbandingan cari notif');
+	// 	}
+	// 	res.status(200).json(plantScheduleFinder)
+	// } catch (error) {
+	// 	next(error)
+	// }
+
+	// try {
+	// 	const selectedDate = new Date("2023-05-23");
+	// 	const selectedTask = "menyebor";
+	// 	const durationTask = 200;
+	// 	const selectedStartHour = "2023-05-23T18:11:00";
+	// 	const selectedFinishHour = "2023-05-23T19:11:00";
+	// 	let availTimeFlag = false;
+	// 	const workingTimeLog = [
+	// 		["2023-05-23T14:10:00", "2023-05-23T15:40:00"],
+	// 		["2023-05-23T15:11:00", "2023-05-23T17:40:00"],
+	// 		["2023-05-23T18:11:00", "2023-05-23T23:23:00"],
+	// 	];
+	// 	const opt = {
+	// 		include: {
+	// 			model: Employee,
+	// 			as: "employee",
+	// 			include: {
+	// 				model: TaskConjunction,
+	// 				as: "taskConjunction",
+	// 				include: {
+	// 					model: Task,
+	// 					as: "task",
+	// 					attributes: ["id", "name"],
+	// 				},
+	// 				attributes: ["EmployeeId", "TaskId"],
+	// 			},
+	// 			attributes: ["id", "name"],
+	// 		},
+	// 		where: {
+	// 			[Op.and]: [
+	// 				{
+	// 					workingDate: selectedDate,
+	// 				},
+	// 				{
+	// 					"$employee.taskConjunction.task.name$": selectedTask,
+	// 				},
+	// 				{
+	// 					offDay: false,
+	// 				},
+	// 				{
+	// 					workMinuteQuota: {
+	// 						[Op.gte]: durationTask,
+	// 					},
+	// 				},
+	// 			],
+	// 		},
+	// 		attributes: [
+	// 			"id",
+	// 			"workingDate",
+	// 			"workMinuteQuota",
+	// 			"offDay",
+	// 			"workingTimeLog",
+	// 		],
+	// 		order: [["workingDate", "ASC"]],
+	// 	};
+
+	// 	const data = await EmployeeTaskConjunction.findAll(opt);
+	// 	if (!data) {
+	// 		throw {
+	// 			name: "NotFound",
+	// 		};
+	// 	}
+	// 	res.status(200).json(data);
+	// } catch (error) {
+	// 	console.log(error);
+	// 	next(error);
+	// }
 });
 router.get("/test/task", async (req, res, next) => {
 	try {
@@ -255,6 +355,19 @@ router.get("/test/task", async (req, res, next) => {
 		next(error);
 	}
 });
+router.get('/test/user', async(req,res,next) => {
+	try {
+		const data = await User.findAll({
+			include: ApprovalMaster,
+			attributes: {
+				exclude: ['createdAt', 'updatedAt']
+			}
+		})
+		res.status(200).json(data)
+	} catch (error) {
+		next(error)
+	}
+})
 router.use("/approvals", approvalRouter);
 router.use("/notifications", notificationRouter);
 router.use("/employees", employeeRouter);

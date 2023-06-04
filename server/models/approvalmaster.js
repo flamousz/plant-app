@@ -11,6 +11,9 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      ApprovalMaster.belongsTo(models.User, {
+        foreignKey: 'UserId'
+      })
     }
   }
   ApprovalMaster.init({
@@ -43,7 +46,8 @@ module.exports = (sequelize, DataTypes) => {
           msg: 'Pronoun cannot be empty'
         }
       }
-    }
+    },
+    UserId: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'ApprovalMaster',

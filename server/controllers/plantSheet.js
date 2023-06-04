@@ -452,7 +452,7 @@ class PlantSheetController {
 				initialPlantsheet.fertilizerConjunctions.map((el) => el.id);
 
 			const pesticidesNotDeletedPlan = PesticideConjunctions.map(
-				(el) => el.id
+				(el) => el.id // hanya menampilkan id
 			);
 			const materialsNotDeletedPlan = materialConjunctions.map(
 				(el) => el.id
