@@ -58,6 +58,22 @@ class UserController{
 			next(err);
 		}
 	}
+	
+	static async getUsers(req, res, next) {
+		try {
+			const opt = {
+				attributes: ['id', 'name', 'email'],
+				order: [['id', 'ASC']]
+			}
+			const data = await User.findAll(opt)
+			if (!data) {
+				throw{name: 'NotFound'}
+			}
+			res.status(200).json(data)
+		} catch (error) {
+			next(error)
+		}
+	}
 }
 
 module.exports= UserController

@@ -7,10 +7,29 @@ export const useUserStore = defineStore("user", {
 		return {
 			access_token:  "",
 			role: '',
-			notification: []
+			notification: [],
+			users: []
 		};
 	},
 	actions: {
+		async fetchUsers(){
+			try {
+				const {data} = await axios({
+					url: `${baseUrl}`,
+					method: 'GET'
+				})
+				this.users = data
+			} catch (error) {
+				Toastify({
+                    text: `${error.response.data.message}`,
+                    style: {
+                      background: "linear-gradient(to right, #611302, #a62103)",
+                    },
+        
+                    duration: 2000,
+                  }).showToast();
+			}
+		},
 		async handleLogout(){
 			try {
 				localStorage.clear()

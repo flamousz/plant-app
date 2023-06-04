@@ -24,7 +24,7 @@ const {
 	sequelize,
 	PlantSchedule,
 	Notification,
-	User
+	User,
 } = require("../models/index");
 const { Op } = require("sequelize");
 const notificationRouter = require("./notification");
@@ -147,22 +147,68 @@ router.get("/test/approval", async (req, res, next) => {
 });
 router.get("/test", async (req, res, next) => {
 	try {
-		const id = 4
-
+		const approvalDummy = [
+			{ id: 1, sequenceLevel: 1, pronoun: "submitted", userId: 1 },
+			{ id: 2, sequenceLevel: 2, pronoun: "approval 1", userId: 2 },
+			{ id: 3, sequenceLevel: 3, pronoun: "approval 2", userId: 3 },
+			{ id: 4, sequenceLevel: 4, pronoun: "confirm", userId: 4 },
+		];
 		const opt = {
 			include: {
-				model: ApprovalMaster,
-				attributes: ['sequenceLevel']
+				model: User,
+				attributes: ["id", "email"],
 			},
-			where: {id},
-			attributes: ['id', 'email']
+			attributes: {
+				exclude: ["createdAt", "updatedAt"],
+			},
+			order: [["sequenceLevel", "ASC"]],
+		};
+		const initialApproval = await ApprovalMaster.findAll(opt);
+		if (!initialApproval) {
+			throw { name: "NotFound" };
 		}
-		const data = await User.findOne(opt)
-		const sequenceLevel = data.ApprovalMaster.sequenceLevel
-		console.log(sequenceLevel,'<<<<<<<<<<<< sequenceLevel');
-		res.status(200).json(data)
+
+		// new const with only id
+		const initialIDapproval = initialApproval.map((el) => el.id);
+
+		const approvalNotDeletedPlan = approvalDummy.map(el => el.id)
+
+		// filtering choosen delete id from initial id approval and comparing with approval notdeletedplan
+		const approvalDeletedPlan = initialIDapproval.filter(el => !approvalNotDeletedPlan.includes(el))
+
+		
+		// searching element that not have 'id' key
+		const newApprovalWithoutId = approvalDummy.filter(el => !el.hasOwnProperty('id'))
+
+		// searching element that  have 'id' key
+		const newApprovalWithId = approvalDummy.filter(el => el.hasOwnProperty('id'))
+		if (approvalDeletedPlan.length) {
+			for (const el of approvalDeletedPlan) {
+				await ApprovalMaster.destroy({
+					where: {id:el}
+				})
+			}
+		}
+		if (newApprovalWithId.length) {
+			for (const el of newApprovalWithId) {
+				await ApprovalMaster.update({
+					sequenceLevel: el.sequenceLevel,
+					pronoun: el.pronoun,
+					UserId: el.userId
+				}, {
+					where: {
+						id: el.id
+					}
+				})
+				
+			}
+		}
+		if (newApprovalWithoutId.length) {
+			await ApprovalMaster.bulkCreate(newApprovalWithoutId)
+		}
+		res.status(200).json('approval sequance successfully changed');
 	} catch (error) {
-		next(error)
+		next(error);
 	}
 	// try {
 	// 	const id = 66;
@@ -309,6 +355,19 @@ router.get("/test/task", async (req, res, next) => {
 		next(error);
 	}
 });
+router.get('/test/user', async(req,res,next) => {
+	try {
+		const data = await User.findAll({
+			include: ApprovalMaster,
+			attributes: {
+				exclude: ['createdAt', 'updatedAt']
+			}
+		})
+		res.status(200).json(data)
+	} catch (error) {
+		next(error)
+	}
+})
 router.use("/approvals", approvalRouter);
 router.use("/notifications", notificationRouter);
 router.use("/employees", employeeRouter);

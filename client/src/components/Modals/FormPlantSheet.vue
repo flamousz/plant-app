@@ -1563,5 +1563,5 @@ export default {
 		</form>
 		<!-- <pre>{{ cropData }}</pre> -->
 	</section>
-	<pre class="ml-9">{{ cropData }}</pre>
+	<!-- <pre class="ml-9">{{ cropData }}</pre> -->
 </template>

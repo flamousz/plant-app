@@ -15,8 +15,8 @@ module.exports = (sequelize, DataTypes) => {
       User.hasMany(models.Notification, {
         foreignKey:'UserId'
       })
-      User.belongsTo(models.ApprovalMaster, {
-        foreignKey: 'ApprovalMasterId'
+      User.hasOne(models.ApprovalMaster, {
+        foreignKey: 'UserId'
       })
     }
   }
@@ -78,9 +78,6 @@ module.exports = (sequelize, DataTypes) => {
           msg: 'minimal password character is 5'
         }
       }
-    },
-    ApprovalMasterId: {
-      type: DataTypes.INTEGER
     }
   }, {
     sequelize,
