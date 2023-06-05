@@ -9,6 +9,9 @@ const cors = require("cors");
 const port = process.env.PORT || 3000;
 const errHandler = require("./middlewares/errHandler");
 
+// serve static files
+app.use('/uploads', express.static('uploads'));
+
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());

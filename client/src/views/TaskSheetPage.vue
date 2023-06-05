@@ -1,4 +1,4 @@
-<script>
+<script allowJs:true>
 import { mapActions, mapState, mapWritableState } from "pinia";
 import { useTaskSheetStore } from "../stores/taskSheet";
 import { useEmployeeStore } from "../stores/employee";
@@ -40,6 +40,7 @@ export default {
 			finishWorkHour,
 			durationTask
 		) {
+			
 			console.log("masuk ke  fetchDataInputEmployee");
 			const data = {
 				selectedDate,
@@ -215,6 +216,7 @@ export default {
 						</div>
 					</th>
 					<th class="w-[5%]">Employee</th>
+					<th class="w-[5%]">Status</th>
 				</tr>
 			</thead>
 			<tbody
@@ -274,6 +276,9 @@ export default {
 							no record
 						</div>
 					</td>
+					<td class="h-14">
+						{{ item?.statusTask }}
+					</td>
 				</tr>
 			</tbody>
 		</table>
@@ -281,5 +286,5 @@ export default {
 	<!-- <pre>{{ queryLocal }}</pre> -->
 	<!-- <pre>ini employees{{ employees }}</pre>
 	<pre>{{ employeeFetchingData }}</pre> -->
-	<!-- <pre>{{ taskSheets }}</pre> -->
+	<pre>{{ taskSheets }}</pre>
 </template>
