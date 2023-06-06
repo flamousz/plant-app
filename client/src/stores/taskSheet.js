@@ -37,7 +37,7 @@ export const useTaskSheetStore = defineStore("tasksheet", {
 				}).showToast();
 			}
 		},
-		async putTaskSheetVerification(val){
+		async putTaskSheetVerification(val, id){
 			try {
 				console.log(val, 'ini val dari putTaskSheetVerification di STORE');
 				const {data} = await axios ({
@@ -48,7 +48,8 @@ export const useTaskSheetStore = defineStore("tasksheet", {
 						'Content-Type': 'multipart/form-data'
 					}
 				})
-
+				
+				this.fetchTaskSheetById(id)
 				Toastify({
 					text: data,
 					style: {

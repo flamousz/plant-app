@@ -175,7 +175,7 @@ export default {
 						"PlantsheetTaskScheduleConjunctionId",
 						this.accidentData.PlantsheetTaskScheduleConjunctionId
 					);
-				this.putTaskSheetVerification(formData);
+				this.putTaskSheetVerification(formData, this.$route.params.id);
 				this.accidentData = {
 					nameAccident: "",
 					descriptionAccident: "",
@@ -195,7 +195,6 @@ export default {
 					description: "",
 					imageAccident: "",
 				};
-				this.fetchTaskSheetById(this.$route.params.id);
 				this.verificationFlag = !this.verificationFlag;
 				this.accidentTabFlag = !this.accidentTabFlag;
 			} else if (!this.editFlag) {
@@ -220,7 +219,6 @@ export default {
 					});
 					this.employeeFetchingData.statusTask = "in progress";
 					this.postTaskSheet(this.employeeFetchingData);
-					this.fetchTaskSheetById(this.$route.params.id);
 				}
 			}
 		},
@@ -353,6 +351,7 @@ export default {
 	<!-- <pre>{{ taskData.description }}</pre> -->
 	<!-- <pre>{{ taskDetail }}</pre> -->
 	<!-- <pre>{{ taskSheetDetail }}</pre> -->
+	<!-- <pre>accidentTabFlag {{ accidentTabFlag }}</pre> -->
 	
 	<section id="task-master-form" class="w-full">
 		<section v-if="accidentModalFlag" id="accident-modal">
@@ -681,7 +680,7 @@ export default {
 												type="text"
 												v-model="accidentData.nameAccident"
 												placeholder="write here ...."
-												class="placeholder:text-xs placeholder:text-center border-2 border-slate-500 rounded-md"
+												class=" px-1 placeholder:text-xs placeholder:text-center border-2 border-slate-500 rounded-md"
 											/>
 										</div>
 										<div class="flex flex-row gap-2">
