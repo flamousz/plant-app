@@ -7,15 +7,20 @@ import BlueButton from "../components/Buttons/BlueButton.vue";
 import GreenButton from "../components/Buttons/GreenButton.vue";
 import { useEmployeeStore } from "../stores/employee";
 import BackButton from "../components/Buttons/BackButton.vue";
+import CloseButton from "../components/Buttons/CloseButton.vue";
 
 export default {
 	name: "TaskSheetAssignment",
 	data() {
 		return {
+			file: null,
 			role: localStorage.getItem("role"),
 			activeTab: "worktime",
 			inputDisabled: false,
+			accidentModalFlag: false,
 			totalEmployee: null,
+			accidentTabFlag: false,
+			verificationFlag: false,
 			employeeArray: [
 				{
 					id: 0,
@@ -31,6 +36,9 @@ export default {
 				finishWorkHour: "",
 				durationTask: 0,
 				fixedDuration: 0,
+				statusTask: "",
+				description: "",
+				imageAccident: "",
 			},
 			employeeAssignment: {
 				id: 0,
@@ -39,9 +47,21 @@ export default {
 				finishTaskTime: null,
 				PlantsheetTaskScheduleConjunctionId: null,
 			},
+			accidentData: {
+				nameAccident: "",
+				descriptionAccident: "",
+				dateAccident: "",
+				PlantsheetTaskScheduleConjunctionId: this.$route.params.id,
+			},
 		};
 	},
 	methods: {
+		verificationEdit() {
+			this.employeeFetchingData.statusTask = this.taskSheetDetail.statusTask;
+			this.employeeFetchingData.description =
+				this.taskSheetDetail.description;
+			this.verificationFlag = !this.verificationFlag;
+		},
 		disableInput() {
 			this.inputDisabled = true;
 		},
@@ -49,7 +69,11 @@ export default {
 			"fetchEmployeeAtTaskSheet",
 			"putEmployeeAtTaskSheet",
 		]),
-		...mapActions(useTaskSheetStore, ["fetchTaskSheetById", "postTaskSheet"]),
+		...mapActions(useTaskSheetStore, [
+			"fetchTaskSheetById",
+			"postTaskSheet",
+			"putTaskSheetVerification",
+		]),
 		localputEmployeeAtTaskSheet(
 			id,
 			workMinuteQuota,
@@ -112,9 +136,67 @@ export default {
 				day: "numeric",
 			});
 		},
+		getImageUrl(filename) {
+			console.log("masuk ke getImageUrl(filename)");
+			const baseUrl = "http://localhost:3000";
+			return `${baseUrl}/uploads/${filename}`;
+		},
+		handleFileUpload(event) {
+			console.log(event.target.files[0], "<<< event target");
+			this.file = event.target.files[0];
+		},
 		handlePutorPost() {
 			if (this.editFlag) {
 				this.putTask(this.taskData);
+			} else if (
+				(!this.editFlag && this.employeeFetchingData.statusTask) ||
+				(!this.editFlag && this.file)
+			) {
+				console.log(
+					"masuk ke else if (this.employeeFetchingData.statusTask)"
+				);
+				const data = {
+					id: this.employeeFetchingData.id,
+					statusTask: this.employeeFetchingData.statusTask,
+					description: this.employeeFetchingData.description,
+				};
+				const formData = new FormData();
+				formData.append("pictureAccident", this.file);
+				formData.append("id", data.id);
+				formData.append("statusTask", data.statusTask);
+				formData.append("description", data.description);
+				formData.append("nameAccident", this.accidentData.nameAccident);
+				formData.append(
+					"descriptionAccident",
+					this.accidentData.descriptionAccident
+				);
+				formData.append("dateAccident", this.accidentData.dateAccident),
+					formData.append(
+						"PlantsheetTaskScheduleConjunctionId",
+						this.accidentData.PlantsheetTaskScheduleConjunctionId
+					);
+				this.putTaskSheetVerification(formData, this.$route.params.id);
+				this.accidentData = {
+					nameAccident: "",
+					descriptionAccident: "",
+					dateAccident: "",
+					PlantsheetTaskScheduleConjunctionId: this.$route.params.id,
+				};
+
+				this.employeeFetchingData = {
+					id: this.$route.params.id,
+					selectedDate: "",
+					selectedTask: "",
+					startWorkHour: "",
+					finishWorkHour: "",
+					durationTask: 0,
+					fixedDuration: 0,
+					statusTask: "",
+					description: "",
+					imageAccident: "",
+				};
+				this.verificationFlag = !this.verificationFlag;
+				this.accidentTabFlag = !this.accidentTabFlag;
 			} else if (!this.editFlag) {
 				if (this.employeeArray[0].id === 0) {
 					Toastify({
@@ -135,7 +217,7 @@ export default {
 							index
 						);
 					});
-
+					this.employeeFetchingData.statusTask = "in progress";
 					this.postTaskSheet(this.employeeFetchingData);
 				}
 			}
@@ -242,9 +324,12 @@ export default {
 			}
 		},
 		computedFixedDuration() {
-			this.employeeFetchingData.fixedDuration =
-				Math.ceil(this.taskSheetDetail.duration / this.employeeArray.length)
-			return Math.ceil(this.taskSheetDetail.duration / this.employeeArray.length)
+			this.employeeFetchingData.fixedDuration = Math.ceil(
+				this.taskSheetDetail.duration / this.employeeArray.length
+			);
+			return Math.ceil(
+				this.taskSheetDetail.duration / this.employeeArray.length
+			);
 		},
 	},
 	created() {
@@ -258,33 +343,59 @@ export default {
 			this.taskData.status = this.taskDetail.status;
 		}
 	},
-	components: { RedButton, BlueButton, GreenButton, BackButton },
+	components: { RedButton, BlueButton, GreenButton, BackButton, CloseButton },
 };
 </script>
 
 <template>
 	<!-- <pre>{{ taskData.description }}</pre> -->
 	<!-- <pre>{{ taskDetail }}</pre> -->
+	<!-- <pre>{{ taskSheetDetail }}</pre> -->
+	<!-- <pre>accidentTabFlag {{ accidentTabFlag }}</pre> -->
+	
 	<section id="task-master-form" class="w-full">
+		<section v-if="accidentModalFlag" id="accident-modal">
+			<div @click.prevent="accidentModalFlag=!accidentModalFlag"  class="h-full z-10 absolute w-screen bg-slate-600 opacity-90">
+			</div>
+			<div class="w-[1000px] h-[600px] rounded-md absolute z-40 top-[10%] left-1/2 transform -translate-x-1/2 bg-slate-50 flex flex-col px-6 py-3 gap-2">
+				<div class="flex flex-row justify-between items-center">
+					<h2 class="text-3xl font-semibold">Accidents Information</h2>
+					<CloseButton @click.prevent="accidentModalFlag=!accidentModalFlag" />
+				</div>
+				<div class="w-[950px] rounded-md h-[550px] bg-gray-100 overflow-auto">
+					<div v-for="(item, index) in taskSheetDetail.Accidents" :key="item.id" class="flex flex-col gap-2 p-2">
+						<div class="flex flex-row justify-between items-end">
+							<h2 class="text-lg font-semibold">
+								 {{ index+1 }}. {{ item.nameAccident }}
+							</h2>
+							<h2 class="font-semibold">
+								{{ formatTime(item.dateAccident)  }}, {{ formatDate(item.dateAccident) }}
+							</h2>
+						</div>
+						<div class="flex flex-row gap-3">
+							<img :src="getImageUrl(item.imageAccident)" alt="Accident Image" class="w-[450px] h-[300px] object-cover rounded-md shadow-md" >
+							<p >{{  item.descriptionAccident }}</p>
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</section>
 		<div class="flex flex-col px-10">
 			<section id="information-block">
-				<div id="button-processing">
-					<div
-						class="w-full flex justify-end items-end pt-4"
-						v-if="editFlag === true"
-					>
-						<div class="text-2xl font-bold w-[8%]">STATUS:</div>
-						<div
-							class="w-[6%] border-[3px] rounded-md border-slate-800 bg-yellow-300 font-semibold text-center tracking-wide"
-						>
-							{{ taskDetail.status }}
-						</div>
+				<div
+					id="button-processing"
+					class="flex flex-row justify-between items-end"
+				>
+					<div class="w-[600px]">
+						<div class="text-5xl font-bold">Task Assignment</div>
 					</div>
-					<div class="flex flex-row h-[50px] mb-3">
+					<div class="flex justify-end w-fit flex-row gap-2">
+						<div class="text-2xl font-bold w-fit">STATUS :</div>
 						<div
-							class="w-[40%] flex justify-start items-end text-5xl font-bold"
+							class="w-fit p-1 bg-yellow-400 border-[3px] rounded-md border-slate-800 font-semibold text-center tracking-wide"
 						>
-							Task Assignment
+							{{ taskSheetDetail?.statusTask }}
 						</div>
 					</div>
 				</div>
@@ -440,7 +551,10 @@ export default {
 								"
 							>
 								<ul class="pl-2">
-									<li v-for="employee in employeesLocal" :key="employee.id">
+									<li
+										v-for="employee in employeesLocal"
+										:key="employee.id"
+									>
 										• {{ employee.employee.name }} -
 										{{ employee.workMinuteQuota }} minutes left -
 										{{ employee.workingTimeLog }}
@@ -461,10 +575,10 @@ export default {
 					</section>
 				</div>
 			</section>
-			<form @submit.prevent="handlePutorPost">
+			<form @submit.prevent="handlePutorPost" enctype="multipart/form-data">
 				<div
 					id="tool-table"
-					class="flex flex-col p-4 bg-slate-100 mt-5 h-[200px] border-2 border-black rounded tracking-wide gap-1 overflow-auto"
+					class="flex flex-col p-4 bg-slate-100 mt-5 h-[280px] border-2 border-black rounded tracking-wide gap-1 overflow-auto"
 				>
 					<section id="breadcrumb" class="flex flex-row gap-1">
 						<div
@@ -472,7 +586,7 @@ export default {
 								'bg-red-500': activeTab === 'worktime',
 								'text-red-100': activeTab === 'worktime',
 							}"
-							class="border border-black p-1 w-[7%] text-center rounded-md active:bg-red-300 hover:bg-red-400"
+							class="cursor-pointer border border-black p-1 w-[7%] text-center rounded-md active:bg-red-300 hover:bg-red-400"
 							@click.prevent="buttonSelector('worktime')"
 						>
 							Worktime
@@ -483,13 +597,256 @@ export default {
 								'bg-red-500': activeTab === 'employee',
 								'text-red-100': activeTab === 'employee',
 							}"
-							class="border border-black p-1 w-[7%] text-center rounded-md active:bg-red-300 hover:bg-red-400"
+							class="cursor-pointer border border-black p-1 w-[7%] text-center rounded-md active:bg-red-300 hover:bg-red-400"
 						>
 							Employees
+						</div>
+						<div
+							v-if="
+								taskSheetDetail
+									.EmployeeTaskPlantsheettaskScheduleConjunctions
+									.length
+							"
+							@click.prevent="buttonSelector('verification')"
+							:class="{
+								'bg-red-500': activeTab === 'verification',
+								'text-red-100': activeTab === 'verification',
+							}"
+							class="cursor-pointer border border-black p-1 w-[7%] text-center rounded-md active:bg-red-300 hover:bg-red-400"
+						>
+							Verification
+						</div>
+						<div
+							v-if="
+								taskSheetDetail
+									.EmployeeTaskPlantsheettaskScheduleConjunctions
+									.length
+							"
+							@click.prevent="buttonSelector('accident')"
+							:class="{
+								'bg-red-500': activeTab === 'accident',
+								'text-red-100': activeTab === 'accident',
+							}"
+							class="cursor-pointer border border-black p-1 w-[7%] text-center rounded-md active:bg-red-300 hover:bg-red-400"
+						>
+							Accident
 						</div>
 					</section>
 					<section id="table-tool" class="pt-2">
 						<div class="w-[90%] flex flex-col gap-4">
+							<div v-if="activeTab === 'accident'">
+								<div
+									class="flex flex-col gap-2"
+									v-if="!accidentTabFlag"
+								>
+									<div
+										class="flex flex-row gap-3 justify-between w-[280px]"
+									>
+										<p>create new accident</p>
+										<RedButton
+											@click.prevent="
+												accidentTabFlag = !accidentTabFlag
+											"
+											:text="'click me'"
+											:type="'button'"
+										/>
+									</div>
+									<div
+										class="flex flex-row gap-3 justify-between w-[280px]"
+									>
+										<p>list of accident</p>
+										<RedButton
+											@click.prevent="
+												accidentModalFlag = !accidentModalFlag
+											"
+											:text="'click me'"
+											:type="'button'"
+										/>
+									</div>
+								</div>
+								<div
+									v-if="accidentTabFlag"
+									class="flex flex-row gap-4 w-full"
+								>
+									<div class="w-[30%] flex flex-col gap-2">
+										<div class="flex flex-row gap-2 w-full">
+											<div
+												class="flex justify-between items-center w-[20%]"
+											>
+												<label>Name</label>
+												<label>:</label>
+											</div>
+											<input
+												type="text"
+												v-model="accidentData.nameAccident"
+												placeholder="write here ...."
+												class=" px-1 placeholder:text-xs placeholder:text-center border-2 border-slate-500 rounded-md"
+											/>
+										</div>
+										<div class="flex flex-row gap-2">
+											<div
+												class="flex justify-between items-center w-[20%]"
+											>
+												<label>Time</label>
+												<label>:</label>
+											</div>
+											<input
+												type="datetime-local"
+												v-model="accidentData.dateAccident"
+											/>
+										</div>
+										<div
+											id="multer-upload"
+											class="flex flex-row gap-2"
+										>
+											<div class="flex justify-between w-[20%]">
+												<label>Picture</label>
+												<label>:</label>
+											</div>
+											<input
+												@change="handleFileUpload"
+												name="pictureAccident"
+												type="file"
+											/>
+										</div>
+									</div>
+									<div class="w-[70%]">
+										<div class="flex flex-row gap-2">
+											<div class="flex justify-between w-[13%]">
+												<label>Description</label>
+												<label>:</label>
+											</div>
+											<textarea
+												class="w-[30%] rounded-md border-2 border-slate-400 p-1 text-sm"
+												v-model="accidentData.descriptionAccident"
+												cols="10"
+												rows="7"
+												placeholder="write description here"
+											></textarea>
+										</div>
+									</div>
+									<RedButton
+										@click.prevent="
+											accidentTabFlag = !accidentTabFlag
+										"
+										class="absolute bottom-[70px] right-[50px]"
+										:type="'button'"
+										:text="'cancel'"
+									/>
+									<GreenButton
+										class="absolute bottom-[70px] right-[150px]"
+										:type="'submit'"
+										:text="'submit'"
+									/>
+								</div>
+							</div>
+							<div
+								v-if="activeTab === 'verification'"
+								class="flex flex-col gap-4"
+							>
+								<!-- <div
+									class="flex flex-row gap-2"
+									v-if="taskSheetDetail.imageAccident"
+								>
+									<div>
+										<img
+											:src="
+												getImageUrl(taskSheetDetail.imageAccident)
+											"
+											alt="Accident Image"
+											class="rounded-md border-2 border-slate-600 w-[500px] h-[300px] object-cover"
+										/>
+									</div>
+									<div
+										class="bg-slate-200 p-3 w-[400px] rounded-md border-2 border-slate-600"
+									>
+										<div class="flex flex-row gap-2">
+											<h3>Status:</h3>
+											<p
+												class="bg-red-600 p-[1px] rounded text-center px-1 text-slate-200 cursor-default"
+											>
+												{{ taskSheetDetail?.statusTask }}
+											</p>
+										</div>
+										<div>
+											<h3>Description</h3>
+											<p
+												class="cursor-default p-1 w-[370px] h-[200px] bg-yellow-50 border-2 border-slate-500 rounded-md"
+											>
+												{{ taskSheetDetail?.description }}
+											</p>
+										</div>
+									</div>
+								</div> -->
+								<div class="flex flex-row gap-2">
+									<div
+										class="flex justify-between items-center w-[13%]"
+									>
+										<label>Task Verification</label>
+										<label>:</label>
+									</div>
+									<p v-if="!verificationFlag">
+										{{ taskSheetDetail?.statusTask }}
+									</p>
+									<select
+										v-if="verificationFlag"
+										class="text-center"
+										v-model="employeeFetchingData.statusTask"
+									>
+										<option selected disabled>
+											--select verification--
+										</option>
+										<option value="done">done</option>
+										<option value="done with note">
+											done with note
+										</option>
+										<option value="accident">accident</option>
+									</select>
+								</div>
+								<div class="flex flex-row gap-2">
+									<div class="flex justify-between w-[13%]">
+										<label>Description</label>
+										<label>:</label>
+									</div>
+									<textarea
+										v-if="verificationFlag"
+										class="w-[30%] rounded-md border-2 border-slate-400 p-1 text-sm"
+										v-model="employeeFetchingData.description"
+										cols="10"
+										rows="7"
+										placeholder="write description here"
+									></textarea>
+									<textarea
+										v-if="!verificationFlag"
+										class="w-[30%] rounded-md border-2 border-slate-400 p-1 text-sm"
+										disabled
+										v-model="taskSheetDetail.description"
+										cols="10"
+										rows="7"
+										placeholder="write description here"
+									></textarea>
+								</div>
+								<RedButton
+									v-if="verificationFlag"
+									@click.prevent="verificationFlag = !verificationFlag"
+									class="absolute bottom-[70px] right-[50px]"
+									:type="'button'"
+									:text="'cancel'"
+								/>
+								<GreenButton
+									v-if="verificationFlag"
+									class="absolute bottom-[70px] right-[150px]"
+									:type="'submit'"
+									:text="'submit'"
+								/>
+								<GreenButton
+									v-else
+									@click.prevent="verificationEdit"
+									class="absolute bottom-[70px] right-[50px]"
+									:type="'button'"
+									:text="'change'"
+								/>
+							</div>
 							<div
 								v-if="activeTab === 'worktime'"
 								class="flex flex-col gap-4"
@@ -575,7 +932,7 @@ export default {
 												no
 											</div>
 											<div
-												class="w-[10%] text-center border-black border"
+												class="w-[15%] text-center border-black border"
 											>
 												name
 											</div>
@@ -606,7 +963,7 @@ export default {
 										>
 											{{ index + 1 }}
 										</div>
-										<div class="w-[10%] border border-black">
+										<div class="w-[15%] border border-black">
 											{{ el.employeecon.empl }}
 										</div>
 										<div
@@ -783,12 +1140,14 @@ export default {
 			</form>
 		</div>
 	</section>
+	<!-- <pre>ini file {{ file }}</pre> -->
 	<!-- <pre>total employee: {{ totalEmployee }}</pre> -->
 	<!-- <pre>ini employeeArray {{ employeeArray }}</pre> -->
-	<div class="flex flex-row">
+	<!-- <div class="flex flex-row justify-between">
 		<pre>ini employee local {{ employeesLocal }}</pre>
 		<pre>ini employee {{ employees }}</pre>
-	</div>
-	<!-- <pre>{{ employeeFetchingData }}</pre> -->
-	<pre>{{ taskSheetDetail }}</pre>
+	</div> -->
+	<!-- <pre>ini employeeFetchingData{{ employeeFetchingData }}</pre> -->
+	<!-- <pre>ini accidentData{{ accidentData }}</pre> -->
+	<!-- <pre>{{ taskSheetDetail }}</pre> -->
 </template>

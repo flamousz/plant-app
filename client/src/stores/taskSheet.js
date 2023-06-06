@@ -37,6 +37,39 @@ export const useTaskSheetStore = defineStore("tasksheet", {
 				}).showToast();
 			}
 		},
+		async putTaskSheetVerification(val, id){
+			try {
+				console.log(val, 'ini val dari putTaskSheetVerification di STORE');
+				const {data} = await axios ({
+					url: `${baseUrl}/task/sheet`,
+					method: 'PUT',
+					data: val,
+					headers: {
+						'Content-Type': 'multipart/form-data'
+					}
+				})
+				
+				this.fetchTaskSheetById(id)
+				Toastify({
+					text: data,
+					style: {
+						background: "linear-gradient(to right, #58c389, #7dd382)",
+					},
+
+					duration: 2000,
+				}).showToast();
+			} catch (error) {
+				console.log(error);
+				Toastify({
+					text: `${error.response.data.message}`,
+					style: {
+						background: "linear-gradient(to right, #611302, #a62103)",
+					},
+
+					duration: 2000,
+				}).showToast();
+			}
+		},
 		async postTaskSheet(val) {
 			try {
 				const { data } = await axios({
@@ -54,7 +87,7 @@ export const useTaskSheetStore = defineStore("tasksheet", {
 					duration: 2000,
 				}).showToast();
 			} catch (error) {
-				console.log();
+				console.log(error);
 				Toastify({
 					text: `${error.response.data.message}`,
 					style: {

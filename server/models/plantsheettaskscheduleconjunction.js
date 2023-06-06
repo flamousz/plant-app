@@ -20,6 +20,9 @@ module.exports = (sequelize, DataTypes) => {
       PlantsheetTaskScheduleConjunction.hasMany(models.EmployeeTaskPlantsheettaskScheduleConjunction, {
         foreignKey: 'PlantsheetTaskScheduleConjunctionId'
       })
+      PlantsheetTaskScheduleConjunction.hasMany(models.Accident, {
+        foreignKey: 'PlantsheetTaskScheduleConjunctionId'
+      })
     }
   }
   PlantsheetTaskScheduleConjunction.init({
@@ -30,6 +33,8 @@ module.exports = (sequelize, DataTypes) => {
     fixedDuration: DataTypes.INTEGER,
     startTaskTime: DataTypes.DATE,
     finishTaskTime: DataTypes.DATE,
+    statusTask: DataTypes.STRING,
+    description: DataTypes.TEXT
   }, {
     sequelize,
     modelName: 'PlantsheetTaskScheduleConjunction',

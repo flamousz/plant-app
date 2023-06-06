@@ -11,12 +11,19 @@ const {
 	EmployeeTaskPlantsheettaskScheduleConjunction,
 	EmployeeTaskConjunction,
 	Employee,
+	Accident,
 } = require("../models/index");
 const { Op } = require("sequelize");
 
 class TaskController {
 	static opt = {
 		include: [
+			{
+				model:Accident,
+				attributes: {
+					exclude: ['createdAt', 'updatedAt']
+				}
+			},
 			{
 				model: EmployeeTaskPlantsheettaskScheduleConjunction,
 				include: {
@@ -68,7 +75,13 @@ class TaskController {
 	};
 	static async postTaskSheet(req, res, next) {
 		try {
-			const { startWorkHour, finishWorkHour, fixedDuration, id } = req.body;
+			const {
+				startWorkHour,
+				finishWorkHour,
+				fixedDuration,
+				id,
+				statusTask,
+			} = req.body;
 			console.log(req.body, "<<<< ini req.body");
 
 			const data = await PlantsheetTaskScheduleConjunction.findByPk(id);
@@ -80,6 +93,7 @@ class TaskController {
 					startTaskTime: startWorkHour,
 					finishTaskTime: finishWorkHour,
 					fixedDuration,
+					statusTask,
 				},
 				{
 					where: { id },
@@ -90,6 +104,56 @@ class TaskController {
 			next(error);
 		}
 	}
+
+	static async putTaskSheetVerification(req, res, next) {
+		try {
+			const {
+				id,
+				statusTask,
+				description,
+				nameAccident,
+				descriptionAccident,
+				dateAccident,
+				PlantsheetTaskScheduleConjunctionId,
+			} = req.body;
+
+			console.log(req.body, "<<<< ini req.body");
+
+			const data = await PlantsheetTaskScheduleConjunction.findByPk(id);
+			if (!data) {
+				throw { name: "NotFound" };
+			}
+			if (statusTask) {
+				console.log("masuk ke kondisi statusTask");
+				await PlantsheetTaskScheduleConjunction.update(
+					{
+						statusTask,
+						description,
+						// imageAccident: filename,
+					},
+					{
+						where: { id },
+					}
+				);
+			}
+			if (nameAccident) {
+				console.log("masuk ke kondisi filename");
+				const { filename } = req.file;
+				console.log(filename, "<<<< ini filename dari req.file");
+				await Accident.create({
+					nameAccident,
+					descriptionAccident,
+					dateAccident,
+					PlantsheetTaskScheduleConjunctionId,
+					imageAccident: filename,
+				});
+			}
+			res.status(200).json("Task successfully updated");
+		} catch (error) {
+			next(error);
+		}
+	}
+
 	static async getTaskSheetById(req, res, next) {
 		try {
 			const { id } = req.params;
@@ -139,6 +203,11 @@ class TaskController {
 						"masuk ke if 3 perbandingan dengan commonDate.length > 1"
 					);
 					TaskController.opt.where = {
+						"$PlantSchedule.statusPlantSchedule$": {
+							[Op.or]: {
+								[Op.eq]: "confirm",
+							},
+						},
 						"$PlantSchedule.PlantSheet.plant.name$": {
 							[Op.or]: query,
 						},
@@ -163,6 +232,11 @@ class TaskController {
 						"masuk ke if 3 perbandingan dengan commonDate.length < 2"
 					);
 					TaskController.opt.where = {
+						"$PlantSchedule.statusPlantSchedule$": {
+							[Op.or]: {
+								[Op.eq]: "confirm",
+							},
+						},
 						"$PlantSchedule.PlantSheet.plant.name$": {
 							[Op.or]: query,
 						},
@@ -194,6 +268,11 @@ class TaskController {
 						"masuk ke if 2 perbandingan antara filterPlant dan commonDate dengan commonDate.length > 1"
 					);
 					TaskController.opt.where = {
+						"$PlantSchedule.statusPlantSchedule$": {
+							[Op.or]: {
+								[Op.eq]: "confirm",
+							},
+						},
 						"$PlantSchedule.PlantSheet.plant.name$": {
 							[Op.or]: query,
 						},
@@ -215,6 +294,11 @@ class TaskController {
 						"masuk ke if 2 perbandingan antara filterPlant dan commonDate dengan commonDate.length < 2"
 					);
 					TaskController.opt.where = {
+						"$PlantSchedule.statusPlantSchedule$": {
+							[Op.or]: {
+								[Op.eq]: "confirm",
+							},
+						},
 						"$PlantSchedule.PlantSheet.plant.name$": {
 							[Op.or]: query,
 						},
@@ -244,6 +328,11 @@ class TaskController {
 					);
 
 					TaskController.opt.where = {
+						"$PlantSchedule.statusPlantSchedule$": {
+							[Op.or]: {
+								[Op.eq]: "confirm",
+							},
+						},
 						"$PlantSchedule.CropArea.name$": {
 							[Op.or]: queryLocation,
 						},
@@ -265,6 +354,11 @@ class TaskController {
 						"masuk ke if 2 perbandingan dengan commonDate.length < 2"
 					);
 					TaskController.opt.where = {
+						"$PlantSchedule.statusPlantSchedule$": {
+							[Op.or]: {
+								[Op.eq]: "confirm",
+							},
+						},
 						"$PlantSchedule.CropArea.name$": {
 							[Op.or]: queryLocation,
 						},
@@ -292,6 +386,11 @@ class TaskController {
 					[Op.eq]: item,
 				}));
 				TaskController.opt.where = {
+					"$PlantSchedule.statusPlantSchedule$": {
+						[Op.or]: {
+							[Op.eq]: "confirm",
+						},
+					},
 					"$PlantSchedule.PlantSheet.plant.name$": {
 						[Op.or]: query,
 					},
@@ -308,6 +407,11 @@ class TaskController {
 					[Op.eq]: item,
 				}));
 				TaskController.opt.where = {
+					"$PlantSchedule.statusPlantSchedule$": {
+						[Op.or]: {
+							[Op.eq]: "confirm",
+						},
+					},
 					"$PlantSchedule.CropArea.name$": {
 						[Op.or]: query,
 					},
@@ -318,6 +422,11 @@ class TaskController {
 					[Op.eq]: item,
 				}));
 				TaskController.opt.where = {
+					"$PlantSchedule.statusPlantSchedule$": {
+						[Op.or]: {
+							[Op.eq]: "confirm",
+						},
+					},
 					"$PlantSchedule.PlantSheet.plant.name$": {
 						[Op.or]: query,
 					},
@@ -342,6 +451,11 @@ class TaskController {
 
 				if (commonDate.length > 1) {
 					TaskController.opt.where = {
+						"$PlantSchedule.statusPlantSchedule$": {
+							[Op.or]: {
+								[Op.eq]: "confirm",
+							},
+						},
 						[Op.and]: [
 							sequelize.where(
 								sequelize.fn("DATE", sequelize.col(filterDate)),
@@ -357,6 +471,11 @@ class TaskController {
 					};
 				} else {
 					TaskController.opt.where = {
+						"$PlantSchedule.statusPlantSchedule$": {
+							[Op.or]: {
+								[Op.eq]: "confirm",
+							},
+						},
 						[Op.and]: sequelize.where(
 							sequelize.fn("DATE", sequelize.col(filterDate)),
 							"=",
