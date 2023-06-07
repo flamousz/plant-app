@@ -2,6 +2,7 @@
 import { mapActions, mapState, mapWritableState } from "pinia";
 import BlueButton from "../components/Buttons/BlueButton.vue";
 import { useTaskStore } from "../stores/task";
+import {useCsvStore} from '../stores/csv'
 
 export default {
 	name: "TaskMasterPage",
@@ -17,6 +18,7 @@ export default {
 	},
 	methods: {
 		...mapActions(useTaskStore, ["fetchTasks"]),
+		...mapActions(useCsvStore, ['postExportTaskMaster']),
 		queryAction(value) {
 			console.log(value);
 			this.query = {
@@ -31,21 +33,31 @@ export default {
 	},
 	created() {
 		this.fetchTasks();
-		console.log(this.queries.filter,'<<< queris filter');
+		console.log(this.queries.filter, "<<< queris filter");
 	},
 	components: { BlueButton },
 };
 </script>
 
 <template>
-	<!-- <pre>{{ query }}</pre> -->
-	<div class="bg-blue-100 p-4 w-full h-full flex flex-col static">
+	<!-- <pre>{{ tasks }}</pre> -->
+	<div class="bg-blue-100 p-4 w-full h-screen flex flex-col static">
 		<div class="z-40 fixed bottom-6 right-7 flex opacity-50 hover:opacity-90">
 			<RouterLink to="/taskmaster/form"
 				><BlueButton :type="'button'" :text="'+ Task'"
 			/></RouterLink>
 		</div>
-		<div class="flex flex-row justify-end items-end gap-3 pr-1 mb-2">
+		<div class="flex flex-row justify-between items-center">
+			<div @click.prevent="postExportTaskMaster(tasks)">
+				<button class="pl-8">
+					<img
+						src="../assets/icons8-export-48.png"
+						alt="export icon"
+						class="w-[25px] hover:opacity-50"
+					/>
+				</button>
+			</div>
+			<div class="flex flex-row justify-end items-end gap-3 pr-1 mb-2">
 				<div class="flex flex-row gap-1">
 					<button
 						:class="{
@@ -60,7 +72,7 @@ export default {
 				</div>
 				<div class="flex flex-row gap-1">
 					<button
-					:class="{
+						:class="{
 							'bg-red-500': query.filter === 'avail',
 							'text-red-100': query.filter === 'avail',
 						}"
@@ -71,6 +83,8 @@ export default {
 					</button>
 				</div>
 			</div>
+		</div>
+
 		<table class="w-full">
 			<thead
 				class="bg-gray-400 h-10 whitespace-nowrap border-b-2 tracking-wide text-center border-gray-700"
@@ -95,7 +109,9 @@ export default {
 						{{ index + 1 }}
 					</td>
 					<td class="h-14">{{ item?.name }}</td>
-					<td class="h-14">{{ item?.TaskPerMinute }} m<sup>2</sup>/minute</td>
+					<td class="h-14">
+						{{ item?.TaskPerMinute }} m<sup>2</sup>/minute
+					</td>
 					<td class="h-14">{{ item?.arcStatus }}</td>
 				</tr>
 			</tbody>

@@ -38,9 +38,9 @@ export const useEmployeeStore = defineStore("employee", {
 				}).showToast();
 				console.log(this.editFlag, "ini edit flag di employee store");
 			} catch (error) {
-				console.log(err);
+				console.log(error);
 				Toastify({
-					text: `${err.response.data.message}`,
+					text: `${error.response.data.message}`,
 					style: {
 						background: "linear-gradient(to right, #611302, #a62103)",
 					},

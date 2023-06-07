@@ -30,6 +30,7 @@ const {
 const { Op } = require("sequelize");
 const notificationRouter = require("./notification");
 const approvalRouter = require("./approval");
+const csvimportexsportRouter = require("./csvimportexsport");
 
 
 
@@ -372,6 +373,7 @@ router.get('/test/user', async(req,res,next) => {
 		next(error)
 	}
 })
+router.use('/csv', csvimportexsportRouter)
 router.use("/approvals", approvalRouter);
 router.use("/notifications", notificationRouter);
 router.use("/employees", employeeRouter);
