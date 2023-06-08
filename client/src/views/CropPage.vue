@@ -3,16 +3,36 @@ import { mapActions, mapState, mapWritableState } from "pinia";
 import TableRowCrop from "../components/TableRow/TableRowCrop.vue";
 import { useCropStore } from "../stores/crop";
 import BlueButton from "../components/Buttons/BlueButton.vue";
+import { useCsvStore } from "../stores/csv";
+import ExportButton from "../components/Buttons/ExportButton.vue";
 
 export default {
 	name: "CropPage",
 	methods: {
 		...mapActions(useCropStore, ["fetchCrop"]),
+		...mapActions(useCsvStore, ["postExportTaskMaster"]),
 		queryAction(value) {
 			this.query = {
 				filter: value,
 			};
 			this.fetchCrop();
+		},
+		localPostExport(val) {
+			const modifiedVal = val.map((item) => {
+				const modifiedItem = { ...item };
+				Object.keys(modifiedItem).forEach((key) => {
+					if (
+						typeof modifiedItem[key] === "object" &&
+						modifiedItem[key] !== null &&
+						"name" in modifiedItem[key]
+					) {
+						modifiedItem[key] = modifiedItem[key].name;
+					}
+				});
+				return modifiedItem;
+			});
+
+			this.postExportTaskMaster(modifiedVal)
 		},
 	},
 	computed: {
@@ -22,12 +42,11 @@ export default {
 	created() {
 		this.fetchCrop();
 	},
-	components: { TableRowCrop, BlueButton },
+	components: { TableRowCrop, BlueButton, ExportButton },
 };
 </script>
 
 <template>
-	<!-- <pre>{{ crop }}</pre> -->
 	<!-- <pre>{{ query }}</pre> -->
 	<div class="z-40 fixed bottom-4 opacity-50 hover:opacity-90 right-6 flex">
 		<RouterLink to="/formplantsheet"
@@ -36,30 +55,35 @@ export default {
 	</div>
 	<div class="bg-blue-100 p-4 w-full">
 		<div class="overflow-auto rounded-lg shadow">
-			<div class="flex flex-row justify-end items-end gap-3 pr-1 mb-2">
-				<div class="flex flex-row gap-1">
-					<button
-						:class="{
-							'bg-red-500': query.filter === 'archived',
-							'text-red-100': query.filter === 'archived',
-						}"
-						@click.prevent="queryAction('archived')"
-						class="border border-black p-1 w-[100%] text-center rounded-md active:bg-red-300 hover:bg-red-400 focus:bg-red-500 focus:text-red-100 bg-red-100"
-					>
-						Archived
-					</button>
+			<div class="flex flex-row justify-between items-center">
+				<div @click.prevent="localPostExport(crop)">
+					<ExportButton />
 				</div>
-				<div class="flex flex-row gap-1">
-					<button
-					:class="{
-							'bg-red-500': query.filter === 'avail',
-							'text-red-100': query.filter === 'avail',
-						}"
-						@click.prevent="queryAction('avail')"
-						class="border border-black p-1 w-[100%] h-[5%] text-center rounded-md active:bg-red-300 hover:bg-red-400 focus:bg-red-500 focus:text-red-100 bg-red-100"
-					>
-						Available
-					</button>
+				<div class="flex flex-row justify-end items-end gap-3 pr-1 mb-2">
+					<div class="flex flex-row gap-1">
+						<button
+							:class="{
+								'bg-red-500': query.filter === 'archived',
+								'text-red-100': query.filter === 'archived',
+							}"
+							@click.prevent="queryAction('archived')"
+							class="border border-black p-1 w-[100%] text-center rounded-md active:bg-red-300 hover:bg-red-400 focus:bg-red-500 focus:text-red-100 bg-red-100"
+						>
+							Archived
+						</button>
+					</div>
+					<div class="flex flex-row gap-1">
+						<button
+							:class="{
+								'bg-red-500': query.filter === 'avail',
+								'text-red-100': query.filter === 'avail',
+							}"
+							@click.prevent="queryAction('avail')"
+							class="border border-black p-1 w-[100%] h-[5%] text-center rounded-md active:bg-red-300 hover:bg-red-400 focus:bg-red-500 focus:text-red-100 bg-red-100"
+						>
+							Available
+						</button>
+					</div>
 				</div>
 			</div>
 			<table class="w-full">

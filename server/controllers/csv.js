@@ -6,61 +6,45 @@ const { Task, ToolConjunction, Item } = require("../models/index");
 class CsvController {
 	static async taskMasterExport(req, res, next) {
 		try {
-			const opt = {
-				include: {
-					model: ToolConjunction,
-					include: {
-						model: Item,
-						attributes: {
-							exclude: ["createdAt", "updatedAt"],
-						},
-						order: [["createdAt", "DESC"]],
-					},
-					attributes: {
-						exclude: ["createdAt", "updatedAt"],
-					},
-				},
-				attributes: {
-					exclude: ["createdAt", "updatedAt"],
-				},
-				order: [["createdAt", "DESC"]],
-				where: {
-					arcStatus: "avail",
-				},
-			};
+			const data = req.body
 
-			const data = await Task.findAll(opt);
-			console.log(data, "<<< data");
-			const csvHeaders = Object.keys(data[0].dataValues)
-				.map((key) => {
-					if (Array.isArray(data[0].dataValues[key])) {
-						return null; // Exclude the key if the value is an array
-					}
+			// Add index to the data
+			const indexedData = data.map((item, index) => ({ ...item, index: index + 1 }));
 
-					const title = key
-						.split(/(?=[A-Z])/)
-						.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-						.join(" ");
+			console.log(data, '<<< DATA');
+			console.log(indexedData, '<<< indexedData');
 
-					return {
-						id: key,
-						title: title,
-					};
-				})
-				.filter((header) => header !== null); // Filter out excluded headers
+			const csvHeaders = Object.keys(indexedData[0])
+			.filter((key) => key !== 'index' && key !== 'SeedId') // Remove 'index' property from csvHeaders
+			.map((key, index) => {
+				if (Array.isArray(indexedData[0][key])) {
+					return null; // Exclude the key if the value is an array
+				}
+				
+
+				const title = key
+					.split(/(?=[A-Z])/)
+					.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+					.join(" ");
+
+				return {
+					id: index === 0 ? 'index' : key,
+					title: index === 0 ? 'number' : title,
+				};
+			})
+			.filter((header) => header !== null); // Filter out excluded headers
+
+
 			console.log(csvHeaders, "<<<< csvHeaders");
 			const csvWriter = createObjectCsvWriter({
 				path: "csvData/file.csv",
 				header: csvHeaders,
 			});
-			await csvWriter.writeRecords(data);
+			await csvWriter.writeRecords(indexedData);
 
 			// Stream the CSV file as a response
 			const filePath = path.join(__dirname, "../csvData/file.csv");
 			console.log(filePath, "<<< filePath");
-
-			// creates a readable stream from the specified file path, allowing to efficiently read the file's contents in chunks or streams.
-			const fileStream = fs.createReadStream(filePath);
 
 			res.setHeader("Content-Type", "text/csv");
 			res.setHeader(
@@ -68,8 +52,13 @@ class CsvController {
 				"attachment; filename=exported_data.csv"
 			);
 
-			fileStream.pipe(res);
+			// creates a readable stream from the specified file path, allowing to efficiently read the file's contents in chunks or streams.
+			const fileStream = fs.createReadStream(filePath);
 
+			fileStream.pipe(res);
+			fileStream.on('end', () => {
+				res.end(); // End the response after piping the file stream
+			});
 			// res.status(200).json(data);
 		} catch (error) {
 			next(error);

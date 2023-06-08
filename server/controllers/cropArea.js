@@ -51,7 +51,7 @@ class CropAreaController {
 
 			const opt = {
 				attributes: {
-					exclude: ["createdAt", "updatedAt"],
+					exclude: ["createdAt", "updatedAt", 'map'],
 				},
 				order: [["createdAt", "DESC"]],
 			};

@@ -21,44 +21,12 @@ class PlantSheetController {
 				include: [
 					{ model: Item, as: "plant", attributes: ["name"] },
 					{
-						model: SeedConjunction,
-						attributes: ["id"],
-						include: {
-							model: Item,
-							attributes: ["name"],
-						},
-					},
-					{
-						model: fertilizerConjunction,
-						attributes: ["id"],
-						include: {
-							model: Item,
-							attributes: ["name"],
-						},
-					},
-					{
-						model: PesticideConjunction,
-						attributes: ["id"],
-						include: {
-							model: Item,
-							attributes: ["name"],
-						},
-					},
-					{
-						model: materialConjunction,
-						attributes: ["id"],
-						include: {
-							model: Item,
-							attributes: ["name"],
-						},
-					},
-					{
 						model: PlantType,
 						attributes: ["name"],
 					},
 				],
 				attributes: {
-					exclude: ["createdAt", "updatedAt"],
+					exclude: ["createdAt", "updatedAt", 'planttypeid', 'plantid', 'plantPerMetre', 'fallacyNursery'],
 				},
 				order: [["createdAt", "DESC"]],
 				where: {

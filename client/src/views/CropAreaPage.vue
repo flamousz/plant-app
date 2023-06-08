@@ -2,6 +2,8 @@
 import { mapActions, mapWritableState, mapState } from "pinia";
 import { useCropAreaStore } from "../stores/cropArea";
 import BlueButton from "../components/Buttons/BlueButton.vue";
+import { useCsvStore } from "../stores/csv";
+import ExportButton from "../components/Buttons/ExportButton.vue";
 
 export default {
 	name: "CropAreaPage",
@@ -21,6 +23,7 @@ export default {
 	},
 	methods: {
 		...mapActions(useCropAreaStore, ["fetchCropArea"]),
+		...mapActions(useCsvStore, ['postExportTaskMaster']),
 		getDisplayedPageNumbers() {
 			const maxDisplayedPages = 3;
 			let startPage = this.currentPage - Math.floor(maxDisplayedPages / 2);
@@ -74,7 +77,7 @@ export default {
 	created() {
 		this.fetchCropArea();
 	},
-	components: { BlueButton },
+	components: { BlueButton, ExportButton },
 };
 </script>
 
@@ -86,7 +89,10 @@ export default {
 				><BlueButton :type="'button'" :text="'NEW AREA'"
 			/></RouterLink>
 		</div>
-		<div class="flex flex-row justify-end items-end gap-2 mb-2">
+		<div class="flex flex-row justify-between items-center">
+			<div @click.prevent="postExportTaskMaster(cropArea)">
+				<ExportButton/>
+			</div>
 			<div class="flex flex-row gap-1">
 				<div>Status:</div>
 				<div>

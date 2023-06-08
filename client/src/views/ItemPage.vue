@@ -2,11 +2,14 @@
 import { mapActions, mapState, mapWritableState } from "pinia";
 import { useItemStore } from "../stores/item";
 import BlueButton from "../components/Buttons/BlueButton.vue";
+import ExportButton from "../components/Buttons/ExportButton.vue";
+import { useCsvStore } from "../stores/csv";
 
 export default {
 	name: "ItemPage",
 	data() {
 		return {
+			modifiedData: [],
 			itemsData: {
 				category: null,
 				status: null,
@@ -22,7 +25,25 @@ export default {
 		};
 	},
 	methods: {
+		...mapActions(useCsvStore, ["postExportTaskMaster"]),
 		...mapActions(useItemStore, ["fetchItem", "fetchCategory"]),
+		localPostExport(val) {
+			const modifiedVal = val.map((item) => {
+				const modifiedItem = { ...item };
+				Object.keys(modifiedItem).forEach((key) => {
+					if (
+						typeof modifiedItem[key] === "object" &&
+						modifiedItem[key] !== null &&
+						"name" in modifiedItem[key]
+					) {
+						modifiedItem[key] = modifiedItem[key].name;
+					}
+				});
+				return modifiedItem;
+			});
+			this.modifiedData = modifiedVal
+			this.postExportTaskMaster(this.modifiedData);
+		},
 		getDisplayedPageNumbers() {
 			const maxDisplayedPages = 3;
 			let startPage = this.currentPage - Math.floor(maxDisplayedPages / 2);
@@ -80,7 +101,7 @@ export default {
 		this.fetchCategory();
 		console.log(this.query, "<< query");
 	},
-	components: { BlueButton },
+	components: { BlueButton, ExportButton },
 };
 </script>
 
@@ -93,38 +114,43 @@ export default {
 				><BlueButton :type="'button'" :text="'NEW ITEM'"
 			/></RouterLink>
 		</div>
-		<div class="flex flex-row justify-end items-end gap-2 mb-2">
-			<div class="flex flex-row gap-1">
-				<div>Category:</div>
-				<div>
-					<select
-						v-model="itemsData.category"
-						@change="queryAction('filter', itemsData.category)"
-					>
-						<option value="" disabled selected class="text-gray-400">
-							---Select Category---
-						</option>
-						<option
-							v-for="item in categories"
-							:key="item.id"
-							:value="item.id"
-						>
-							{{ item.name }}
-						</option>
-					</select>
-				</div>
+		<div class="flex flex-row justify-between items-center">
+			<div @click.prevent="localPostExport(items)">
+				<ExportButton />
 			</div>
-			<div class="flex flex-row gap-1">
-				<div>Status:</div>
-				<div>
-					<select
-						v-model="itemsData.status"
-						@change="queryAction('filterStatus', itemsData.status)"
-					>
-						<option value="" disabled>---Select Status---</option>
-						<option value="avail">Available</option>
-						<option value="archived">Archived</option>
-					</select>
+			<div class="flex flex-row justify-end items-end gap-2 mb-2">
+				<div class="flex flex-row gap-1">
+					<div>Category:</div>
+					<div>
+						<select
+							v-model="itemsData.category"
+							@change="queryAction('filter', itemsData.category)"
+						>
+							<option value="" disabled selected class="text-gray-400">
+								---Select Category---
+							</option>
+							<option
+								v-for="item in categories"
+								:key="item.id"
+								:value="item.id"
+							>
+								{{ item.name }}
+							</option>
+						</select>
+					</div>
+				</div>
+				<div class="flex flex-row gap-1">
+					<div>Status:</div>
+					<div>
+						<select
+							v-model="itemsData.status"
+							@change="queryAction('filterStatus', itemsData.status)"
+						>
+							<option value="" disabled>---Select Status---</option>
+							<option value="avail">Available</option>
+							<option value="archived">Archived</option>
+						</select>
+					</div>
 				</div>
 			</div>
 		</div>

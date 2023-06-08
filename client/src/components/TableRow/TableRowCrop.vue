@@ -19,11 +19,11 @@ export default {
 			{{ index + 1 }}
 		</td>
 		<td class="h-14">{{ item?.plant?.name }}</td>
-		<td class="h-14">{{ item?.seedlingAge }}</td>
-		<td class="h-14">{{ item?.harvestAge }}</td>
-		<td class="h-14">{{ item?.harvestTime }}</td>
-		<td class="h-14">{{ item?.cropAge }}</td>
-		<td class="h-14">{{ item?.cropProdWeight }}</td>
+		<td class="h-14">{{ item?.seedlingAge }} day</td>
+		<td class="h-14">{{ item?.harvestAge }} day</td>
+		<td class="h-14">{{ item?.harvestTime }} day</td>
+		<td class="h-14">{{ item?.cropAge }} day</td>
+		<td class="h-14">{{ item?.cropProdWeight }} kg</td>
 		<td class="h-14">{{ item?.arcStatus }}</td>
 		<td class="h-14">{{ item?.PlantType?.name }}</td>
 	</tr>

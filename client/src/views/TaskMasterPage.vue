@@ -3,6 +3,7 @@ import { mapActions, mapState, mapWritableState } from "pinia";
 import BlueButton from "../components/Buttons/BlueButton.vue";
 import { useTaskStore } from "../stores/task";
 import {useCsvStore} from '../stores/csv'
+import ExportButton from "../components/Buttons/ExportButton.vue";
 
 export default {
 	name: "TaskMasterPage",
@@ -35,7 +36,7 @@ export default {
 		this.fetchTasks();
 		console.log(this.queries.filter, "<<< queris filter");
 	},
-	components: { BlueButton },
+	components: { BlueButton, ExportButton },
 };
 </script>
 
@@ -49,13 +50,7 @@ export default {
 		</div>
 		<div class="flex flex-row justify-between items-center">
 			<div @click.prevent="postExportTaskMaster(tasks)">
-				<button class="pl-8">
-					<img
-						src="../assets/icons8-export-48.png"
-						alt="export icon"
-						class="w-[25px] hover:opacity-50"
-					/>
-				</button>
+				<ExportButton/>
 			</div>
 			<div class="flex flex-row justify-end items-end gap-3 pr-1 mb-2">
 				<div class="flex flex-row gap-1">

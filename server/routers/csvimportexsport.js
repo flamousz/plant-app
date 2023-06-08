@@ -4,6 +4,6 @@ const csvimportexsportRouter = express.Router()
 
 
 
-csvimportexsportRouter.get('/export', CsvController.taskMasterExport)
+csvimportexsportRouter.post('/export', CsvController.taskMasterExport)
 
 module.exports = csvimportexsportRouter

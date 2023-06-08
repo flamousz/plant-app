@@ -2,11 +2,14 @@
 import { mapActions, mapState } from "pinia";
 import { useSeedStore } from "../stores/seed";
 import { useSeedNurseryStore } from "../stores/seedNursery";
+import { useCsvStore } from "../stores/csv";
+import ExportButton from "../components/Buttons/ExportButton.vue";
 
 export default {
 	name: "SeedNurseryPage",
 	data() {
 		return {
+			modifiedData: [],
 			itemsData: {
 				id: null,
 				SeedId: null,
@@ -18,6 +21,7 @@ export default {
 			"fetchSeedNursery",
 			"patchSeedNursery",
 		]),
+		...mapActions(useCsvStore, ["postExportTaskMaster"]),
 		...mapActions(useSeedStore, ["fetchSeed"]),
 		formatDate(date) {
 			if (!date) {
@@ -29,6 +33,43 @@ export default {
 				day: "numeric",
 			});
 		},
+		localPostExport(val) {
+			const modifiedVal = val.map((item) => {
+				const modifiedItem = { ...item };
+				//  optional chaining 
+				modifiedItem['plantName'] = modifiedItem['PlantSchedule']?.PlantSheet?.plant?.name;
+
+				Object.keys(modifiedItem).forEach((key) => {
+					if (key === "Item") {
+						modifiedItem["seedBrand"] = modifiedItem[key].name;
+						delete modifiedItem[key];
+					} else if (
+						typeof modifiedItem[key] === "object" &&
+						modifiedItem[key] !== null &&
+						"name" in modifiedItem[key]
+					) {
+						modifiedItem[key] = modifiedItem[key].name;
+					}
+				});
+				
+				modifiedItem["seedlingDate"] = modifiedItem["PlantSchedule"]?.seedlingDate
+					? this.formatDate(modifiedItem["PlantSchedule"].seedlingDate)
+					: undefined;
+
+				modifiedItem["plantingDate"] = modifiedItem["PlantSchedule"]?.plantingDate
+					? this.formatDate(modifiedItem["PlantSchedule"].plantingDate)
+					: undefined;
+
+				
+				
+				delete modifiedItem['PlantSchedule']
+				delete modifiedItem['SeedId']
+				return modifiedItem;
+			});
+
+			this.modifiedData = modifiedVal;
+			this.postExportTaskMaster(this.modifiedData);
+		},
 	},
 	computed: {
 		...mapState(useSeedNurseryStore, ["seedNursery"]),
@@ -38,14 +79,25 @@ export default {
 		this.fetchSeedNursery();
 		this.fetchSeed();
 	},
+	components: { ExportButton },
 };
 </script>
 
 <template>
+	<!-- <div class="flex flex-row gap-3">
+		<pre>{{ seedNursery }}</pre>
+		<pre>{{ modifiedData }}</pre>
+	</div> -->
+
 	<section
 		id="seed-nursery-full-page"
 		class="bg-blue-100 p-4 w-full flex flex-col"
 	>
+		<div class="flex flex-row justify-between items-center">
+			<div @click.prevent="localPostExport(seedNursery)">
+				<ExportButton />
+			</div>
+		</div>
 		<table class="w-full">
 			<thead
 				class="bg-gray-400 h-10 whitespace-nowrap border-b-2 tracking-wide text-center border-gray-700"
@@ -86,7 +138,10 @@ export default {
 					<td v-if="item.SeedId" class="h-14">
 						{{ item.Item.name }} - {{ item.Item.description }}
 					</td>
-					<td v-if="!item.SeedId" class="h-14 flex flex-row gap-2 justify-center items-center" >
+					<td
+						v-if="!item.SeedId"
+						class="h-14 flex flex-row gap-2 justify-center items-center"
+					>
 						<select id="seed-option" v-model="itemsData.SeedId">
 							<option
 								v-for="item in seed"
@@ -100,7 +155,7 @@ export default {
 							@click.prevent="
 								patchSeedNursery(item.id, itemsData.SeedId)
 							"
-							class="border-2 border-black rounded-md h-[35px] px-2 bg-red-300 hover:bg-red-400 active:bg-red-500 "
+							class="border-2 border-black rounded-md h-[35px] px-2 bg-red-300 hover:bg-red-400 active:bg-red-500"
 						>
 							submit
 						</button>

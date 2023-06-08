@@ -53,7 +53,7 @@ class seedNurseriesController {
 					},
 				],
 				attributes: {
-					exclude: ["createdAt", "updatedAt"],
+					exclude: ["createdAt", "updatedAt", 'PlantScheduleId'],
 				},
 				order: [["createdAt", "DESC"]],
 			};
@@ -173,7 +173,7 @@ class seedNurseriesController {
 							"seedlingDate",
 							"plantingDate",
 							"code",
-							"status",
+							"statusPlantSchedule",
 							"seedNursery",
 							"totalPopulation"
 						],
