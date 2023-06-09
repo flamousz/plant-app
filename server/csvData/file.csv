@@ -1,47 +1,5 @@
-number,Status Nursery,Plant Name,Seed Brand,Seedling Date,Planting Date
-1,draft,Siomak,Bayam Hijau,13 August 2023,16 August 2023
-2,draft,Lolorosa,Bayam Merah,6 November 2023,8 November 2023
-3,draft,Siomak,Paprika Kuning,30 April 2023,3 May 2023
-4,draft,Lolorosa,Tomat Lokal ,23 May 2023,25 May 2023
-5,draft,Siomak,Tomat Ceri,22 May 2023,25 May 2023
-6,draft,Siomak,Pakchoy,2 June 2023,5 June 2023
-7,draft,Siomak,Selada Keriting,27 May 2023,30 May 2023
-8,draft,Lolorosa,Lettuce,29 May 2023,31 May 2023
-9,draft,Lolorosa,Brokoli,20 June 2023,25 June 2023
-10,draft,Siomak,Kangkung,11 June 2023,14 June 2023
-11,,Siomak,Poleng,24 May 2023,27 May 2023
-12,,Lolorosa,Kyuri,25 May 2023,27 May 2023
-13,,Lolorosa,Tomat Ceri,,25 May 2023
-14,,Lolorosa,Tomat Lokal ,28 June 2023,30 June 2023
-15,,Lolorosa,Buncis,24 May 2023,26 May 2023
-16,,Lolorosa,Paprika Kuning,3 April 2023,5 April 2023
-17,,Lolorosa,Jagung Ketan,3 April 2023,5 April 2023
-18,,Lolorosa,Naibay,21 May 2023,23 May 2023
-19,,Lolorosa,Kale Merah,22 May 2023,24 May 2023
-20,,Lolorosa,Paprika Kuning,28 May 2023,30 May 2023
-21,,Lolorosa,Buncis,16 May 2023,18 May 2023
-22,,Lolorosa,Butterhead,23 May 2023,25 May 2023
-23,,Lolorosa,Kembang Kol,21 May 2023,23 May 2023
-24,,Lolorosa,Lolorosa,20 May 2023,22 May 2023
-25,,Lolorosa,Lolorosa,20 May 2023,22 May 2023
-26,,Lolorosa,Lolorosa,20 May 2023,22 May 2023
-27,,Lolorosa,Lolorosa,20 May 2023,22 May 2023
-28,,Lolorosa,Lolorosa,20 May 2023,22 May 2023
-29,,Lolorosa,Lolorosa,20 May 2023,22 May 2023
-30,,Lolorosa,Lolorosa,23 May 2023,25 May 2023
-31,,Lolorosa,Naibay,21 May 2023,23 May 2023
-32,,Lolorosa,Kembang Kol,19 May 2023,21 May 2023
-33,,Bayam Hijau,Paprika Kuning,19 May 2023,22 May 2023
-34,,Brokoli,Brokoli,12 May 2023,18 May 2023
-35,,Brokoli,Brokoli,15 May 2023,17 May 2023
-36,,Rocket ,Paprika Merah,5 May 2023,17 May 2023
-37,,Tomat Ceri,Buncis,30 April 2023,21 May 2023
-38,,Tomat Ceri,Bayam Merah,3 May 2023,24 May 2023
-39,,Tomat Ceri,Kangkung,7 May 2023,28 May 2023
-40,,Tomat Ceri,Lolorosa,11 May 2023,1 June 2023
-41,,Tomat Ceri,Paprika Kuning,21 April 2023,12 May 2023
-42,,Brokoli,Naibay,7 May 2023,19 May 2023
-43,,Rocket ,Paprika Kuning,7 May 2023,19 May 2023
-44,,Rocket ,Paprika Kuning,6 May 2023,18 May 2023
-45,,Tomat Beef,Tomat Beef,,16 May 2023
-46,,Kyuri,Basil,29 April 2023,11 May 2023
+number,Name,Task Per Minute,Description,Status,Arc Status
+1,Memanen,3.1,,draft,avail
+2,menyiram,3.4,pesticide,confirm,avail
+3,menyebor,3.8,fertilizer,draft,avail
+4,memberi nutrisi,2.8,material,draft,avail

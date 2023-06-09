@@ -7,11 +7,14 @@ import BlueButton from "../components/Buttons/BlueButton.vue";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 import SideBar from "../components/SideBar.vue";
+import ExportButton from "../components/Buttons/ExportButton.vue";
+import { useCsvStore } from "../stores/csv";
 
 export default {
 	name: "PlantSchedulePage",
 	data() {
 		return {
+			modifiedData: [],
 			itemsData: {
 				filterPlant: "",
 				filterLocation: "",
@@ -24,6 +27,39 @@ export default {
 		...mapActions(usePlantScheduleStore, ["fetchPlantSchedules"]),
 		...mapActions(useItemStore, ["fetchPlant"]),
 		...mapActions(useCropAreaStore, ["fetchAllCropArea"]),
+		...mapActions(useCsvStore, ["postExportTaskMaster"]),
+		deleteObjectPropertiesOfType(obj, type) {
+			Object.keys(obj).forEach((key) => {
+				if (typeof obj[key] === type && obj[key] !== null) {
+					delete obj[key];
+				}
+			});
+		},
+		localPostExport(val) {
+			const modifiedVal = val.map((item) => {
+				const modifiedItem = { ...item };
+
+				modifiedItem.plantName = modifiedItem.PlantSheet?.plant?.name;
+				modifiedItem.Location = modifiedItem.CropArea?.name;
+
+				const dateFields = ["seedlingDate","plantingDate","harvestDate","unloadDate"];
+				dateFields.forEach((field) => {
+					modifiedItem[field] = this.formatDate(modifiedItem[field]);
+				});
+
+				const fieldsToDelete = ["PlantSchedule","seedNursery","CropAreaId","PlantsheetId"];
+				fieldsToDelete.forEach((field) => {
+					delete modifiedItem[field];
+				});
+
+				this.deleteObjectPropertiesOfType(modifiedItem, "object");
+
+				return modifiedItem;
+			});
+
+			this.modifiedData = modifiedVal;
+			this.postExportTaskMaster(this.modifiedData);
+		},
 		formatDate(date) {
 			if (!date) {
 				return "";
@@ -74,11 +110,16 @@ export default {
 		this.fetchPlantSchedules();
 		// console.log(typeof this.plantSchedules[0].seedlingDate, '<<< seedlingDate');
 	},
-	components: { BlueButton, SideBar },
+	components: { BlueButton, SideBar, ExportButton },
 };
 </script>
 
 <template>
+	<!-- <div class="flex flex-row gap-1">
+		<pre>plantSchedules{{ plantSchedules }}</pre>
+		<pre>modifiedData{{ modifiedData }}</pre>
+	</div> -->
+
 	<!-- <pre>{{ itemsData.filterDate }}</pre> -->
 	<!-- <SideBar/> -->
 	<div class="bg-blue-100 p-4 w-full h-screen flex flex-col static">
@@ -89,6 +130,9 @@ export default {
 		</div>
 		<div class="flex flex-row justify-between items-start gap-2 mb-2">
 			<div class="flex flex-row gap-2">
+				<div @click.prevent="localPostExport(plantSchedules)">
+					<ExportButton />
+				</div>
 				<div class="flex flex-row gap-1">
 					<div>
 						<select
@@ -108,8 +152,8 @@ export default {
 				</div>
 				<div class="flex flex-row gap-1 pl-4">
 					<div class="flex flex-col">
-						<div >
-							<select v-model="itemsData.filterDate" >
+						<div>
+							<select v-model="itemsData.filterDate">
 								<option value="" disabled selected>
 									--Select Date Type--
 								</option>

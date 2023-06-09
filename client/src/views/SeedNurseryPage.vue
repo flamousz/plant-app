@@ -5,6 +5,27 @@ import { useSeedNurseryStore } from "../stores/seedNursery";
 import { useCsvStore } from "../stores/csv";
 import ExportButton from "../components/Buttons/ExportButton.vue";
 
+/**
+ * No	Plant	Date	Block	HST	Task	Duration	Fixed Duration	
+Work Time
+Start
+Finish
+Employee	Status
+
+// udshf 239uhksd iwdhf92hiu soz03h ihuxcv iuhwe4857 iuhds1038 iuhznqui 9328 
+
+please modify the code to add new property with name 'employees' and the value of property with typeof string  based on iteration od each index EmployeeTaskPlantsheettaskScheduleConjunctions property with value EmployeeTaskPlantsheettaskScheduleConjunctions[i].employeecon.empl
+
+The new code adds the 'employees' property to each item in the 'modifiedVal' array. It iterates over the 'EmployeeTaskPlantsheettaskScheduleConjunctions' array of each item using the map function. For each conjunction, it retrieves the value of 'employeecon.empl' and adds it to the 'employees' array. Finally, it applies a filter to keep only the values of type 'string'.
+
+Make sure to uncomment the line // this.postExportTaskMaster(this.modifiedData); if you want to call the postExportTaskMaster function with the modified data.
+
+I hope this modification helps! Let me know if you have any further questions.
+
+sometime EmployeeTaskPlantsheettaskScheduleConjunctions is empty array please handle that case too
+ */
+
+
 export default {
 	name: "SeedNurseryPage",
 	data() {
