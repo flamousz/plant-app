@@ -2,6 +2,8 @@
 import { mapActions, mapState, mapWritableState } from "pinia";
 import { useEmployeeStore } from "../stores/employee";
 import BlueButton from '../components/Buttons/BlueButton.vue'
+import { useCsvStore } from "../stores/csv";
+import ExportButton from "../components/Buttons/ExportButton.vue";
 
 export default {
 	name: "EmployeePage",
@@ -16,6 +18,7 @@ export default {
 		}
 	},
 	methods: {
+		...mapActions(useCsvStore, ['postExportTaskMaster']),
 		...mapActions(useEmployeeStore, ["fetchEmployee"]),
 		queryAction(params, val) {
 			console.log(params, val, "ini query action");
@@ -37,7 +40,7 @@ export default {
 	created() {
 		this.fetchEmployee();
 	},
-	components: {BlueButton}
+	components: { BlueButton, ExportButton }
 };
 </script>
 
@@ -49,7 +52,10 @@ export default {
 				><BlueButton :type="'button'" :text="'+ Employee'"
 			/></RouterLink>
 		</div>
-		<div class="flex flex-row justify-end items-end gap-2 mb-2">
+		<div class="flex flex-row justify-between items-center">
+			<div @click.prevent="postExportTaskMaster(employees)">
+				<ExportButton/>
+			</div>
 			<div class="flex flex-row gap-1">
 				<div>Status:</div>
 				<div>

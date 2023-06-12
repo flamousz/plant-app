@@ -247,7 +247,7 @@ class ItemController {
 					},
 				],
 				attributes: {
-					exclude: ["createdAt", "updatedAt"],
+					exclude: ["createdAt", "updatedAt", 'categoryid', 'uomid', 'standardqty', 'status'],
 				},
 				order: [["createdAt", "DESC"]],
 			};

@@ -2,6 +2,8 @@
 import { mapActions, mapState, mapWritableState } from "pinia";
 import { useCategoryStore } from "../stores/category";
 import BlueButton from '../components/Buttons/BlueButton.vue'
+import ExportButton from "../components/Buttons/ExportButton.vue";
+import { useCsvStore } from "../stores/csv";
 
 export default {
 	name: "CategoryPage",
@@ -17,6 +19,7 @@ export default {
 	},
 	methods: {
 		...mapActions(useCategoryStore, ['fetchCategory']),
+		...mapActions(useCsvStore,['postExportTaskMaster']),
 		queryAction(params, val) {
 			console.log(params, val, "ini query action");
 			if (params === "filter") {
@@ -36,19 +39,22 @@ export default {
 	created() {
 		this.fetchCategory();
 	},
-	components: {BlueButton}
+	components: { BlueButton, ExportButton }
 };
 </script>
 
 <template>
-    <!-- <pre>{{ employees }}</pre> -->
+    <!-- <pre>{{ categories }}</pre> -->
 	<div class="bg-blue-100 p-4 w-full h-full flex flex-col static">
 		<div class="z-40 fixed bottom-6 right-7 flex opacity-50 hover:opacity-90">
-			<RouterLink to="/categoryform"
+			<RouterLink to="/category/form"
 				><BlueButton :type="'button'" :text="'+ Category'"
 			/></RouterLink>
 		</div>
-		<div class="flex flex-row justify-end items-end gap-2 mb-2">
+		<div class="flex flex-row justify-between items-center">
+			<div @click.prevent="postExportTaskMaster(categories)">
+				<ExportButton/>
+			</div>
 			<div class="flex flex-row gap-1">
 				<div>Status:</div>
 				<div>

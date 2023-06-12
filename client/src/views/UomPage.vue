@@ -1,54 +1,61 @@
 <script>
 import { mapActions, mapState, mapWritableState } from "pinia";
 import { useUomStore } from "../stores/uom";
-import BlueButton from '../components/Buttons/BlueButton.vue'
+import BlueButton from "../components/Buttons/BlueButton.vue";
+import ExportButton from "../components/Buttons/ExportButton.vue";
+import { useCsvStore } from "../stores/csv";
 
 export default {
 	name: "UomPage",
-	data(){
-		return{
+	data() {
+		return {
 			itemsData: {
 				status: null,
 			},
 			queries: {
-				filter: ""
+				filter: "",
 			},
-		}
+		};
 	},
 	methods: {
+		...mapActions(useCsvStore, ['postExportTaskMaster']),
 		...mapActions(useUomStore, ["fetchUom"]),
 		queryAction(params, val) {
 			console.log(params, val, "ini query action");
 			if (params === "filter") {
 				this.queries.filter = val;
 			}
-			
+
 			this.query = {
 				filter: this.queries.filter,
 			};
 			this.fetchUom();
-		}
+		},
 	},
 	computed: {
-		...mapWritableState(useUomStore, ['query']),
+		...mapWritableState(useUomStore, ["query"]),
 		...mapState(useUomStore, ["uoms"]),
 	},
 	created() {
 		this.fetchUom();
 	},
-	components: {BlueButton}
+	components: { BlueButton, ExportButton },
 };
 </script>
 
 <template>
-    <!-- <pre>{{ employees }}</pre> -->
+	<!-- <pre>{{ employees }}</pre> -->
+	<!-- <pre>{{ uoms }}</pre> -->
 	<div class="bg-blue-100 p-4 w-full h-full flex flex-col static">
 		<div class="z-40 fixed bottom-6 right-7 flex opacity-50 hover:opacity-90">
-			<RouterLink to="/uomform"
+			<RouterLink to="/uom/form"
 				><BlueButton :type="'button'" :text="'+ Uom'"
 			/></RouterLink>
 		</div>
-		<div class="flex flex-row justify-end items-end gap-2 mb-2">
+		<div class="flex flex-row justify-between items-center">
+			<div @click.prevent="postExportTaskMaster(uoms)">
+				<ExportButton/>
+			</div>
 			<div class="flex flex-row gap-1">
 				<div>Status:</div>
 				<div>
@@ -63,7 +70,7 @@ export default {
 				</div>
 			</div>
 		</div>
-		<table class="w-full ">
+		<table class="w-full">
 			<thead
 				class="bg-gray-400 h-10 whitespace-nowrap border-b-2 tracking-wide text-center border-gray-700"
 			>
@@ -84,13 +91,13 @@ export default {
 					:key="item.id"
 				>
 					<td class="h-14">
-						{{ index+1 }}
+						{{ index + 1 }}
 					</td>
 					<td class="h-14">{{ item?.name }}</td>
 					<td class="h-14">{{ item?.description }}</td>
 					<td class="h-14">{{ item?.arcStatus }}</td>
 				</tr>
-			</tbody>		
+			</tbody>
 		</table>
 	</div>
 </template>

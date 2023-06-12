@@ -1,8 +1,7 @@
-<script>
+<script >
 import { mapActions, mapState } from "pinia";
 import TableRow4Colum from "../components/TableRow/TableRow4Colum.vue";
 import { useSeedNurseryStore } from "../stores/seedNursery";
-
 export default {
 	name: "SeedNurseryDetailPage",
 	data() {

@@ -815,17 +815,172 @@ class PlantScheduleController {
 			const opt = {
 				include: [
 					{
-						model: CropArea,
-						attributes: ["name", "area"],
+						model: PlantsheetTaskScheduleConjunction,
+						include: {
+							model: PlantsheetTaskConjunction,
+							include: {
+								model: Task,
+								attributes: ["name"],
+							},
+							where: {
+								[Op.or]: [
+									{
+										description: "hst",
+									},
+									{
+										description: "processing",
+									},
+								],
+							},
+						},
+						attributes: {
+							exclude: ["createdAt", "updatedAt"],
+						},
 					},
 					{
 						model: PlantSheet,
-						include: {
-							model: Item,
-							as: "plant",
-							attributes: ["name"],
+						include: [
+							{
+								model: PlantsheetTaskConjunction,
+								include: [
+									{
+										model: Task,
+										attributes: [
+											"name",
+											"TaskPerMinute",
+											"description",
+										],
+									},
+									{
+										model: Item,
+										attributes: ["name", "arcStatus"],
+									},
+								],
+								attributes: [
+									"id",
+									"PlantSheetId",
+									"day",
+									"description",
+								],
+								separate: true,
+								where: {
+									[Op.or]: [
+										{
+											description: "hst",
+										},
+										{
+											description: "processing",
+										},
+									],
+								},
+								order: [["id", "ASC"]],
+							},
+							{
+								model: Item,
+								as: "plant",
+								attributes: ["name", "code"],
+							},
+							{
+								model: PlantType,
+								attributes: ["name"],
+							},
+							{
+								model: SeedConjunction,
+								attributes: ["id", "seedid", "plantsheetid"],
+								include: {
+									model: Item,
+									attributes: ["name", "description", "standardqty"],
+								},
+							},
+							{
+								model: fertilizerConjunction,
+								attributes: [
+									"id",
+									"dose",
+									"fertilizerid",
+									"plantsheetid",
+									"type",
+								],
+								include: {
+									model: Item,
+									attributes: ["name", "standardqty", "description"],
+									include: [
+										{
+											model: Uom,
+											attributes: ["name"],
+										},
+									],
+								},
+								where: {
+									type: "planting",
+								},
+							},
+							{
+								model: PesticideConjunction,
+								attributes: [
+									"id",
+									"dose",
+									"pesticideid",
+									"plantsheetid",
+									"type",
+								],
+								include: {
+									model: Item,
+									attributes: ["name", "standardqty", "description"],
+									include: [
+										{
+											model: Uom,
+											attributes: ["name"],
+										},
+										{
+											model: Category,
+											attributes: ["name"],
+										},
+									],
+								},
+								where: {
+									type: "planting",
+								},
+							},
+							{
+								model: materialConjunction,
+								attributes: [
+									"id",
+									"dose",
+									"materialid",
+									"plantsheetid",
+									"type",
+								],
+								include: {
+									model: Item,
+									attributes: ["name", "standardqty", "description"],
+									include: [
+										{
+											model: Uom,
+											attributes: ["name"],
+										},
+									],
+								},
+								where: {
+									type: "planting",
+								},
+							},
+						],
+						attributes: {
+							exclude: ["createdAt", "updatedAt"],
 						},
-						attributes: ["seedlingAge", "harvestAge", "harvestTime"],
+					},
+					{
+						model: HarvestOutcome,
+						attributes: {
+							exclude: ["createdAt", "updatedAt"],
+						},
+					},
+					{
+						model: CropArea,
+						attributes: {
+							exclude: ["createdAt", "updatedAt", 'map', 'status', 'arcStatus'],
+						},
 					},
 				],
 				attributes: {
