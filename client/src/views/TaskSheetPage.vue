@@ -1,4 +1,4 @@
-<script>
+<script >
 import { mapActions, mapState, mapWritableState } from "pinia";
 import { useTaskSheetStore } from "../stores/taskSheet";
 import { useEmployeeStore } from "../stores/employee";

@@ -36,28 +36,155 @@ export default {
 			});
 		},
 		localPostExport(val) {
-			const modifiedVal = val.map((item) => {
-				const modifiedItem = { ...item };
+			let multipliedVal = [];
+			val.forEach((obj) => {
+				let fertilizerCount = 0;
+				if (obj.PlantSheet) {
+					fertilizerCount = obj.PlantSheet.fertilizerConjunctions.length;
+				}
+				let pesticideCount = 0;
+				if (obj.PlantSheet) {
+					pesticideCount = obj.PlantSheet.PesticideConjunctions.length;
+				}
+				let materialCount = 0;
+				if (obj.PlantSheet) {
+					materialCount = obj.PlantSheet.materialConjunctions.length;
+				}
+				let plantsheetTaskCount = 0;
+				if (obj.PlantSheet) {
+					plantsheetTaskCount = obj.PlantSheet.PlantsheetTaskConjunctions.length;
+				}
+				let harvestOutcomesCount = 0;
+				if (obj.PlantsheetTaskConjunctions) {
+					harvestOutcomesCount = obj.HarvestOutcomes.length;
+				}
+				const maxCount = Math.max(
+					fertilizerCount,
+					pesticideCount,
+					materialCount,
+					plantsheetTaskCount,
+					harvestOutcomesCount
+				);
 
-				modifiedItem.plantName = modifiedItem.PlantSheet?.plant?.name;
-				modifiedItem.Location = modifiedItem.CropArea?.name;
-
-				const dateFields = ["seedlingDate","plantingDate","harvestDate","unloadDate"];
-				dateFields.forEach((field) => {
-					modifiedItem[field] = this.formatDate(modifiedItem[field]);
-				});
-
-				const fieldsToDelete = ["PlantSchedule","seedNursery","CropAreaId","PlantsheetId"];
-				fieldsToDelete.forEach((field) => {
-					delete modifiedItem[field];
-				});
-
-				this.deleteObjectPropertiesOfType(modifiedItem, "object");
-
-				return modifiedItem;
+				for (let i = 0; i < maxCount; i++) {
+					const modifiedItem = {
+						id: i === 0 ? obj.id : "",
+						plant: i === 0 ? obj.PlantSheet.plant.name : "",
+						code: i === 0 ? obj.code : "",
+						PlantType: i === 0 ? obj.PlantSheet.PlantType.name : "",
+						seedlingAge: i === 0 ? obj.PlantSheet.seedlingAge : "",
+						harvestAge: i === 0 ? obj.PlantSheet.harvestAge : "",
+						harvestTime: i === 0 ? obj.PlantSheet.harvestTime : "",
+						cropAge: i === 0 ? obj.PlantSheet.cropAge : "",
+						plantPerMetre: i === 0 ? obj.PlantSheet.plantPerMetre : "",
+						fallacyNursery: i === 0 ? obj.PlantSheet.fallacyNursery : "",
+						cropProdWeight: i === 0 ? obj.PlantSheet.cropProdWeight : "",
+						seedlingDate:
+							i === 0 ? this.formatDate(obj.seedlingDate) : "",
+						plantingDate:
+							i === 0 ? this.formatDate(obj.plantingDate) : "",
+						harvestDate: i === 0 ? this.formatDate(obj.harvestDate) : "",
+						unloadDate: i === 0 ? this.formatDate(obj.unloadDate) : "",
+						totalPopulation: i === 0 ? obj.totalPopulation : "",
+						statusPlantSchedule: i === 0 ? obj.statusPlantSchedule : "",
+						BlockName: i === 0 ? obj.CropArea.name : "",
+						BlockArea: i === 0 ? obj.CropArea.area : "",
+						BlockType: i === 0 ? obj.CropArea.type : "",
+						BlockDetailLocation: i === 0 ? obj.CropArea.detailplace : "",
+						"task.name": "",
+						"task.day": "",
+						"task.description": "",
+						"task.TaskPerMinute": "",
+						"task.toolCategory": "",
+						"task.toolName": "",
+						"pesticide.name": "",
+						"pesticide.standardqty": "",
+						"pesticide.Uom": "",
+						"pesticide.description": "",
+						"pesticide.type": "",
+						"fertilizer.name": "",
+						"fertilizer.standardqty": "",
+						"fertilizer.Uom": "",
+						"fertilizer.description": "",
+						"fertilizer.type": "",
+						"material.name": "",
+						"material.standardqty": "",
+						"material.Uom": "",
+						"material.description": "",
+						"material.type": "",
+						"harvestOutcome.letterNumber": "",
+						"harvestOutcome.harvestDate": "",
+						"harvestOutcome.harvestWeightEst": "",
+						"harvestOutcome.harvestWeightReal": "",
+					};
+					if (i < harvestOutcomesCount) {
+						const harvestOutcome = obj.HarvestOutcomes[i];
+						modifiedItem["harvestOutcome.letterNumber"] =
+							harvestOutcome?.letterNumber;
+						modifiedItem["harvestOutcome.harvestDate"] =
+							harvestOutcome?.harvestDate;
+						modifiedItem["harvestOutcome.harvestWeightEst"] =
+							harvestOutcome?.harvestWeightEst;
+						modifiedItem["harvestOutcome.harvestWeightReal"] =
+							harvestOutcome?.Task?.harvestWeightReal;
+					}
+					if (i < plantsheetTaskCount) {
+						const taskConjunction = obj.PlantSheet.PlantsheetTaskConjunctions[i];
+						modifiedItem["task.name"] = taskConjunction?.Task?.name;
+						modifiedItem["task.day"] = taskConjunction?.day;
+						modifiedItem["task.description"] =
+							taskConjunction?.description;
+						modifiedItem["task.TaskPerMinute"] =
+							taskConjunction?.Task?.TaskPerMinute;
+						modifiedItem["task.toolCategory"] =
+							taskConjunction?.Task?.description;
+						modifiedItem["task.toolName"] = taskConjunction?.Item?.name;
+					}
+					if (i < fertilizerCount) {1
+						const fertilizerConjunction =
+							obj.PlantSheet.fertilizerConjunctions[i];
+						modifiedItem["fertilizer.name"] =
+							fertilizerConjunction?.Item?.name;
+						modifiedItem["fertilizer.standardqty"] =
+							fertilizerConjunction?.Item?.standardqty;
+						modifiedItem["fertilizer.Uom"] =
+							fertilizerConjunction?.Item?.Uom?.name;
+						modifiedItem["fertilizer.description"] =
+							fertilizerConjunction?.Item?.description;
+						modifiedItem["fertilizer.type"] = fertilizerConjunction?.type;
+					}
+					if (i < pesticideCount) {
+						const pesticideConjunction =
+							obj.PlantSheet.PesticideConjunctions[i];
+						modifiedItem["pesticide.name"] =
+							pesticideConjunction?.Item?.name;
+						modifiedItem["pesticide.standardqty"] =
+							pesticideConjunction?.Item?.standardqty;
+						modifiedItem["pesticide.Uom"] =
+							pesticideConjunction?.Item?.Uom?.name;
+						modifiedItem["pesticide.description"] =
+							pesticideConjunction?.Item?.description;
+						modifiedItem["pesticide.type"] = pesticideConjunction?.type;
+					}
+					if (i < materialCount) {
+						const materialConjunction =
+							obj.PlantSheet.materialConjunctions[i];
+						modifiedItem["material.name"] =
+							materialConjunction?.Item?.name;
+						modifiedItem["material.standardqty"] =
+							materialConjunction?.Item?.standardqty;
+						modifiedItem["material.Uom"] =
+							materialConjunction?.Item?.Uom?.name;
+						modifiedItem["material.description"] =
+							materialConjunction?.Item?.description;
+						modifiedItem["material.type"] = materialConjunction?.type;
+					}
+					multipliedVal.push(modifiedItem);
+				}
 			});
 
-			this.modifiedData = modifiedVal;
+
+			this.modifiedData = multipliedVal;
 			this.postExportTaskMaster(this.modifiedData);
 		},
 		formatDate(date) {
@@ -232,12 +359,12 @@ export default {
 					<td class="h-14">
 						{{ index + 1 }}
 					</td>
-					<td class="h-14">{{ item?.PlantSheet.plant.name }}</td>
+					<td class="h-14">{{ item?.PlantSheet?.plant?.name }}</td>
 					<td class="h-14">{{ formatDate(item?.seedlingDate) }}</td>
 					<td class="h-14">{{ formatDate(item?.plantingDate) }}</td>
 					<td class="h-14">{{ formatDate(item?.harvestDate) }}</td>
 					<td class="h-14">{{ formatDate(item?.unloadDate) }}</td>
-					<td class="h-14">{{ item?.CropArea.name }}</td>
+					<td class="h-14">{{ item?.CropArea?.name }}</td>
 					<td class="h-14">{{ item?.totalPopulation }}</td>
 				</tr>
 			</tbody>

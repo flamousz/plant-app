@@ -21,12 +21,72 @@ class PlantSheetController {
 				include: [
 					{ model: Item, as: "plant", attributes: ["name"] },
 					{
+						model: PlantsheetTaskConjunction,
+						include: [
+							{
+								model: Task,
+								attributes: ["name", "TaskPerMinute", "description"],
+							},
+							{
+								model: Item,
+								attributes: ["name", "arcStatus"],
+							},
+						],
+						attributes: ["id", "PlantSheetId", "day", "description"],
+						order: [["id", "DESC"]],
+					},
+					{
 						model: PlantType,
 						attributes: ["name"],
 					},
+					{
+						model: fertilizerConjunction,
+						attributes: ["id", "type"],
+						include: {
+							model: Item,
+							attributes: ["name", "standardqty", "description"],
+							include: [
+								{
+									model: Uom,
+									attributes: ["name"],
+								},
+							],
+						},
+						order: [["id", "DESC"]],
+					},
+					{
+						model: PesticideConjunction,
+						attributes: ["id", "type"],
+						include: {
+							model: Item,
+							attributes: ["name", "standardqty", "description"],
+							include: [
+								{
+									model: Uom,
+									attributes: ["name"],
+								},
+							],
+						},
+						order: [["id", "DESC"]],
+					},
+					{
+						model: materialConjunction,
+						attributes: ["id", "type"],
+						include: {
+							model: Item,
+							attributes: ["name", "standardqty", "description"],
+							include: [
+								{
+									model: Uom,
+									attributes: ["name"],
+								},
+							],
+						},
+						order: [["id", "DESC"]],
+					},
 				],
 				attributes: {
-					exclude: ["createdAt", "updatedAt", 'planttypeid', 'plantid', 'plantPerMetre', 'fallacyNursery'],
+					exclude: ["createdAt", "updatedAt", "planttypeid", "plantid"],
 				},
 				order: [["createdAt", "DESC"]],
 				where: {
@@ -150,7 +210,7 @@ class PlantSheetController {
 							},
 						],
 						attributes: ["id", "PlantSheetId", "day", "description"],
-						order: [["id", "DESC"]]
+						order: [["id", "DESC"]],
 					},
 					{
 						model: PlantType,
@@ -159,7 +219,7 @@ class PlantSheetController {
 				],
 				attributes: {
 					exclude: ["createdAt", "updatedAt"],
-				}
+				},
 			});
 
 			if (!data) {

@@ -7,7 +7,7 @@ class CsvController {
 	static async taskMasterExport(req, res, next) {
 		try {
 			const data = req.body
-
+			console.log(data,'<<<<<<<< data di csv controller');
 			// Add index to the data
 			const indexedData = data.map((item, index) => ({ ...item, index: index + 1 }));
 
