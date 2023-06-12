@@ -2,8 +2,9 @@
 import { mapActions, mapState, mapWritableState } from "pinia";
 import BlueButton from "../components/Buttons/BlueButton.vue";
 import { useTaskStore } from "../stores/task";
-import {useCsvStore} from '../stores/csv'
+import { useCsvStore } from "../stores/csv";
 import ExportButton from "../components/Buttons/ExportButton.vue";
+import ImportButton from "../components/Buttons/ImportButton.vue";
 
 export default {
 	name: "TaskMasterPage",
@@ -18,8 +19,19 @@ export default {
 		};
 	},
 	methods: {
+		/*
+			front-end tech stack:
+			vue3 option api, pinia state store
+
+			backend tech stack:
+			node js, sequelize orm, express js, postgres, rest API
+
+			i have import feature to upload csv file from client and send to back end, what input should i use? is it req.file? 
+
+			and if i upload image i can use multer, do you any suggestion to send csv file from front-end to back-end?
+		*/
 		...mapActions(useTaskStore, ["fetchTasks"]),
-		...mapActions(useCsvStore, ['postExportTaskMaster']),
+		...mapActions(useCsvStore, ["postExportTaskMaster"]),
 		queryAction(value) {
 			console.log(value);
 			this.query = {
@@ -36,7 +48,7 @@ export default {
 		this.fetchTasks();
 		console.log(this.queries.filter, "<<< queris filter");
 	},
-	components: { BlueButton, ExportButton },
+	components: { BlueButton, ExportButton, ImportButton },
 };
 </script>
 
@@ -49,8 +61,13 @@ export default {
 			/></RouterLink>
 		</div>
 		<div class="flex flex-row justify-between items-center">
-			<div @click.prevent="postExportTaskMaster(tasks)">
-				<ExportButton/>
+			<div class="flex flex-row  justify-start items-start">
+				<div>
+					<ImportButton />
+				</div>
+				<div @click.prevent="postExportTaskMaster(tasks)">
+					<ExportButton />
+				</div>
 			</div>
 			<div class="flex flex-row justify-end items-end gap-3 pr-1 mb-2">
 				<div class="flex flex-row gap-1">

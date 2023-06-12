@@ -104,7 +104,6 @@ class TaskController {
 			next(error);
 		}
 	}
-
 	static async putTaskSheetVerification(req, res, next) {
 		try {
 			const {

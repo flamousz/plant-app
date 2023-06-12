@@ -5,7 +5,7 @@ export default {
 </script>
 
 <template>
-	<button class="pl-8">
+	<button >
 		<img
 			src="../../assets/icons8-export-48.png"
 			alt="export icon"
